@@ -5,137 +5,258 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>html{color-scheme:light}body{margin:0}@media (prefers-color-scheme:dark){html:not([data-theme="light"]){color-scheme:dark}}</style>
 <title>Jalur IELTS</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* Layout: departure-board header, ticket-style flashcards, one tab per skill. Blue signal + amber board text. */
+/* Tema "kertas kotak-kotak": tinta navy, garis tebal, bayangan keras, label mono. Ada mode terang dan gelap. */
 :root{
-  --bg:#EDF0F5; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#58657A; --line:#D3D9E3;
-  --accent:#1F4FD8; --accent-ink:#FFFFFF; --board:#101B2E; --board-ink:#F5B82E; --board-dim:#8FA0BA;
-  --good:#12805C; --warn:#B26A00; --bad:#C23B3B; --soft:#E4EAF6;
-  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --bg:#E9EFE2; --grid:#D3DCC8; --surface:#FCFDF8; --ink:#0F2040; --muted:#51617A; --line:#C7D1C0; --edge:#0F2040;
+  --accent:#2C58E0; --accent-ink:#FFFFFF; --amber:#F2B632; --navy:#0F2040; --navy-ink:#F4F7FB; --navy-dim:#93A5C3;
+  --good:#1C8A5A; --good-bg:#DCEFE3; --bad:#CF3F3F; --bad-bg:#F8E2DF; --warn:#A8640A;
+  --slate:#BCCBD8; --soft:#E1EADC; --sh:#BCCBD8; --on-bg:#0F2040; --on-ink:#FFFFFF;
+  --board:#0F2040; --board-ink:#F2B632; --board-dim:#93A5C3;
+  --f-display:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0A111C; --surface:#121C2B; --ink:#E7ECF4; --muted:#93A1B6; --line:#24344B;
-  --accent:#7AA2FF; --accent-ink:#0A111C; --board:#060B13; --board-ink:#F2B93B; --board-dim:#6F8099;
-  --good:#4FC79C; --warn:#E0A64A; --bad:#EF7B7B; --soft:#17243A; color-scheme:dark}}
+  --bg:#0B1524; --grid:#13223A; --surface:#101F34; --ink:#E8EFF8; --muted:#8FA2BE; --line:#26395A; --edge:#3D557D;
+  --accent:#86A8FF; --accent-ink:#0B1524; --amber:#F5C04A; --navy:#08111F; --navy-ink:#F4F7FB; --navy-dim:#7F93B2;
+  --good:#4FD1A0; --good-bg:#0F2F29; --bad:#FF8383; --bad-bg:#36191F; --warn:#E3A84C;
+  --slate:#223650; --soft:#16273F; --sh:#050B16; --on-bg:#86A8FF; --on-ink:#0B1524;
+  --board:#08111F; --board-ink:#F5C04A; --board-dim:#7F93B2; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0A111C; --surface:#121C2B; --ink:#E7ECF4; --muted:#93A1B6; --line:#24344B;
-  --accent:#7AA2FF; --accent-ink:#0A111C; --board:#060B13; --board-ink:#F2B93B; --board-dim:#6F8099;
-  --good:#4FC79C; --warn:#E0A64A; --bad:#EF7B7B; --soft:#17243A; color-scheme:dark}
+  --bg:#0B1524; --grid:#13223A; --surface:#101F34; --ink:#E8EFF8; --muted:#8FA2BE; --line:#26395A; --edge:#3D557D;
+  --accent:#86A8FF; --accent-ink:#0B1524; --amber:#F5C04A; --navy:#08111F; --navy-ink:#F4F7FB; --navy-dim:#7F93B2;
+  --good:#4FD1A0; --good-bg:#0F2F29; --bad:#FF8383; --bad-bg:#36191F; --warn:#E3A84C;
+  --slate:#223650; --soft:#16273F; --sh:#050B16; --on-bg:#86A8FF; --on-ink:#0B1524;
+  --board:#08111F; --board-ink:#F5C04A; --board-dim:#7F93B2; color-scheme:dark}
+
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
-  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:860px;margin:0 auto}
-h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.15}
+body{margin:0;background-color:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px;
+  padding-block:0 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:900px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.12;letter-spacing:-.01em}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 
-.board{background:var(--board);color:var(--board-ink);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:18px max(16px,env(safe-area-inset-left,0px)) 16px}
-.board .in{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
-.board h1{font-size:30px;color:#fff;letter-spacing:-.01em}
-.board .sub{font-family:var(--f-mono);font-size:12px;color:var(--board-dim);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
-.board .wk{font-family:var(--f-mono);font-size:13px;text-align:right}
-.board .wk b{display:block;font-size:22px;font-weight:500;color:var(--board-ink)}
-.sync{font-family:var(--f-mono);font-size:11px;color:var(--board-dim);text-transform:uppercase;letter-spacing:.06em}
+/* header */
+.top{position:relative;background:var(--navy);color:var(--navy-ink);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:calc(22px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-left,0px)) 26px;border-bottom:4px solid var(--amber);
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px}
+.top .in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end;justify-content:space-between}
+.kicker{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.top h1{font-size:clamp(34px,8vw,52px);font-weight:700;color:#fff;margin:6px 0 4px;letter-spacing:-.03em}
+.top .sub{font-size:13px;color:var(--navy-dim)}
+.wkbox{min-width:210px;display:grid;gap:8px}
+.wkt{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--f-mono);font-size:12px;color:var(--navy-dim);text-transform:uppercase;letter-spacing:.08em}
+.wkt b{font-size:20px;color:var(--amber);font-weight:700;letter-spacing:0}
+.seg12{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.seg12 i{height:10px;border-radius:2px;background:rgba(255,255,255,.14)}
+.seg12 i.on{background:var(--amber)}
+.seg12 i.now{background:#fff}
+.sync{font-family:var(--f-mono);font-size:11px;color:var(--navy-dim);text-transform:uppercase;letter-spacing:.06em}
 
-nav{display:flex;gap:2px;overflow-x:auto;margin:16px 0;border-bottom:1px solid var(--line)}
-nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;color:var(--muted);font-weight:500;white-space:nowrap}
-nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+/* navigasi */
+nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:12px 2px 12px;margin:0 -2px 14px;background:var(--bg);background-image:inherit;background-size:26px 26px;border-bottom:2px solid var(--edge)}
+nav::-webkit-scrollbar{display:none}
+nav button{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:2px solid var(--edge);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px;white-space:nowrap;color:var(--ink)}
+nav button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav button[aria-selected="true"]{background:var(--on-bg);color:var(--on-ink);border-color:var(--on-bg);box-shadow:3px 3px 0 var(--amber)}
 
-.grid{display:grid;gap:12px}
+/* dasar */
+.grid{display:grid;gap:14px}
 .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px;min-width:0}
-.panel h2{font-size:18px;margin-bottom:10px}
-.lbl{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.big{font-family:var(--f-mono);font-size:30px;font-weight:500;line-height:1.1;margin-top:4px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.panel{background:var(--surface);border:2px solid var(--edge);border-radius:10px;box-shadow:4px 4px 0 var(--sh);padding:18px;min-width:0}
+.panel h2{font-size:20px;margin-bottom:10px}
+.lbl{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.big{font-family:var(--f-display);font-size:34px;font-weight:700;line-height:1.05;margin-top:6px}
 .small{font-size:13px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 
-.today{display:grid;grid-template-columns:auto 1fr auto;gap:8px 16px;align-items:center}
-.today .day{font-family:var(--f-mono);text-transform:uppercase;font-size:13px;color:var(--muted)}
-.today .focus{font-family:var(--f-display);font-size:24px;font-weight:700}
-@media (max-width:520px){.today{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:2px solid var(--edge);border-radius:8px;padding:10px 18px;font-weight:700;box-shadow:3px 3px 0 var(--edge);transition:transform .08s,box-shadow .08s}
+.btn:hover:not([disabled]){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--edge)}
+.btn:active:not([disabled]){transform:translate(3px,3px);box-shadow:0 0 0 var(--edge)}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:none}
+.btn.ghost:hover:not([disabled]){background:var(--soft);transform:none;box-shadow:none}
+.btn.good{background:var(--good);color:#fff}
+.btn.warn{background:var(--amber);color:#0F2040}
+.btn.bad{background:var(--bad);color:#fff}
+.btn.amber{background:var(--amber);color:#0F2040;border-color:#0F2040}
+.btn[disabled]{opacity:.45;cursor:default;box-shadow:none}
 
-.btn{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:4px;padding:9px 16px;font-weight:600}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-.btn.good{background:var(--good);border-color:var(--good);color:#fff}
-.btn.warn{background:transparent;border-color:var(--warn);color:var(--warn)}
-.btn.bad{background:transparent;border-color:var(--bad);color:var(--bad)}
-.btn[disabled]{opacity:.5;cursor:default}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* hero hari ini */
+.hero{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;background:var(--navy);color:var(--navy-ink);border:2px solid var(--edge);border-radius:10px;box-shadow:5px 5px 0 var(--amber);padding:22px;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:22px 22px}
+.hero .kick{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+.hero h2{font-size:clamp(26px,6vw,36px);color:#fff;margin:6px 0 6px}
+.hero p{margin:0;color:var(--navy-dim);max-width:46ch;font-size:14px}
+.stat{display:flex;flex-direction:column;gap:2px;position:relative}
+.stat .lbl{padding-right:42px}
+.stat .ic{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:var(--soft);border:2px solid var(--edge)}
+.stat .ic svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;text-align:left}
+.cta h2{margin:0 0 4px;font-size:20px}
+.cta.alt{background:var(--soft)}
 
-.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.week div{border:1px solid var(--line);border-radius:3px;padding:6px 2px;text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
-.week div.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.week div.now{outline:2px solid var(--board-ink);outline-offset:1px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.week div{border:2px solid var(--edge);border-radius:8px;padding:9px 2px;text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--muted);background:var(--surface)}
+.week div.on{background:var(--good);border-color:var(--edge);color:#fff;font-weight:700}
+.week div.now{box-shadow:0 0 0 3px var(--amber)}
 
-.ticket{display:grid;grid-template-columns:96px 1fr;background:var(--surface);border:1px solid var(--line);border-radius:4px;min-height:230px}
-.ticket .stub{background:var(--board);color:var(--board-ink);padding:14px 10px;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;display:flex;flex-direction:column;justify-content:space-between;border-right:2px dashed var(--bg)}
-.ticket .stub b{font-size:22px;font-weight:500;display:block;color:#fff}
-.ticket .face{padding:20px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
-.ticket .word{font-family:var(--f-display);font-size:34px;font-weight:700;overflow-wrap:anywhere}
-.ticket .mean{font-size:20px;font-weight:600}
-.ticket .ex{color:var(--muted);font-style:italic}
-@media (max-width:520px){.ticket{grid-template-columns:1fr}.ticket .stub{flex-direction:row;border-right:0;border-bottom:2px dashed var(--bg);align-items:center}}
-.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+/* kosakata: poster + kartu */
+.seg{display:inline-grid;grid-auto-flow:column;gap:0;border:2px solid var(--edge);border-radius:10px;overflow:hidden;background:var(--surface);margin-bottom:14px;max-width:100%}
+.seg button{background:transparent;border:0;padding:9px 16px;font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap}
+.seg button+button{border-left:2px solid var(--edge)}
+.seg button[aria-pressed="true"]{background:var(--on-bg);color:var(--on-ink)}
+.poster{background:var(--surface);border:2px solid var(--edge);border-radius:10px;box-shadow:5px 5px 0 var(--sh);padding:22px 20px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+.poster h2{font-size:clamp(32px,8vw,48px);font-weight:700;letter-spacing:-.035em;margin-bottom:4px}
+.poster .lead{margin:0 0 14px;color:var(--muted);font-size:13px}
+.vl{list-style:none;margin:0;padding:0;display:grid;gap:0;counter-reset:v}
+.vl li{display:grid;grid-template-columns:34px 1fr;gap:4px 8px;padding:13px 0;border-top:2px dashed var(--line);align-items:baseline}
+.vl li:first-child{border-top:0}
+.vl .n{font-family:var(--f-mono);font-weight:700;font-size:15px;color:var(--muted)}
+.vl .w{font-family:var(--f-display);font-size:clamp(22px,5.5vw,28px);font-weight:700;letter-spacing:-.02em;overflow-wrap:anywhere}
+.vl .p{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin:0 6px}
+.vl .m{font-size:16px}
+.vl .x{grid-column:2;font-size:13px;color:var(--muted);font-style:italic}
+.flash{display:grid;grid-template-columns:104px 1fr;background:var(--surface);border:2px solid var(--edge);border-radius:10px;box-shadow:5px 5px 0 var(--sh);min-height:250px;overflow:hidden}
+.flash .stub{background:var(--navy);color:var(--amber);padding:16px 12px;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;display:flex;flex-direction:column;justify-content:space-between;border-right:3px dashed var(--bg)}
+.flash .stub b{font-size:24px;display:block;color:#fff;letter-spacing:0}
+.flash .face{padding:22px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+.flash .word{font-family:var(--f-display);font-size:clamp(32px,8vw,44px);font-weight:700;letter-spacing:-.03em;overflow-wrap:anywhere}
+.flash .pos{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.flash .mean{font-size:22px;font-weight:700}
+.flash .ex{color:var(--muted);font-style:italic}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+@media (max-width:520px){.flash{grid-template-columns:1fr}.flash .stub{flex-direction:row;border-right:0;border-bottom:3px dashed var(--bg);align-items:center}}
 
-textarea,input[type=number],select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px;min-width:0}
-textarea{min-height:260px;resize:vertical;line-height:1.6}
-.field{display:flex;flex-direction:column;gap:4px}
-.field label{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.timer{font-family:var(--f-mono);font-size:44px;font-weight:500;letter-spacing:.02em}
+/* formulir */
+textarea,input[type=number],input[type=text],input[type=password],select{width:100%;background:var(--surface);border:2px solid var(--edge);border-radius:8px;padding:10px 12px;min-width:0}
+textarea{min-height:260px;resize:vertical;line-height:1.65}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.timer{font-family:var(--f-mono);font-size:46px;font-weight:700;letter-spacing:.02em}
 .timer.low{color:var(--bad)}
-.card-cue{border:1px solid var(--line);border-left:4px solid var(--board-ink);padding:12px 16px;background:var(--soft);border-radius:3px}
+.card-cue{border:2px solid var(--edge);border-left:8px solid var(--amber);padding:14px 18px;background:var(--soft);border-radius:8px}
 .card-cue ul{margin:6px 0 0;padding-left:20px}
 
 table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
-th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+th,td{text-align:left;padding:9px 6px;border-bottom:2px solid var(--line)}
+th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
 td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
-.bars{display:grid;gap:8px}
+.bars{display:grid;gap:10px}
 .bar{display:grid;grid-template-columns:84px 1fr 36px;gap:8px;align-items:center;font-size:13px}
-.bar i{display:block;height:10px;background:var(--soft);border-radius:2px;position:relative}
-.bar i span{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:2px}
-.bar i em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--board-ink)}
+.bar i{display:block;height:14px;background:var(--soft);border:2px solid var(--edge);border-radius:4px;position:relative}
+.bar i span{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.bar i em{position:absolute;top:-5px;bottom:-5px;width:3px;background:var(--amber);border-left:1px solid var(--edge)}
 svg text{font-family:var(--f-mono);font-size:11px}
 .gl{stroke:var(--line);stroke-width:1}
 .tx{fill:var(--muted)}
-.ln{fill:none;stroke:var(--accent);stroke-width:2.5}
+.ln{fill:none;stroke:var(--accent);stroke-width:3}
 .dot{fill:var(--accent);stroke:var(--surface);stroke-width:2}
-.tg{stroke:var(--board-ink);stroke-width:2;stroke-dasharray:6 4}
-.tgt{fill:var(--warn);font-weight:500}
-.empty{padding:20px;border:1px dashed var(--line);border-radius:4px;color:var(--muted);text-align:center}
-@media (prefers-reduced-motion:no-preference){.btn{transition:filter .15s}.btn:hover{filter:brightness(1.08)}}
-@media (max-width:520px){.board .wk{text-align:left}}
-.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-.prog{height:6px;background:var(--soft);border-radius:3px;margin:10px 0 14px;overflow:hidden}
-.prog i{display:block;height:100%;background:var(--accent)}
-.passage{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin:0 0 14px;line-height:1.65}
-.qh{font-family:var(--f-display);font-size:20px;font-weight:600;line-height:1.35;margin:6px 0 14px}
-.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin-bottom:8px;min-width:0}
-.opt .ol{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:3px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
-.opt span:last-child{overflow-wrap:anywhere;min-width:0}
-.opt:hover:not([disabled]){border-color:var(--accent)}
-.opt[disabled]{cursor:default;color:var(--ink);opacity:1}
-.opt.right{border-color:var(--good);background:var(--soft)}
-.opt.right .ol{background:var(--good);border-color:var(--good);color:#fff}
-.opt.wrong{border-color:var(--bad)}
-.opt.wrong .ol{background:var(--bad);border-color:var(--bad);color:#fff}
-.fb{margin-top:12px;padding:12px 14px;border-radius:4px;border-left:4px solid var(--good);background:var(--soft)}
-.fb.no{border-left-color:var(--bad)}
+.tg{stroke:var(--amber);stroke-width:2.5;stroke-dasharray:6 4}
+.tgt{fill:var(--warn);font-weight:700}
+.empty{padding:22px;border:2px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center}
+
+/* ===== SOAL ===== */
+.prog{display:flex;gap:3px;margin:12px 0 16px}
+.prog i{flex:1;height:8px;border-radius:2px;background:var(--line)}
+.prog i.d{background:var(--accent)}
+.prog i.c{background:var(--good)}
+.prog i.x{background:var(--bad)}
+.prog i.n{background:var(--amber)}
+.lv{display:flex;gap:8px;flex-wrap:wrap}
+.lv button{background:var(--surface);border:2px solid var(--edge);border-radius:999px;padding:7px 16px;font-weight:700;font-size:14px}
+.lv button[aria-pressed="true"]{background:var(--on-bg);color:var(--on-ink);box-shadow:3px 3px 0 var(--amber);border-color:var(--on-bg)}
+.mode{--c:var(--accent);padding:0;overflow:hidden;display:flex;flex-direction:column}
+.mode .bandt{background:var(--c);height:12px;border-bottom:2px solid var(--edge)}
+.mode .bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.mode h3{font-size:24px}
+.meter{height:12px;border:2px solid var(--edge);border-radius:4px;background:var(--soft);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--c)}
+.case{background:var(--surface);border:2px solid var(--edge);border-radius:10px;box-shadow:5px 5px 0 var(--sh);padding:20px 18px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+.case-h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.case-t{font-family:var(--f-display);font-size:clamp(22px,5.5vw,28px);font-weight:700;letter-spacing:-.02em}
+.chip{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--edge);border-radius:999px;padding:3px 10px;background:var(--surface)}
+.chip.lvl{background:var(--amber);color:#0F2040}
+.passage{background:var(--surface);border:2px solid var(--edge);border-radius:8px;padding:16px 18px;margin:12px 0;line-height:1.75}
+.passage h3{font-size:clamp(22px,5.5vw,28px);margin-bottom:8px}
+.qh{font-family:var(--f-display);font-size:clamp(22px,5.5vw,30px);font-weight:600;line-height:1.28;margin:14px 0 18px;letter-spacing:-.015em}
+.blank{display:inline-block;min-width:6.5ch;border-bottom:3px solid var(--ink);margin:0 4px;transform:translateY(2px)}
+.fill{display:inline-block;border-bottom:3px solid var(--good);color:var(--good);padding:0 4px;margin:0 2px}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--slate);border:2px solid var(--edge);border-radius:6px;padding:13px 14px;font-family:var(--f-mono);font-size:15px;min-width:0;color:var(--ink);box-shadow:3px 3px 0 var(--edge);transition:transform .08s,box-shadow .08s}
+.opt .ol{flex:none;font-weight:700;opacity:.85}
+.opt .ot{overflow-wrap:anywhere;min-width:0}
+.opt:hover:not([disabled]){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--edge)}
+.opt:active:not([disabled]){transform:translate(3px,3px);box-shadow:0 0 0 var(--edge)}
+.opt[disabled]{cursor:default;box-shadow:none;transform:none}
+.opt.right{background:var(--good);color:#fff}
+.opt.wrong{background:var(--bad);color:#fff}
+.opt[disabled]:not(.right):not(.wrong){opacity:.55}
+.reveal{margin-top:18px;display:grid;gap:16px}
+.rv-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:620px){.rv-top{grid-template-columns:1fr}}
+.ans{font-family:var(--f-display);font-size:clamp(20px,5vw,26px);font-weight:700;display:flex;gap:10px;align-items:flex-start;line-height:1.2}
+.ans.ok{color:var(--good)}
+.ans.no{color:var(--bad)}
+.ans svg{flex:none;width:30px;height:30px}
+.ans small{display:block;font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-top:4px}
+.rule{border:2px solid var(--edge);outline:2px solid var(--edge);outline-offset:3px;background:var(--slate);padding:12px 16px;border-radius:2px;margin:3px}
+.rule-t{font-family:var(--f-display);font-size:clamp(20px,5vw,24px);font-weight:700}
+.rule-p{font-family:var(--f-mono);font-size:13px;margin-top:4px}
+.why{margin:0;font-size:15px;line-height:1.6}
+.tl{background:var(--surface);border:2px solid var(--edge);border-radius:8px;padding:6px 10px}
+.tl svg{display:block;width:100%;height:auto;max-height:150px}
+.tl .ax{stroke:var(--accent);stroke-width:4}
+.tl .ar{stroke:var(--amber);stroke-width:5;fill:none}
+.tl .arh{fill:var(--amber)}
+.tl .d1{fill:var(--amber);stroke:var(--edge);stroke-width:2}
+.tl .d2{fill:var(--accent);stroke:var(--edge);stroke-width:2}
+.tl .d3{fill:var(--muted);stroke:var(--edge);stroke-width:2}
+.tl .lb{fill:var(--ink);font-size:11px}
+.sec-t{font-family:var(--f-display);font-size:clamp(20px,5vw,26px);font-weight:700;margin:0 0 8px}
+.mx{border:2px solid var(--edge);border-radius:8px;overflow:hidden;background:var(--surface)}
+.mx-r{display:grid;grid-template-columns:1.15fr 70px .95fr 2.2fr;gap:0;align-items:stretch;border-top:2px solid var(--edge)}
+.mx-r:first-child{border-top:0}
+.mx-r>span{padding:10px 10px;border-left:2px solid var(--edge);display:flex;align-items:center;min-width:0;overflow-wrap:anywhere}
+.mx-r>span:first-child{border-left:0}
+.mx-th{background:var(--soft);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.mx-r .o{font-family:var(--f-mono);font-size:13px}
+.mx-r .s{justify-content:center}
+.mx-r .s svg{width:22px;height:22px}
+.mx-r .f{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.mx-r .a{font-size:13px;line-height:1.45}
+.mx-r.ok{background:var(--good-bg)}
+.mx-r.pick:not(.ok){background:var(--bad-bg)}
+@media (max-width:620px){
+  .mx-th{display:none}
+  .mx-r{grid-template-columns:1fr 44px;grid-template-areas:"o s" "f f" "a a"}
+  .mx-r .o{grid-area:o}.mx-r .s{grid-area:s}.mx-r .f{grid-area:f;border-left:0;padding-top:0}.mx-r .a{grid-area:a;border-left:0;padding-top:0}
+  .mx-r>span{border-left:0}
+  .mx-r .o{border-bottom:0}
+}
+.ring{--p:50;width:132px;height:132px;border-radius:50%;background:conic-gradient(var(--good) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;border:2px solid var(--edge);flex:none}
+.ring b{width:98px;height:98px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--f-display);font-size:30px;border:2px solid var(--edge)}
+.wr{border:2px solid var(--edge);border-left:8px solid var(--bad);border-radius:8px;background:var(--surface);padding:12px 14px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){.btn,.opt{transition:none}}
+@media (max-width:520px){.top .in{align-items:flex-start}.wkbox{width:100%}}
 </style>
 
 </head>
 <body>
-<div class="board"><div class="in">
-  <div><h1>Jalur IELTS</h1><div class="sub">Target rata-rata <span id="tgtTop">7</span> &middot; 5 Nov 2026 &ndash; 27 Jan 2027</div></div>
-  <div class="wk"><span id="wkLbl">Minggu</span><b id="wkNum">--</b><span class="sync" id="sync">Sinkron belum diatur</span></div>
-</div></div>
+<header class="top"><div class="in">
+  <div><div class="kicker">IELTS Academic &middot; target <span id="tgtTop">7</span></div><h1>Jalur IELTS</h1><div class="sub">5 Nov 2026 &ndash; 27 Jan 2027 &middot; dari B1-B2 menuju C1</div></div>
+  <div class="wkbox"><div class="wkt"><span id="wkLbl">Minggu</span><b id="wkNum">--</b></div><div class="seg12" id="wkSeg"></div><span class="sync" id="sync">Sinkron belum diatur</span></div>
+</div></header>
 <div class="wrap">
   <nav role="tablist" id="tabs"></nav>
   <main id="view"></main>
@@ -331,37 +452,72 @@ function chart(){
 }
 
 /* views */
+/* ===== UI BARU: ikon, beranda, kosakata ===== */
+var IC={
+  hari:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  kata:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',
+  soal:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  skor:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  tulis:'<path d="M4 20l1-4L17 4l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  bicara:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  salah:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',
+  atur:'<path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/>',
+  api:'<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',
+  kartu:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',
+  bintang:'<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.2 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'
+};
+function ico(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[n]||"")+'</svg>'}
+function icoOk(){return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 8.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+function icoNo(){return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>'}
+
+var POS={mitigate:"v",sustainable:"adj",infrastructure:"n",congestion:"n",commuter:"n",emission:"n",accessible:"adj",pedestrian:"n",integrate:"v",multimodal:"adj",regulation:"n",enforce:"v",subsidy:"n",implement:"v",priority:"n",allocate:"v",beneficial:"adj",significant:"adj",consequence:"n",alleviate:"v",deteriorate:"v",fluctuate:"v",surge:"n",decline:"v",comprehensive:"adj",feasible:"adj",stakeholder:"n",efficiency:"n",capacity:"n",demand:"n",supply:"n",afford:"v",inevitable:"adj",outweigh:"v",advocate:"v",encourage:"v",discourage:"v",reliable:"adj",hazardous:"adj",vulnerable:"adj",urban:"adj",sprawl:"n","urban sprawl":"n","modal shift":"n","public transit":"n","last-mile":"adj","last-mile connectivity":"n",connectivity:"n",fare:"n",freight:"n",logistics:"n",bottleneck:"n",retrofit:"v",gridlock:"n",carpool:"v",pollutant:"n",revenue:"n",budget:"n","trade-off":"n",prevalent:"adj",diminish:"v",undermine:"v","pave the way for":"phrase"};
+function posOf(w){return POS[w]||"kata"}
+
 function vHari(){
-  var p=PLAN[new Date().getDay()],dd=day(),t=today(),n=dueCount();
-  var wk="",i,k;
+  var p=PLAN[new Date().getDay()],dd=day(),t=today(),n=dueCount(),wk="",i,k;
   for(i=6;i>=0;i--){k=addDays(t,-i);wk+='<div class="'+(active(k)?"on":"")+(i===0?" now":"")+'">'+PLAN[parse(k).getDay()].d.slice(0,3)+'</div>'}
   var sc=S.scores.length?avg(S.scores[S.scores.length-1]).toFixed(1):"--";
-  return '<div class="panel"><div class="today"><div class="day">'+p.d+' &middot; '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+'</div>'
-   +'<div><div class="focus">'+p.f+'</div><div class="small">'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</div></div>'
-   +'<button class="btn '+(dd.done?"good":"")+'" id="doneBtn">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div>'
-   +'<div class="grid g4" style="margin-top:12px">'
-   +'<div class="panel"><div class="lbl">Streak</div><div class="big">'+streak()+' <span class="small">hari</span></div></div>'
-   +'<div class="panel"><div class="lbl">Kartu menunggu</div><div class="big">'+n+'</div><button class="btn ghost" style="margin-top:8px" data-go="kata">'+(n?"Mulai":"Lihat")+'</button></div>'
-   +'<div class="panel"><div class="lbl">Kata dikuasai</div><div class="big">'+mastered()+'<span class="small">/'+VOCAB.length+'</span></div></div>'
-   +'<div class="panel"><div class="lbl">Skor terakhir</div><div class="big">'+sc+'<span class="small"> / '+S.target+'</span></div></div></div>'
-   +'<div class="grid g2" style="margin-top:12px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:10px 0 0">Hari aktif: kartu dikerjakan atau ditandai selesai.</p></div>'
+  var qn=dd.quiz||0;
+  return '<section class="hero"><div><div class="kick">'+p.d+' &middot; '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+'</div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p></div>'
+   +'<button class="btn '+(dd.done?"good":"amber")+'" id="doneBtn">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></section>'
+   +'<div class="grid g4" style="margin-top:16px">'
+   +'<div class="panel stat"><span class="ic">'+ico("api")+'</span><div class="lbl">Streak</div><div class="big">'+streak()+' <span class="small">hari</span></div></div>'
+   +'<div class="panel stat"><span class="ic">'+ico("kartu")+'</span><div class="lbl">Kartu menunggu</div><div class="big">'+n+'</div></div>'
+   +'<div class="panel stat"><span class="ic">'+ico("bintang")+'</span><div class="lbl">Kata dikuasai</div><div class="big">'+mastered()+'<span class="small">/'+VOCAB.length+'</span></div></div>'
+   +'<div class="panel stat"><span class="ic">'+ico("target")+'</span><div class="lbl">Skor terakhir</div><div class="big">'+sc+'<span class="small"> / '+S.target+'</span></div></div></div>'
+   +'<div class="grid g2" style="margin-top:16px">'
+   +'<div class="panel cta"><div><div class="lbl">Latihan hari ini</div><h2>25 kasus diagnostik</h2><div class="small">'+(qn?qn+' soal sudah dijawab hari ini.':'Kosakata, tata bahasa, atau Reading mini.')+'</div></div><button class="btn" data-go="soal">Mulai soal</button></div>'
+   +'<div class="panel cta alt"><div><div class="lbl">Kosakata</div><h2>10 kata baru</h2><div class="small">'+(n?n+' kartu menunggu untuk diulang.':'Antrean kartu kosong.')+'</div></div><button class="btn ghost" data-go="kata">Buka</button></div></div>'
+   +'<div class="grid g2" style="margin-top:16px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:12px 0 0">Hari aktif: kartu atau soal dikerjakan, atau ditandai selesai.</p></div>'
    +'<div class="panel"><h2>Menuju band '+S.target+'</h2>'+(S.scores.length?chart():'<div class="empty">Belum ada skor. Kerjakan tes diagnostik lalu catat hasilnya di tab Skor.</div>')+'</div></div>';
 }
+
+function newWords(){var r=[];VOCAB.forEach(function(v,i){if(!S.cards[i]&&r.length<NEW_PER_DAY)r.push(i)});return r}
 function vKata(){
+  state.km=state.km||"list";
+  var n=dueCount(),seg='<div class="seg" role="group" aria-label="Mode kosakata"><button data-km="list" aria-pressed="'+(state.km==="list")+'">10 Kata Baru</button><button data-km="cards" aria-pressed="'+(state.km==="cards")+'">Kartu Ulang'+(n?' ('+n+')':'')+'</button></div>';
+  if(state.km==="list"){
+    var ws=newWords();
+    if(!ws.length)return seg+'<div class="poster"><h2>Semua kata sudah dikenalkan</h2><p class="lead">Lanjutkan dengan kartu ulang agar kata tetap melekat.</p><button class="btn" data-km="cards">Buka kartu ulang</button></div>';
+    return seg+'<div class="poster"><h2>10 Kosakata Baru</h2><p class="lead">Baca dulu semuanya, lalu uji ingatan lewat kartu.</p><ol class="vl">'
+      +ws.map(function(i,j){var v=VOCAB[i];return '<li><span class="n">'+(j+1)+'.</span><div><span class="w">'+esc(v[0])+'</span><span class="p">('+posOf(v[0])+')</span><span class="m">&ndash; '+esc(v[1])+'</span></div><span class="x">'+esc(v[2])+'</span></li>'}).join("")
+      +'</ol><div class="row" style="margin-top:16px"><button class="btn" data-km="cards">Mulai kartu ulang</button></div></div>';
+  }
   if(!session)session={q:buildQueue(),i:0,flip:false,total:0},session.total=session.q.length;
   if(session.i>=session.q.length){
     var nxt=null;for(var k in S.cards){if(!nxt||S.cards[k].due<nxt)nxt=S.cards[k].due}
-    return '<div class="panel"><h2>Kosakata hari ini selesai</h2><p>'+(session.total?session.total+' kartu sudah dikerjakan. ':'')+'Kartu baru dibatasi '+NEW_PER_DAY+' per hari supaya ulangan tetap ringan.'+(nxt&&nxt>today()?' Kartu berikutnya jatuh tempo '+nxt.slice(8)+'/'+nxt.slice(5,7)+'.':'')+'</p><button class="btn ghost" id="resetSess">Muat ulang antrean</button></div>';
+    return seg+'<div class="panel"><h2>Kosakata hari ini selesai</h2><p>'+(session.total?session.total+' kartu sudah dikerjakan. ':'')+'Kartu baru dibatasi '+NEW_PER_DAY+' per hari supaya ulangan tetap ringan.'+(nxt&&nxt>today()?' Kartu berikutnya jatuh tempo '+nxt.slice(8)+'/'+nxt.slice(5,7)+'.':'')+'</p><button class="btn ghost" id="resetSess">Muat ulang antrean</button></div>';
   }
   var i=session.q[session.i],v=VOCAB[i],c=S.cards[i];
   var face=session.flip
-   ?'<div class="word">'+esc(v[0])+'</div><div class="mean">'+esc(v[1])+'</div><div class="ex">'+esc(v[2])+'</div>'
-   :'<div class="word">'+esc(v[0])+'</div><div class="small">Ingat artinya, lalu balik kartu.</div>';
-  return '<div class="ticket"><div class="stub"><div>Kartu<b>'+(session.i+1)+'/'+session.q.length+'</b></div><div>'+(c?"Kotak "+c.box:"Baru")+'</div></div><div class="face">'+face+'</div></div>'
+   ?'<div class="word">'+esc(v[0])+'</div><div class="pos">('+posOf(v[0])+')</div><div class="mean">'+esc(v[1])+'</div><div class="ex">'+esc(v[2])+'</div>'
+   :'<div class="word">'+esc(v[0])+'</div><div class="pos">('+posOf(v[0])+')</div><div class="small">Ingat artinya, lalu balik kartu.</div>';
+  return seg+'<div class="flash"><div class="stub"><div>Kartu<b>'+(session.i+1)+'/'+session.q.length+'</b></div><div>'+(c?"Kotak "+c.box:"Baru")+'</div></div><div class="face">'+face+'</div></div>'
    +(session.flip
      ?'<div class="rate"><button class="btn bad" data-r="again">Lupa</button><button class="btn warn" data-r="hard">Sulit</button><button class="btn good" data-r="good">Ingat</button></div>'
      :'<div class="rate" style="grid-template-columns:1fr"><button class="btn" id="flip">Balik kartu</button></div>')
-   +'<p class="small">Lupa: muncul lagi sesi ini. Sulit: besok. Ingat: jarak ulangan makin panjang (1, 2, 4, 8, 16, 32 hari).</p>';
+   +'<p class="small" style="margin-top:12px">Lupa: muncul lagi sesi ini. Sulit: besok. Ingat: jarak ulangan makin panjang (1, 2, 4, 8, 16, 32 hari).</p>';
 }
 function vSkor(){
   var L=S.scores.length?S.scores[S.scores.length-1]:null,names=[["L","Listening"],["R","Reading"],["W","Writing"],["S","Speaking"]],bars="";
@@ -970,6 +1126,450 @@ var RP2=[
 ];
 
 
+/* GM: matriks eliminasi. Format: id|Aturan|Pola|Label benar|label~alasan (x3, urutan pengecoh seperti di data)|[peristiwa lebih awal,...,lebih akhir] */
+var GM1=`g1|Past Perfect Tense|S + had + V3|Past Perfect|already left~Past Simple; urutan dua kejadian tidak terlihat|has already left~Present Perfect; tidak cocok dengan waktu lampau (arrived)|was already leaving~Past Continuous; artinya sedang pergi, bukan sudah pergi|Kereta berangkat,Kami tiba
+g2|Conditional Tipe 2|If + S + V2, S + would + V1|Past Simple|have~Present Simple; itu pola tipe 1, bukan pengandaian|will have~will tidak dipakai di klausa if|would have~would tidak dipakai di klausa if
+g3|Kolokasi Preposisi|good + at + V-ing|good at|in~Bukan kolokasi dengan good + kegiatan|on~Tidak lazim setelah good|for~good for = bermanfaat bagi, maknanya berbeda
+g4|Passive Future|will be + V3|Passive Future|will open~Aktif; jembatan tidak membuka dirinya sendiri|is opening~Aktif continuous; subjek tidak melakukan aksi|has opened~Aktif present perfect; tidak cocok dengan next month
+g5|Relative Clause (Kepemilikan)|noun + whose + noun|whose|who~who tidak dipakai untuk kepemilikan|which~which untuk benda, bukan pemilik orang|whom~whom adalah objek, bukan pemilik
+g6|Kontras dengan Frasa|Despite + noun phrase|Despite|Although~Although harus diikuti klausa (S + V)|However~Kata keterangan, tidak menyambung frasa|Because~Menyatakan sebab, makna kontras hilang
+g7|Gerund setelah To|look forward to + V-ing|V-ing|hear~V1 salah, to di sini adalah preposisi|heard~V3 tidak dipakai setelah preposisi|have heard~Bentuk perfect tidak lazim di sini
+g8|Modal Kewajiban|must + V1|must|might~Hanya kemungkinan, bukan kewajiban hukum|needn't~Artinya tidak perlu, berlawanan makna|would~Pengandaian, tidak menyatakan kewajiban
+g9|Present Perfect Continuous|S + have been + V-ing|Present Perfect Cont.|study~Present Simple; tidak mencakup durasi for three years|am studying~Present Continuous; tidak menunjukkan durasi sampai sekarang|studied~Past Simple; kegiatan dianggap sudah selesai|Mulai belajar,Sekarang
+g10|Reported Speech (Pertanyaan)|asked + where + S + V (lampau)|Urutan kalimat biasa|did I live~Masih memakai urutan tanya|do I live~Urutan tanya dan tense tidak bergeser|was I living~Urutan tanya dipertahankan
+g11|Artikel a/an|an + bunyi vokal|an|a~honest dibaca /onist/ (bunyi vokal), jadi bukan a|the~Orang yang dimaksud bersifat umum, bukan tertentu|tanpa artikel~Kata benda tunggal wajib memakai artikel
+g12|Comparative|far/much + more/-er + than|Comparative dengan far|much directer~Direct memakai more, bukan -er|more directer~Dobel komparatif|the most direct~Superlatif, padahal ada than
+g13|Quantifier Tak Terhitung|not ... much + noun tak terhitung|much|many~many untuk benda terhitung jamak|few~few untuk benda terhitung|a few~a few untuk benda terhitung
+g14|Time Clause|as soon as + Present Simple|Present Simple|will arrive~will tidak dipakai di time clause|arrived~Past Simple; kalimat bicara masa depan|am arriving~Continuous tidak lazim di time clause
+g15|Wish (Kemampuan)|wish + S + could + V1|could|can~Present; wish butuh bentuk lampau|will~will tidak dipakai setelah wish|would~would untuk perilaku orang lain, bukan kemampuan sendiri
+g16|Inversi Not Only|Not only + did + S + V1|Inversi|he arrived~Tidak membalik urutan setelah Not only|he did arrive~Inversi hilang, auxiliary setelah subjek|arrived he~Tanpa auxiliary, tidak gramatikal
+g17|Inversi Rarely|Rarely + have + S + V3|Inversi|I have seen~Urutan normal; seharusnya terbalik|have seen I~Urutan salah; auxiliary diikuti subjek|I saw~Past Simple tanpa inversi
+g18|Conditional Tipe 3 (Inversi)|Had + S + V3, S + would have + V3|Had + S + V3|If~If + I known tidak gramatikal tanpa had|Were~Were untuk pengandaian present|Should~Should untuk kemungkinan masa depan
+g19|Subjunctive|recommend that + S + V1 / be + V3|be + V3|is approved~Bentuk indikatif, bukan subjunctive|was approved~Past simple pasif, bukan subjunctive|would approve~Aktif; proposal menerima aksi
+g20|Participle Perfect|Having + V3, S + V|Having + V3|To read~Infinitive menyiratkan tujuan, bukan urutan|Being read~Pasif; pelaku adalah she|Read~Tidak menunjukkan kegiatan lebih awal|Membaca laporan,Menyadari kesalahan
+g21|Would Rather|would rather + S + V2|Past Simple|don't~Present; setelah would rather perlu bentuk lampau|wouldn't~would tidak dipakai setelah would rather|hadn't~Past perfect untuk menyesali masa lalu
+g22|Cleft Sentence|It was + noun + that + V|that|what~what tidak dipakai setelah It was + noun|whose~whose menunjukkan kepemilikan|whom~whom untuk objek orang
+g23|Modal Perfect (Deduksi)|must have + V3|must have + V3|must miss~Bentuk present, kejadiannya lampau|should miss~Artinya seharusnya, bukan kesimpulan|might missing~Bentuk salah
+g24|Kolokasi Preposisi|in consultation with|in|on~Tidak lazim|at~Tidak lazim|by~Tidak lazim
+g25|Causative Have|have + object + V3|V3|audit~V1 salah; perlu V3|auditing~V-ing salah untuk pekerjaan yang dilakukan orang lain|to audit~to + V1 dipakai untuk get, bukan have
+g26|Penghubung Kontras|; nevertheless,|Nevertheless|Moreover~Menambah informasi, bukan kontras|Therefore~Menyatakan akibat|Similarly~Menyatakan kesamaan
+g27|Preposisi + Whom|with + whom|whom|who~who tidak boleh setelah preposisi|which~which untuk benda|whose~whose menunjukkan kepemilikan
+g28|Future Perfect|will have + V3|Future Perfect|will work~Future Simple; tidak menyatakan durasi sampai titik tertentu|have worked~Present Perfect; tidak cocok dengan next June|am working~Present Continuous; tidak bicara masa depan|Sekarang,Juni depan
+g29|Conditional Inversi Should|Should + S + V1|Should|If~Tidak lagi inversi; kalimat memakai you encounter|Were~Were untuk pengandaian present|Had~Had untuk pengandaian masa lalu
+g30|Gerund setelah Preposisi|no point + in + V-ing|in writing|to write~to + V1 tidak sesuai pola no point|write~V1 tidak bisa setelah preposisi|written~V3 salah bentuk
+g31|Present Perfect|S + has/have + V3 + since|Present Perfect|worked~Past Simple; kegiatan dianggap selesai|works~Present Simple; tidak cocok dengan since 2018|is working~Present Continuous; since butuh perfect|Mulai 2018,Sekarang
+g32|Past Continuous|was/were + V-ing|Past Continuous|cooked~Past Simple; tidak menyatakan kegiatan yang sedang berlangsung|has cooked~Present Perfect; konteks lampau|cooks~Present Simple; konteksnya lampau|Memasak,Telepon berdering
+g33|Present Perfect|haven't + V3 + for ages|Present Perfect|didn't see~Past Simple; tidak menjangkau sampai sekarang|don't see~Present Simple; bukan kebiasaan|hadn't seen~Past Perfect; tidak ada titik lampau|Terakhir bertemu,Sekarang
+g34|Future Continuous|will be + V-ing|Future Continuous|will lie~Future Simple; tidak menunjukkan sedang berlangsung|are lying~Present Continuous; ini rencana masa depan jauh|lie~Present Simple; kata keterangan masa depan butuh will|Sekarang,Minggu depan
+g35|Past Simple|V2 + when she was a student|Past Simple|has lived~Present Perfect; waktu lampau sudah ditentukan|lives~Present Simple; konteks lampau|is living~Present Continuous; konteks lampau
+g36|Past Continuous|were + V-ing + when + Past Simple|Past Continuous|had~Past Simple; tidak menunjukkan kegiatan yang terpotong|have had~Present Perfect; tidak cocok|are having~Present Continuous; bukan masa lampau|Makan malam,Telepon berdering
+g37|Present Perfect|have been to|Present Perfect|went~Past Simple; tidak untuk pengalaman tanpa waktu|was~Past Simple be, tidak mencakup sampai sekarang|had been~Past Perfect; tidak ada titik lampau
+g38|Past Perfect|By the time + Past Simple, S + had + V3|Past Perfect|fell~Past Simple; urutan peristiwa kurang jelas|has fallen~Present Perfect; konteks lampau|was falling~Past Continuous; tidak menyatakan sudah tertidur|Tertidur,Film selesai
+g39|Present Continuous + always|always + V-ing|V-ing|lose~V1; tidak menunjukkan kebiasaan mengganggu|lost~V3 salah bentuk setelah always|loses~Present Simple; tidak menandai rasa jengkel
+g40|Present Simple|Fakta ilmiah: V1 + s|Present Simple|is boiling~Continuous; fakta umum tidak butuh continuous|has boiled~Present Perfect; bukan fakta umum|boil~Subjek tunggal butuh -s
+g41|Conditional Tipe 1|If + Present, will + V1|Will + V1|would stay~Tipe 2; kondisi dianggap tidak nyata|stayed~Past simple tidak cocok dengan tomorrow|stay~Present simple; tidak menyatakan akibat
+g42|Conditional Tipe 3|If + had + V3, would have + V3|would have|will have~will tidak dipakai di tipe 3|had~had tidak melengkapi klausa akibat|would~Perlu have + V3 untuk masa lalu
+g43|Kondisi dengan Unless|Unless + V (tanpa not)|study|will study~will tidak dipakai di klausa kondisi|studied~Past; tidak cocok dengan won't pass|don't study~Unless sudah bermakna if not
+g44|Conditional Tipe 2|If + S + were, would + V1|were|am~Present; tipe 2 memakai were|will be~will tidak dipakai di klausa if|would be~would tidak dipakai di klausa if
+g45|Zero Conditional|If + Present, Present|melts|will melt~Tipe 1; fakta umum tidak butuh will|would melt~Tipe 2; bukan pengandaian|melted~Past; bukan fakta umum
+g46|Conditional Tipe 2|If + Past, would + V1|lost|lose~Present; tipe 2 butuh bentuk lampau|will lose~will tidak dipakai di klausa if|would lose~would tidak dipakai di klausa if
+g47|Conditional Campuran|If + had + V3, would + V1|had gone|went~Past Simple; kondisi terjadi di masa lalu|has gone~Present Perfect; tidak cocok|would go~would tidak dipakai di klausa if
+g48|Passive Past|was/were + V3|was broken|broke~Aktif; jendela tidak memecahkan dirinya sendiri|has broken~Aktif present perfect; ada yesterday|is broken~Pasif present; waktu lampau
+g49|Passive Present|is/are + V3|is spoken|speaks~Aktif; subjek English tidak berbicara|is speaking~Aktif continuous|spoken~Tanpa auxiliary be
+g50|Passive Continuous|is/are being + V3|is being painted|is painting~Aktif; rumah tidak melukis|paints~Present Simple aktif|has painted~Aktif present perfect`;
+
+var GM2=`g51|Passive Past|was/were + V3|was invited|invited~Aktif; saya tidak mengundang diri sendiri|have invited~Aktif present perfect|invite~Aktif present simple
+g52|Passive Future|will be + V3|will be announced|will announce~Aktif; hasil tidak mengumumkan|are announcing~Aktif continuous|announce~Aktif present simple
+g53|Passive Past|was + V3 + by agent|was caught|caught~Aktif; pencuri tidak menangkap dirinya|was catching~Aktif continuous|has caught~Aktif present perfect
+g54|Modal Larangan|mustn't + V1|mustn't|needn't~Artinya tidak perlu, bukan dilarang|wouldn't~Pengandaian, bukan larangan|mightn't~Menyatakan kemungkinan, bukan larangan
+g55|Modal Tidak Wajib|needn't + V1|needn't|mustn't~Artinya dilarang, bertentangan dengan konteks|can't~Artinya tidak bisa, bukan tidak perlu|won't~Menyatakan penolakan atau prediksi
+g56|Modal Kemampuan Lampau|could + V1|could|can~Present; konteks lampau (was five)|must~Menyatakan kewajiban|should~Menyatakan saran
+g57|Modal Permintaan Sopan|Could I + V1?|Could|Must~Menyatakan kewajiban|Need~Tidak lazim untuk meminta izin|Shall~Dipakai untuk tawaran
+g58|Modal Deduksi Positif|must + be|must|can't~Kesimpulan negatif, berlawanan dengan bukti|shouldn't~Menyatakan saran|needn't~Menyatakan tidak perlu
+g59|Modal Deduksi Negatif|can't + be|can't|must~Kesimpulan positif; bukti menunjukkan sebaliknya|should~Menyatakan saran|needn't~Menyatakan tidak perlu
+g60|Modal Saran|should + V1|should|shall~Dipakai untuk tawaran atau saran formal|would~Pengandaian|will~Prediksi atau janji
+g61|Relative Clause|noun (benda) + that|that|what~what bukan kata penghubung klausa relatif|who~who untuk orang|whose~whose menunjukkan kepemilikan
+g62|Relative Clause|person + who + V|who|whom~whom untuk objek|which~which untuk benda|whose~whose menunjukkan kepemilikan
+g63|Relative Adverb Tempat|place + where|where|which~which butuh preposisi di klausa tempat|who~who untuk orang|when~when untuk waktu
+g64|Relative Adverb Waktu|time + when|when|where~where untuk tempat|which~which butuh preposisi|who~who untuk orang
+g65|Non-defining Clause|, who + V ,|who|that~that tidak dipakai di klausa bertanda koma|whom~whom untuk objek|which~which untuk benda
+g66|Relative Clause|everything + that|that|what~what tidak dipakai setelah everything|which~which tidak lazim setelah everything|who~who untuk orang
+g67|Gerund|suggest + V-ing|V-ing|to go~suggest tidak diikuti to + V1|go~Bentuk dasar tidak tepat|went~Past simple tidak tepat
+g68|Infinitive|would like + to + V1|to + V1|asking~would like tidak diikuti V-ing|ask~Tanpa to|asked~V2 salah bentuk
+g69|Gerund|avoid + V-ing|V-ing|to answer~avoid tidak diikuti to + V1|answer~Bentuk dasar tidak tepat|answered~V2 salah bentuk
+g70|Infinitive|decide + to + V1|to + V1|selling~decide tidak diikuti V-ing|sell~Tanpa to|sold~V2 salah bentuk
+g71|Be Used To|be used to + V-ing|V-ing|get~V1 salah setelah to preposisi|got~V2 salah bentuk|to get~Dobel to
+g72|Stop + V-ing|stop + V-ing|V-ing|to walk~stop + to V1 artinya berhenti untuk melakukan|walk~V1 tidak tepat|walked~V2 salah bentuk
+g73|Remember + to|remember + to + V1|to + V1|locking~Artinya ingat sudah melakukan|lock~Tanpa to|locked~V2 salah bentuk
+g74|Gerund|enjoy + V-ing|V-ing|to work~enjoy tidak diikuti to + V1|work~Bentuk dasar tidak tepat|worked~V2 salah bentuk
+g75|Preposisi Hari|on + hari|on|at~at untuk jam atau titik|in~in untuk bulan, tahun, bagian hari|by~by artinya paling lambat
+g76|Kolokasi Preposisi|interested + in|in|on~Bukan kolokasi|at~Bukan kolokasi|for~Bukan kolokasi
+g77|Kolokasi Preposisi|afraid + of|of|from~Bukan kolokasi|for~Bukan kolokasi|with~Bukan kolokasi
+g78|Preposisi Tempat|arrive + at|at|in~in untuk kota atau negara besar|to~arrive tidak memakai to|on~Bukan kolokasi
+g79|Preposisi Durasi|for + durasi|for|since~since butuh titik waktu|during~during diikuti peristiwa, bukan durasi|from~from butuh to untuk rentang
+g80|Preposisi Titik Waktu|since + titik waktu|since|for~for butuh durasi|from~from tidak dipakai dengan perfect|during~during bukan titik awal
+g81|Kolokasi Preposisi|married + to|to|with~Bukan kolokasi|by~Bukan kolokasi|for~Bukan kolokasi
+g82|Preposisi Tahun|in + tahun|in|on~on untuk hari atau tanggal|at~at untuk jam|by~by artinya paling lambat
+g83|Penghubung Sebab|because + clause|because|although~Menyatakan kontras|unless~Menyatakan syarat negatif|whereas~Menyatakan perbandingan
+g84|Penghubung Kontras|Although + clause|Although|Because~Menyatakan sebab|So~So di awal kalimat butuh klausa lain|Unless~Menyatakan syarat negatif
+g85|Penghubung Syarat|as long as|as long as|unless~Artinya kecuali, bertentangan|although~Menyatakan kontras|whereas~Menyatakan perbandingan
+g86|Penghubung Akibat|; therefore,|therefore|however~Menyatakan kontras|although~Dipakai dalam klausa, bukan setelah titik koma|unless~Menyatakan syarat negatif
+g87|Penghubung Kontras|clause, but clause|but|so~Menyatakan akibat|because~Menyatakan sebab|or~Menyatakan pilihan
+g88|Penghubung Berjaga|in case|in case|unless~Menyatakan syarat negatif|although~Menyatakan kontras|whereas~Menyatakan perbandingan
+g89|Artikel the|play + the + alat musik|the|a~Bukan alat musik tertentu|an~an untuk bunyi vokal|tanpa artikel~Setelah play alat musik butuh the
+g90|Artikel Nol|benda tak terhitung umum|tanpa artikel|The~Water di sini bersifat umum|A~Tak terhitung tidak memakai a|An~Tak terhitung tidak memakai an
+g91|Determiner Tak Terhitung|some + tak terhitung|some|an~Tak terhitung|a~Tak terhitung|many~many untuk terhitung jamak
+g92|Determiner Negatif|not + any|any|some~some untuk kalimat positif|a~Tak terhitung|many~many untuk terhitung jamak
+g93|Quantifier|Most of the + jamak|Most|Almost~Almost butuh all atau every|Every~Every diikuti kata benda tunggal|Much~much untuk tak terhitung
+g94|Reported Speech|the night before → had + V3|Past Perfect|saw~Past Simple; urutan tidak bergeser|has seen~Present Perfect; kalimat tidak langsung lampau|sees~Present Simple; bergeser mundur satu tense|Menonton film,Dia bicara
+g95|Reported Question|asked + if|if|that~that untuk pernyataan|what~what butuh kata tanya|which~which butuh kata tanya
+g96|Reported Command|told + obj + not to + V1|not to be|don't be~Bentuk perintah langsung tidak bergeser|to not being~Bentuk salah|not being~Tanpa to
+g97|Reported Speech|will → would|would|will~will tidak bergeser|shall~shall tidak lazim|can~can bermakna kemampuan
+g98|Reported Question|where + S + V|we were going|were we going~Urutan tanya dipertahankan|did we going~Auxiliary salah|we going~Kata kerja tidak lengkap
+g99|Comparative|adj pendek + -er + than|taller|more tall~Adjektiva pendek memakai -er|tallest~Superlatif|the taller~the tidak dipakai dengan than
+g100|Superlative Tak Beraturan|the + worst|the worst|worse~Komparatif; superlatif butuh the|worst~Tanpa the|the worse~Komparatif dengan the
+g101|Equal Comparison|as + adj/adv + as|fast|faster~Komparatif tidak dipakai dengan as ... as|fastest~Superlatif|more fast~Bentuk salah
+g102|Double Comparative|the + comp, the + comp|the better|better~Tanpa the|the best~Superlatif|more better~Dobel komparatif
+g103|Comparison Less|less + adj + than|less|least~Superlatif|fewer~fewer untuk terhitung jamak|little~little bukan komparatif
+g104|Wish|wish + S + V2|had|have~Present; wish butuh bentuk lampau|would have~would tidak dipakai setelah wish|will have~will tidak dipakai setelah wish
+g105|If Only|If only + V2|knew|know~Present; butuh bentuk lampau|will know~will tidak dipakai|would know~would tidak dipakai untuk kondisi sendiri
+g106|Question Tag|have → haven't|haven't you|didn't you~Auxiliary tidak sesuai|aren't you~Auxiliary tidak sesuai|don't you~Auxiliary tidak sesuai
+g107|Question Tag|negatif + tag positif|does she|doesn't she~Tag harus berlawanan polaritas|is she~Auxiliary tidak sesuai|did she~Tense tidak sesuai
+g108|Pertanyaan Tidak Langsung|where + S + V|the station is|is the station~Urutan tanya dipertahankan|the station does~Auxiliary tidak perlu|does the station~Urutan tanya dan auxiliary
+g109|Pertanyaan Tidak Langsung|how much + S + V|it costs|does it cost~Urutan tanya dipertahankan|it cost~Verb tidak sesuai subjek|costs it~Urutan salah
+g110|Quantifier Terhitung|few + jamak|few|a few~a few berarti ada beberapa; konteks hampir kosong|little~little untuk tak terhitung|much~much untuk tak terhitung
+g111|Quantifier Tak Terhitung|a little + tak terhitung|a little|a few~a few untuk terhitung|few~few untuk terhitung|many~many untuk terhitung
+g112|Quantifier Tak Terhitung|how much + tak terhitung|much|many~many untuk terhitung|few~few untuk terhitung|lot~lot butuh a dan of
+g113|Subject-Verb Agreement|each of + jamak + V tunggal|receives|receive~Kata kerja jamak tidak cocok dengan each|are receiving~Bentuk jamak|have received~Bentuk jamak
+g114|Subject-Verb Agreement|both + V jamak|live|lives~Kata kerja tunggal tidak cocok dengan both|is living~Bentuk tunggal|has lived~Bentuk tunggal
+g115|Subject-Verb Agreement|traffic (tak terhitung) + was|was|were~Bentuk jamak untuk tak terhitung|have been~Bentuk jamak|are~Present; konteks lampau (this morning)`;
+
+var GM3=`g116|Inversi Hardly|Hardly + had + S + V3 + when|Inversi|we had left~Urutan normal; Hardly butuh inversi|did we leave~Past simple; perlu past perfect|we left~Tanpa inversi|Kami pergi,Hujan turun
+g117|Inversi No Sooner|No sooner + had + S + V3 + than|than|when~Dipakai dengan hardly, bukan no sooner|that~Bukan pasangan no sooner|then~Bukan pasangan no sooner
+g118|Inversi Negatif|Under no circumstances + aux + S|should|does~Tidak cocok dengan passive be left|is~Tidak membentuk inversi yang benar|has~Tidak cocok dengan be left
+g119|Inversi Only After|Only after + ... + did + S + V1|did we discover|we discovered~Tanpa inversi|we did discover~Urutan salah|discovered we~Tanpa auxiliary
+g120|Inversi Little|Little + did + S + V1|did she know|she knew~Tanpa inversi|she did know~Urutan salah|knew she~Tanpa auxiliary
+g121|Inversi On No Account|On no account + may + S|may visitors enter|visitors may enter~Tanpa inversi|visitors enter~Tanpa auxiliary|do visitors entering~Bentuk salah
+g122|Inversi Not Until|Not until + clause + did + S + V1|did people realise|people realised~Tanpa inversi|people did realise~Urutan salah|realised people~Tanpa auxiliary
+g123|Inversi So + Adj|So + adj + be + S|was he|he was~Tanpa inversi|did he~Auxiliary salah untuk be|had he~Tense salah
+g124|Conditional Tipe 3 (If it hadn't been for)|If it hadn't been for + noun|hadn't been|wasn't~Past simple; bukan masa lalu hipotetis|weren't~Bentuk tipe 2|hasn't been~Present perfect; konteks lampau
+g125|Conditional Formal|Were + S + to + V1|to know|knowing~Bentuk V-ing tidak lazim|known~V3 tidak lazim|know~Tanpa to
+g126|Wish Masa Lalu|wish + had + V3|had passed|passed~Past Simple; untuk keinginan sekarang|have passed~Present perfect; konteks lampau|would pass~would tidak dipakai untuk menyesali diri sendiri
+g127|Conditional Tipe 3|If + had + V3, might have + V3|had tried|tried~Past Simple; bukan tipe 3|would try~would tidak dipakai di klausa if|has tried~Present perfect
+g128|Supposing|Supposing + V2|won|will win~will tidak dipakai setelah supposing|would win~would tidak dipakai setelah supposing|winning~V-ing tidak lazim
+g129|Provided That|provided that + Present|have|will have~will tidak dipakai di klausa syarat|had~Past; konteks masa depan|would have~would tidak dipakai di klausa syarat
+g130|As Though|as though + were|were|is~Present; konteks tidak nyata|will be~will tidak dipakai|has been~Present perfect
+g131|Subjunctive|essential that + S + V1|submit|submits~Bentuk indikatif dengan -s|submitted~Past; bukan subjunctive|submitting~V-ing salah
+g132|Subjunctive|demand that + S + V1|leave|leaves~Bentuk indikatif dengan -s|left~Past; bukan subjunctive|leaving~V-ing salah
+g133|It's High Time|It's high time + V2|made|make~Present; high time butuh lampau|will make~will tidak dipakai|have made~Present perfect tidak lazim
+g134|Subjunctive Pasif|insist that + S + be + V3|be|is~Indikatif, bukan subjunctive|was~Past; bukan subjunctive|were~Bentuk jamak/past tidak tepat
+g135|Participle Pasif|V3 + , S + V|Seen|Seeing~Aktif; kota tidak melihat|Having seen~Perfect aktif; makna berbeda|To see~Infinitive; bukan pasif
+g136|Participle Aktif|V-ing + , S + V|Feeling|Felt~V3 pasif; she melakukan aksi aktif|To feel~Infinitive; bukan alasan|Having feel~Bentuk salah
+g137|Reduced Relative Clause|noun + V-ing|standing|stood~V3 tidak aktif berlangsung|stands~Present; bukan klausa tereduksi|to stand~Infinitive tidak tepat
+g138|Participle Negatif|Not + V-ing|knowing|known~V3 pasif|to know~Infinitive|having know~Bentuk salah
+g139|Reduced Relative Clause|anyone + V-ing|wishing|wished~V3 pasif|to wish~Infinitive|wishes~Present tidak cocok
+g140|Participle Pasif|V3 + by + agent|Frightened|Frightening~Aktif; bayi tidak menakuti|Having frighten~Bentuk salah|Frighten~V1 salah
+g141|Cleft What|What + S + V + is|is|are~Klausa what dianggap tunggal|were~Past; konteks sekarang|have~Bukan kata kerja penghubung
+g142|Cleft It Is|It was + time + that|that|what~what tidak dipakai di cleft|whose~whose menunjukkan kepemilikan|whom~whom untuk objek orang
+g143|Cleft What|What + V + is|What|That~That tidak bisa sebagai subjek klausa nominal|Who~Who untuk orang|Which~Which butuh antecedent
+g144|Reason Clause|The reason why|why|for~Bukan pasangan reason|what~Bukan pasangan reason|how~Bukan pasangan reason
+g145|Cleft It Is|It is + person + who|who|whom~whom untuk objek|which~which untuk benda|whose~whose menunjukkan kepemilikan
+g146|Modal Perfect Negatif|can't have + V3|can't have received|mustn't have received~Bukan deduksi negatif|shouldn't receive~Bentuk present|needn't received~Bentuk salah
+g147|Modal Perfect Saran|should have + V3|should have told|must have told~Kesimpulan, bukan penyesalan|would tell~Bentuk present|could telling~Bentuk salah
+g148|Modal Perfect Kemungkinan|may have + V3|may have missed|must miss~Bentuk present|should missed~Bentuk salah|can have missed~can have tidak lazim
+g149|Modal Perfect Tidak Perlu|needn't have + V3|needn't have cooked|mustn't have cooked~Bukan larangan lampau|couldn't cook~Bukan makna yang dimaksud|shouldn't cooking~Bentuk salah
+g150|Modal Perfect Penyesalan|shouldn't have + V3|shouldn't have eaten|needn't eat~Bentuk present|couldn't eat~Bukan penyesalan|mustn't eat~Bukan penyesalan
+g151|Modal Perfect Deduksi|must have + V3|must have known|can't have known~Berlawanan dengan konteks confident|should know~Bentuk present|might knowing~Bentuk salah
+g152|Kolokasi Preposisi|accused + of|of|for~Bukan kolokasi|with~Bukan kolokasi|about~Bukan kolokasi
+g153|Kolokasi Preposisi|apologise + for|for|of~Bukan kolokasi|about~Kurang lazim|to~to dipakai untuk penerima
+g154|Kolokasi Preposisi|responsible + for|for|of~Bukan kolokasi|to~to untuk pihak yang bertanggung jawab|at~Bukan kolokasi
+g155|Kolokasi Preposisi|look forward + to|to|for~Bukan kolokasi|at~Bukan kolokasi|on~Bukan kolokasi
+g156|Kolokasi Preposisi|pride oneself + on|on|in~Bukan kolokasi|for~Bukan kolokasi|at~Bukan kolokasi
+g157|Kolokasi Preposisi|capable + of|of|to~Bukan kolokasi|for~Bukan kolokasi|at~Bukan kolokasi
+g158|Kolokasi Preposisi|at war|at|in~Bukan kolokasi|on~Bukan kolokasi|with~Bukan kolokasi
+g159|Causative Have|have + obj + V3|V3|cutting~V-ing salah|to cut~to + V1 untuk get|cuts~Bentuk present
+g160|Causative Have|have + obj + V3|V3|service~V1 salah|servicing~V-ing salah|to service~to + V1 untuk get
+g161|Causative Get|get + person + to + V1|to + V1|help~Tanpa to|helping~V-ing salah|helped~V2 salah
+g162|Penghubung Kontras|Even though + clause|Even though|Despite~Butuh frasa, bukan klausa|In case~Berjaga-jaga|Unless~Syarat negatif
+g163|Penghubung Formal|; nonetheless,|nonetheless|moreover~Menambah informasi|consequently~Menyatakan akibat|likewise~Menyatakan kesamaan
+g164|Penghubung Tujuan|so that + clause|so that|in spite of~Kontras|as though~Pengandaian|whereas~Perbandingan
+g165|Penghubung Kontras|While + clause|While|Because~Sebab|Unless~Syarat negatif|Until~Batas waktu
+g166|Penghubung Kontras|in spite of + noun|in spite of|although~Butuh klausa|even though~Butuh klausa|whereas~Butuh klausa
+g167|Penghubung Kontras|; even so,|even so|for instance~Memberi contoh|in particular~Menekankan|as a result~Menyatakan akibat
+g168|Relative Clause|, which + V ,|which|that~that tidak dipakai setelah koma|what~what tidak dipakai|who~who untuk orang
+g169|Relative Clause|both of + whom|whom|who~who tidak setelah of|which~which untuk benda|them~them bukan kata penghubung
+g170|Relative Clause|preposisi + which|which|what~what tidak setelah preposisi|whom~whom untuk orang|whose~whose menunjukkan kepemilikan
+g171|Relative Clause|, which + V (seluruh klausa)|which|what~what tidak dipakai|that~that tidak dipakai setelah koma|it~it bukan penghubung
+g172|Relative Clause|whose + noun|whose|which~which tidak bisa diikuti kata benda milik|who's~Kependekan who is|that~that tidak untuk kepemilikan
+g173|Relative Clause|in + which|which|that~that tidak setelah preposisi|where~where tidak setelah preposisi|what~what tidak dipakai
+g174|Future Perfect Continuous|will have been + V-ing|Future Perfect Cont.|will wait~Future Simple; tidak menyatakan durasi|have waited~Present Perfect; konteks masa depan|am waiting~Present Continuous; tidak cocok|Mulai menunggu,Kamu tiba
+g175|Present Perfect (Stative)|have + known (stative)|Present Perfect|know~Present simple; tidak cocok dengan since|knew~Past simple; hubungan dianggap selesai|am knowing~know tidak dipakai continuous|Di sekolah,Sekarang
+g176|Past Perfect Continuous|had been + V-ing|Past Perfect Cont.|was working~Past continuous; tidak menyatakan sebelum tiba|has worked~Present perfect; konteks lampau|worked~Past simple; durasi kurang jelas|Mulai bekerja,Saya tiba
+g177|Used To|used to + V1|used to|am used to going~Terbiasa; bukan kebiasaan lampau yang berhenti|use to go~use to tanpa d tidak lazim di bentuk positif|was used to go~Bentuk salah
+g178|Future Continuous|will be + V-ing|Future Continuous|will live~Future simple; tidak menunjukkan sedang berlangsung|have lived~Present perfect; konteks masa depan|live~Present simple; tidak cocok|Sekarang,Tahun depan
+g179|Present Simple untuk Jadwal|jadwal tetap: V1 + s|Present Simple|left~Past simple; konteks masa depan|has left~Present perfect|is left~Pasif, tidak tepat
+g180|Past Perfect|first time + had + V3|Past Perfect|has travelled~Present perfect; konteks lampau|travelled~Past simple; tidak sesuai pola first time|was travelling~Past continuous; bukan pengalaman pertama
+g181|Present Perfect Continuous|has been + V-ing|Present Perfect Cont.|wrote~Past simple; tidak sampai sekarang|is written~Pasif; subjek he menulis|writes~Present simple; tidak cocok dengan all week|Mulai menulis,Sekarang
+g182|Regret|regret + to + V1|to + V1|informing~regret + V-ing = menyesali sesuatu yang sudah dilakukan|inform~Tanpa to|informed~V2 salah
+g183|Admit|admit + V-ing|V-ing|to break~admit tidak diikuti to + V1|break~Bentuk dasar tidak tepat|broke~V2 salah
+g184|Perfect Infinitive Pasif|believed + to have + V3|to have + V3|to leave~Present infinitive; peristiwa lampau|leaving~V-ing tidak tepat|having left~Bentuk perfect gerund
+g185|Can't Help|can't help + V-ing|V-ing|to think~Bukan pola|think~Tanpa V-ing|thought~V2 salah
+g186|Pasif Make|be made + to + V1|to + V1|wait~Tanpa to setelah pasif|waiting~V-ing salah|waited~V2 salah
+g187|It's No Use|it's no use + V-ing|V-ing|to cry~Bukan pola|cry~Bentuk dasar|cried~V2 salah
+g188|Too + Adj + To|too + adj + to + V1|to + V1|asking~V-ing salah|ask~Tanpa to|asked~V2 salah
+g189|Pasif dengan Infinitive|is expected + to + V1|to + V1|arriving~V-ing salah|arrives~Present simple salah|to be arrived~Bentuk pasif salah untuk arrive
+g190|Perfect Infinitive Pasif|to have been + V3|to have been|to be~Present infinitive; peristiwa lampau|being~V-ing tidak lazim|having been~Perfect gerund
+g191|Gerund Pasif|being + V3|being + V3|criticising~Aktif; he menerima kritik|to criticise~Infinitive aktif|criticised~V3 tanpa being
+g192|Modal Pasif|must be + V3|must be + V3|must receive~Aktif; applications tidak menerima|must have received~Perfect aktif|must receiving~Bentuk salah
+g193|Pasif Past Perfect|had been + V3|Past Perfect Pasif|has delayed~Aktif present perfect|was delaying~Aktif continuous|delayed~Aktif past simple|Penundaan,Kami diberi tahu
+g194|Ellipsis|do (auxiliary)|do|like~Kata kerja penuh tidak perlu diulang|am~Auxiliary salah|does~Subjek I memakai do
+g195|Neither|Neither + aux + S|Neither|So~So untuk persetujuan positif|Either~Either tidak di awal|Too~Too di akhir kalimat positif
+g196|Ellipsis|was (be)|was|did~Auxiliary salah untuk be|is~Present; konteks lampau|would~Tidak sesuai
+g197|Determiner|Neither of the two|Neither|None~None untuk lebih dari dua|No~No tidak diikuti of|Any~Any tidak untuk dua opsi negatif
+g198|Quantifier|a great deal of + tak terhitung|a great deal of|a great number of~Untuk terhitung jamak|many~Untuk terhitung jamak|few~Untuk terhitung jamak
+g199|Determiner|Not all of the + jamak|all|every~every tidak diikuti of|each~each tidak sesuai|either~either untuk dua pilihan
+g200|Determiner Negatif|have no idea|no|not~not butuh auxiliary|none~none tidak dipakai sebelum kata benda|any~any membuat kalimat negatif ganda`;
+var GMTXT=GM1+"\n"+GM2+"\n"+GM3;
+
+var VM1=`v1|Pilihan Kata|alleviate = meringankan, mengurangi|meringankan|~mengasingkan; alienate = membuat terasing|~mengalokasikan; allocate = membagi jatah|~bergantian; alternate = silih berganti
+v2|Bentuk Kata|considerable = cukup besar (adjektiva)|adjektiva (besar)|~penuh pertimbangan; considerate = perhatian pada orang lain|~kata kerja; Setelah a dibutuhkan adjektiva|~bentuk -ing; Tidak bisa menerangkan delay
+v3|Pilihan Kata|implement = menerapkan|menerapkan|~menyiratkan; imply = mengisyaratkan|~mengesankan; impress = membuat terkesan|~mengimpor; import = membawa dari luar negeri
+v4|Pilihan Kata|afford = mampu membeli|mampu membeli|~menawarkan; offer = menawarkan|~usaha; effort adalah kata benda|~mendukung; support tidak berpola to + V1 di sini
+v5|Bentuk Kata|reputation = nama baik (kata benda)|kata benda (nama baik)|~terpandang; reputable adalah adjektiva|~pengulangan; repetition = repetisi|~persyaratan; requirement = syarat
+v6|Pilihan Kata|effect = dampak (kata benda)|dampak (benda)|~memengaruhi; affect adalah kata kerja|~kasih sayang; affection = rasa sayang|~efektif; effective adalah adjektiva
+v7|Pilihan Kata|vulnerable to = rentan terhadap|rentan|~berharga; valuable = bernilai|~berubah-ubah; variable = bervariasi|~terlihat; visible = tampak
+v8|Pilihan Kata|predict = memprediksi|memprediksi|~mencegah; prevent = mencegah|~berpura-pura; pretend = pura-pura|~menghasilkan; produce = membuat
+v9|Kolokasi|strike a balance = menemukan keseimbangan|menemukan keseimbangan|~menangkap; catch a balance tidak lazim|~menarik; pull a balance tidak lazim|~melempar; throw a balance tidak lazim
+v10|Pilihan Kata|discourage = menghalangi|menghalangi|~mengecewakan; disappoint tidak berobjek from V-ing|~tidak setuju; disagree tidak berobjek langsung|~memberhentikan; dismiss = mengabaikan atau memecat
+v11|Pilihan Kata|fluctuate = naik turun|naik turun|~memukau; fascinate = menarik minat|~menjilat; flatter = memuji berlebihan|~fasih; fluent adalah adjektiva
+v12|Kolokasi|impose a ban = memberlakukan larangan|memberlakukan|~menyusun; compose = menggubah|~membuang; dispose = membuang|~menduga; suppose = mengira
+v13|Bentuk Kata|the + construction = pembangunan (kata benda)|kata benda (pembangunan)|~membangun (adj); constructive = bersifat membangun|~pembangun orang; constructor = orang yang membangun|~kata kerja bentuk lampau; Setelah the of dibutuhkan kata benda
+v14|Pilihan Kata|overview = gambaran umum|gambaran umum|~menyalip; overtake = mendahului|~mengabaikan; overlook = melewatkan|~mengatasi; overcome = melampaui
+v15|Pilihan Kata|likely = kemungkinan besar|kemungkinan besar|~kemiripan; likeness = kesamaan wujud|~kesukaan; liking = rasa suka|~serupa; alike = mirip
+v16|Pilihan Kata|oppose = menentang|menentang|~menindas; oppress = menindas|~sebaliknya; opposite adalah adjektiva atau benda|~tepat waktu; opportune = pas waktunya
+v17|Pilihan Kata|reduce = mengurangi|mengurangi|~menaikkan; raise bertentangan dengan konteks|~memperpanjang; extend memperpanjang waktu|~memastikan; ensure = menjamin
+v18|Pilihan Kata|submit = menyerahkan|menyerahkan|~menenggelamkan; submerge = merendam|~berlangganan; subscribe = berlangganan|~menggantikan; substitute = mengganti
+v19|Pilihan Kata|facilities = fasilitas|fasilitas|~fakultas; faculties = fakultas atau kemampuan|~pemandu; facilitators = fasilitator|~kemampuan; abilities = kemampuan orang
+v20|Bentuk Kata|convincing = meyakinkan|meyakinkan|~merasa yakin; convinced tentang orang yang yakin|~meyakinkan (kerja); convince adalah kata kerja|~nyaman; convenient = praktis
+v21|Pilihan Kata|disproportionate = tidak seimbang|tidak seimbang|~sembarangan; indiscriminate = tanpa pilih-pilih|~sangat penting; indispensable = tak tergantikan|~tidak mencolok; inconspicuous = tidak kentara
+v22|Pilihan Kata|compelled = dipaksa|dipaksa|~mematuhi; complied tidak berpasif seperti ini|~menyusun; compiled = mengumpulkan data|~melengkapi; complemented = melengkapi
+v23|Pilihan Kata|augment = menambah|menambah|~menunda; adjourn = menunda sidang|~menghapus; abolish = menghapuskan|~meninggalkan; abandon = menelantarkan
+v24|Kolokasi|curb reliance = membatasi|membatasi|~mengeriting; curl = mengeriting|~melengkung; curve = melengkung|~mengutuk; curse = mengutuk
+v25|Kolokasi|fraught with = penuh dengan|penuh dengan|~rapuh; frail = lemah|~ganas; fierce = garang|~sekejap; fleeting = cepat berlalu
+v26|Kolokasi|attributable to = dapat dikaitkan dengan|dapat dikaitkan|~bersifat atributif; attributive istilah tata bahasa|~menyumbang; contributory tidak berpasangan dengan to di sini|~bertanggung jawab; accountable berpola for
+v27|Pilihan Kata|holistic = menyeluruh|menyeluruh|~bermusuhan; hostile = memusuhi|~hipotetis; hypothetical = berandai-andai|~histeris; hysterical = panik
+v28|Pilihan Kata|vehement = sangat keras|sangat keras|~kosong; vacant = kosong|~rentan; vulnerable = mudah terluka|~tegak lurus; vertical = vertikal
+v29|Pilihan Kata|dwindle = menyusut|menyusut|~tinggal; dwell = berdiam|~mengerdilkan; dwarf = membuat tampak kecil|~menipu; delude = memperdaya
+v30|Pilihan Kata|imprudent = tidak bijaksana|tidak bijaksana|~tidak memihak; impartial = netral|~mustahil; improbable = kecil kemungkinannya|~sempurna; impeccable = tanpa cela
+v31|Pilihan Kata|soar = melonjak|melonjak|~menjadi asam; sour = memburuk|~melorot; sag = kendur|~anjlok; slump = merosot
+v32|Pilihan Kata|summarily = secara langsung tanpa proses|tanpa proses|~serupa; similarly = demikian juga|~bersamaan; simultaneously = sekaligus|~secukupnya; sufficiently = cukup
+v33|Kolokasi|mutually exclusive = saling meniadakan|saling meniadakan|~inklusif; inclusive = mencakup|~berlebihan; excessive = melampaui batas|~pengecualian; exclusion adalah kata benda
+v34|Kolokasi|pave the way = membuka jalan|membuka jalan|~melangkah; pace = langkah|~pucat; pale = pucat|~pasak; peg = pasak
+v35|Pilihan Kata|perpetuate = melanggengkan|melanggengkan|~melakukan kejahatan; perpetrate = melakukan kejahatan|~meresap; permeate = menembus|~membingungkan; perplex = membingungkan
+v36|Pilihan Kata|reconcile = mendamaikan|mendamaikan|~membangun ulang; reconstruct = merekonstruksi|~mengingat; recollect = mengingat|~merekrut; recruit = merekrut
+v37|Pilihan Kata|repercussions = dampak lanjutan|dampak lanjutan|~reputasi; reputations = nama baik|~reproduksi; reproductions = salinan|~pengunduran diri; resignations = pengunduran diri
+v38|Kolokasi|consistent with = sejalan dengan|sejalan|~bersikeras; insistent = ngotot|~tahan; resistant = menolak|~ada; existent = nyata ada
+v39|Pilihan Kata|adamant = bersikukuh|bersikukuh|~memadai; adequate = cukup|~kecanduan; addicted = ketagihan|~bersebelahan; adjacent = berdekatan
+v40|Pilihan Kata|underscore = menegaskan|menegaskan|~melemahkan; undermine = merusak|~mengalami; undergo = menjalani|~meremehkan; underestimate = menganggap kecil
+v41|Pilihan Kata|expand = memperluas|memperluas|~menghabiskan; expend = mengeluarkan|~mengharapkan; expect = berharap|~memaparkan; expose = membuka
+v42|Pilihan Kata|achieve a dream = mewujudkan|mewujudkan|~tiba; arrive = sampai|~memperoleh; acquire = mendapatkan barang atau keahlian|~mampu membeli; afford = sanggup beli
+v43|Bentuk Kata|the + inconvenience = ketidaknyamanan (benda)|kata benda|~tidak nyaman (adj); inconvenient adalah adjektiva|~dengan tidak nyaman; inconveniently adalah adverbia|~merepotkan (lampau); inconvenienced adalah kata kerja
+v44|Pilihan Kata|distinguish between = membedakan|membedakan|~mengalihkan; distract = mengganggu fokus|~membagikan; distribute = membagi|~memutarbalikkan; distort = mengubah bentuk
+v45|Pilihan Kata|a collection of = kumpulan|kumpulan|~bersama; collective adalah adjektiva|~kolektor; collector = orang yang mengumpulkan|~tabrakan; collision = benturan
+v46|Pilihan Kata|postpone = menunda|menunda|~mencegah; prevent = menghalangi|~mendahului; precede = datang sebelum|~melanjutkan; proceed = meneruskan
+v47|Pilihan Kata|tedious = membosankan|membosankan|~rapi; tidy = rapi|~lembut; tender = lembut|~teliti; thorough = menyeluruh
+v48|Pilihan Kata|consider = mempertimbangkan|mempertimbangkan|~membangun; construct = membangun|~mengonsumsi; consume = makan atau memakai habis|~memuat; contain = berisi
+v49|Pilihan Kata|disqualify = mendiskualifikasi|mendiskualifikasi|~dibebaskan; discharge = membebaskan atau memulangkan|~dipecat; dismiss = memberhentikan|~terganggu; distract = teralihkan
+v50|Pilihan Kata|protest against = memprotes|memprotes|~membuktikan; prove = membuktikan|~mempromosikan; promote = memajukan|~melindungi; protect = melindungi
+v51|Pilihan Kata|commitment to = komitmen terhadap|komitmen|~panitia; committee = komite|~komisi; commission = bayaran atau tugas|~komoditas; commodity = barang dagangan
+v52|Pilihan Kata|discover = menemukan|menemukan|~membahas; discuss = berdiskusi|~mengecilkan hati; discourage = menghalangi|~memberi diskon; discount = mengurangi harga
+v53|Pilihan Kata|bland = hambar|hambar|~tumpul; blunt = tumpul atau blak-blakan|~kosong; blank = kosong|~suram; bleak = muram
+v54|Pilihan Kata|punctual = tepat waktu|tepat waktu|~sabar; patient = sabar|~sopan; polite = sopan|~populer; popular = digemari
+v55|Pilihan Kata|remote = terpencil|terpencil|~memindahkan; remove = menyingkirkan|~berkomentar; remark = berkata|~tetap tinggal; remain = tetap
+v56|Bentuk Kata|more + efficient = lebih efisien (adj)|adjektiva|~efisiensi; efficiency adalah kata benda|~dengan efisien; efficiently adalah adverbia|~efek; effects adalah kata benda
+v57|Bentuk Kata|straightforward = lugas|adjektiva (lugas)|~selat; strait = selat|~meluruskan; straighten adalah kata kerja|~bentuk salah; straightly tidak lazim
+v58|Pilihan Kata|merge = bergabung|bergabung|~berduka; mourn = berkabung|~memperbaiki; mend = menambal|~mencampur; mix tidak untuk perusahaan menjadi satu
+v59|Bentuk Kata|a + sharp + increase = kenaikan tajam (adj)|adjektiva|~mengasah; sharpen adalah kata kerja|~dengan tajam; sharply adalah adverbia|~berbentuk; shaped adalah kata kerja lampau
+v60|Pilihan Kata|accept an invitation = menerima|menerima|~kecuali; except = selain|~mengharapkan; expect = berharap|~kutipan; excerpt = cuplikan
+v61|Pilihan Kata|inform someone of = memberi tahu|memberi tahu|~tidak resmi; informal adalah adjektiva|~informasi; information adalah kata benda|~bentuk -ing; informing tidak setelah please
+v62|Bentuk Kata|was damaged = rusak (pasif)|rusak (pasif)|~merusak; damaging bersifat aktif|~kerusakan; damages adalah kata benda jamak|~lembap; damp = basah
+v63|Pilihan Kata|curious = ingin tahu|ingin tahu|~sopan; courteous = santun|~hati-hati; cautious = waspada|~kejam; cruel = kejam
+v64|Pilihan Kata|mission = misi|misi|~gerakan; motion = gerak|~rumah besar; mansion = mansion|~menyebut; mention = menyebutkan
+v65|Bentuk Kata|nervous = gugup (adj)|adjektiva|~dengan gugup; nervously adalah adverbia|~saraf; nerve adalah kata benda|~saraf jamak; nerves adalah kata benda jamak
+v66|Kolokasi|make progress = membuat kemajuan|membuat|~melakukan; do progress tidak lazim|~mengambil; take progress tidak lazim|~mendapatkan; get progress tidak lazim
+v67|Kolokasi|take a risk = mengambil risiko|mengambil|~membuat; make a risk tidak lazim|~melakukan; do a risk tidak lazim|~memiliki; have a risk tidak lazim
+v68|Kolokasi|do someone a favour = menolong|melakukan|~membuat; make a favour tidak lazim|~memberi; give a favour tidak lazim|~mengambil; take a favour tidak lazim
+v69|Kolokasi|make a complaint = mengajukan keluhan|membuat|~melakukan; do a complaint tidak lazim|~mengambil; take a complaint tidak lazim|~memberi; give a complaint tidak lazim
+v70|Pilihan Kata|attract attention = menarik perhatian|menarik|~melekatkan; attach = menempelkan|~menghadiri; attend = datang ke|~mencoba; attempt = berusaha
+v71|Kolokasi|take advantage of = memanfaatkan|memanfaatkan|~membuat; make advantage tidak lazim|~mendapat; get advantage tidak lazim|~memiliki; have advantage tidak berpola of
+v72|Kolokasi|make a profit = meraup laba|membuat|~melakukan; do a profit tidak lazim|~memberi; give a profit tidak lazim|~mengambil; take a profit tidak lazim
+v73|Kolokasi|pay attention = memperhatikan|membayar|~menghabiskan; spend attention tidak lazim|~kehilangan; lose attention berarti kehilangan fokus|~menahan; hold attention = mempertahankan perhatian
+v74|Kolokasi|earn a living = mencari nafkah|mencari nafkah|~memenangkan; win a living tidak lazim|~memperoleh; gain a living tidak lazim|~mencapai; reach a living tidak lazim
+v75|Kolokasi|engaged in = terlibat dalam|terlibat|~mendaftar; enrolled in = terdaftar|~dipekerjakan; employed by = bekerja untuk|~menikmati; enjoyed bersifat aktif
+v76|Kolokasi|come into effect = mulai berlaku|mulai berlaku|~berlari; run into effect tidak lazim|~berbalik; turn into effect tidak lazim|~jatuh; fall into effect tidak lazim
+v77|Kolokasi|take + waktu = memakan waktu|memakan waktu|~menghabiskan; spent berpola spend time + V-ing|~bertahan; lasted tidak berobjek me|~membutuhkan; needed tidak berobjek me
+v78|Kolokasi|in the long run = dalam jangka panjang|jangka panjang|~jauh; far run tidak lazim|~luas; wide run tidak lazim|~besar; large run tidak lazim
+v79|Kolokasi|a sense of humour = selera humor|selera|~perasaan; feel of humour tidak lazim|~rasa; taste of humour tidak lazim|~penglihatan; sight of humour tidak lazim
+v80|Kolokasi|badly short of = sangat kekurangan|sangat|~nyaris tidak; hardly short tidak lazim|~kira-kira; roughly short tidak lazim|~hampir; nearly short tidak lazim
+v81|Phrasal Verb|take off = lepas landas|lepas landas|~mengambil alih; take on = menerima tugas|~mulai menekuni; take up = mulai suka|~mengeluarkan; take out = membawa keluar
+v82|Phrasal Verb|give up = berhenti|berhenti|~menyerah; give in = mengalah|~membagikan; give out = membagikan|~memberikan gratis; give away = menghadiahkan
+v83|Phrasal Verb|turn down = mengecilkan|mengecilkan|~membesarkan; turn up = menaikkan volume|~membalik; turn over = membalikkan|~berubah menjadi; turn into = menjadi
+v84|Phrasal Verb|run out of = kehabisan|kehabisan|~run off of tidak lazim|~run over of tidak lazim|~run down of tidak lazim
+v85|Phrasal Verb|take after = mirip dengan|mirip|~mengambil alih; take over = mengambil alih|~mulai menekuni; take up = mulai suka|~lepas landas; take off = melepas
+v86|Phrasal Verb|pick up = menjemput|menjemput|~membawa; take up tidak berarti menjemput|~menarik; pull up = menepi|~meletakkan; put up = memasang
+v87|Phrasal Verb|call off = membatalkan|membatalkan|~menunda; put off = menangguhkan|~menahan; held off = menunda|~menjaga; kept off = menjauhi
+v88|Phrasal Verb|tidy up = merapikan|merapikan|~mengikat; tie up = mengikat|~memutar; turn up = muncul|~mengambil; take up = mengambil
+v89|Phrasal Verb|figure out = memahami|memahami|~membawa; carry out = melaksanakan|~melewati; pass out = pingsan|~membawa; bring out = merilis
+v90|Phrasal Verb|come up with = mencetuskan|mencetuskan|~mendapat; get up with tidak lazim|~pergi; go up with tidak lazim|~menaruh; put up with = mentoleransi
+v91|Phrasal Verb|get along with = akur dengan|akur|~datang; come along = ikut|~mengambil; take along = membawa serta|~berbalik; turn along tidak lazim
+v92|Phrasal Verb|grow up = tumbuh dewasa|tumbuh dewasa|~membesarkan; raised up butuh objek|~naik; rose up = bangkit|~membawa; brought up = dibesarkan orang lain
+v93|Phrasal Verb|cut down on = mengurangi|mengurangi|~menolak; turn down on tidak lazim|~merusak; break down on tidak lazim|~mencari; look down on = meremehkan
+v94|Phrasal Verb|bring out = merilis|merilis|~mengambil; took out = mengeluarkan|~menyimpan; kept out = menjauhkan|~jatuh; fell out = bertengkar
+v95|Phrasal Verb|break into = membobol|membobol|~menerobos; break over tidak lazim|~pecah keluar; break out = terjadi tiba-tiba|~mogok; break up = berakhir
+v96|Sinonim|mandatory = wajib; sinonim compulsory|wajib|~bersifat pilihan; optional berlawanan|~digemari; popular = populer|~mahal; expensive = mahal
+v97|Sinonim|reluctant = enggan; sinonim unwilling|enggan|~bersemangat; eager berlawanan|~tidak mampu; unable = tidak sanggup|~sial; unlucky = tidak beruntung
+v98|Sinonim|abundant = berlimpah; sinonim plentiful|berlimpah|~langka; scarce berlawanan|~mendadak; abrupt = tiba-tiba|~kuno; ancient = purba
+v99|Sinonim|genuine = asli; sinonim real|asli|~palsu; fake berlawanan|~dermawan; generous = murah hati|~umum; general = umum
+v100|Sinonim|trivial = remeh; sinonim unimportant|remeh|~mendesak; urgent berlawanan|~rumit; complicated = rumit|~berbahaya; dangerous = berbahaya`;
+
+var VM2=`v101|Sinonim|obvious = jelas; sinonim clear|jelas|~tersembunyi; hidden berlawanan|~diragukan; doubtful = meragukan|~tidak mungkin; unlikely = kecil kemungkinan
+v102|Sinonim|enormous = sangat besar; sinonim huge|sangat besar|~sangat kecil; tiny berlawanan|~biasa; ordinary = lazim|~kosong; empty = kosong
+v103|Sinonim|furious = sangat marah|sangat marah|~sangat lelah; makna very tired berbeda|~sangat senang; berlawanan|~sangat sopan; tidak terkait marah
+v104|Sinonim|essential = penting sekali|diperlukan|~bersifat pilihan; optional berlawanan|~menyenangkan; pleasant = enak|~biasa; ordinary = lazim
+v105|Sinonim|fragile = mudah pecah|mudah pecah|~sangat berat; very heavy tidak sesuai|~sangat tua; very old tidak sesuai|~sangat terang; very bright tidak sesuai
+v106|Sinonim|purchase = membeli|membeli|~menjual; sell berlawanan|~meminjam; borrow = meminjam|~memperbaiki; repair = memperbaiki
+v107|Sinonim|assist = membantu|membantu|~menghalangi; hinder berlawanan|~memeriksa; inspect = memeriksa|~mengundang; invite = mengundang
+v108|Sinonim|hesitate = ragu-ragu|berhenti sejenak|~bertindak cepat; berlawanan|~menolak keras; lebih kuat dari ragu|~setuju senang hati; berlawanan
+v109|Sinonim|ancient = kuno|sangat tua|~sangat aneh; strange = aneh|~sangat besar; large = besar|~sangat langka; rare = jarang
+v110|Sinonim|dependable = dapat diandalkan|dapat diandalkan|~ceroboh; careless berlawanan|~luwes; flexible = fleksibel|~rendah hati; humble = sederhana
+v111|Bentuk Kata|his + creativity = kreativitasnya (benda)|kata benda|~kreatif; creative adalah adjektiva|~secara kreatif; creatively adalah adverbia|~menciptakan; create adalah kata kerja
+v112|Bentuk Kata|spoke + enthusiastically = penuh semangat (adv)|adverbia|~antusias; enthusiastic adalah adjektiva|~antusiasme; enthusiasm adalah kata benda|~penggemar; enthusiast = orang yang antusias
+v113|Bentuk Kata|the + completion = penyelesaian (benda)|kata benda|~lengkap; complete adalah adjektiva atau kata kerja|~sepenuhnya; completely adalah adverbia|~menyelesaikan; completing adalah bentuk -ing
+v114|Bentuk Kata|It was kind of you = baik hati (adj)|adjektiva|~kebaikan; kindness adalah kata benda|~dengan baik; kindly adalah adverbia|~jenis; kinds adalah kata benda jamak
+v115|Bentuk Kata|their contribution = kontribusi (benda)|kata benda|~menyumbang; contribute adalah kata kerja|~penyumbang; contributor = orang yang menyumbang|~bersifat menyumbang; contributory adalah adjektiva
+v116|Bentuk Kata|patient = sabar (adj)|adjektiva|~kesabaran; patience adalah kata benda|~dengan sabar; patiently adalah adverbia|~pasien; patients = para pasien
+v117|Bentuk Kata|dependent on = bergantung pada (adj)|adjektiva|~ketergantungan; dependence adalah kata benda|~bergantung; depend adalah kata kerja|~secara bergantung; dependently tidak lazim
+v118|Bentuk Kata|were shocked = terkejut (pasif)|terkejut|~mengejutkan; shocking menerangkan penyebab|~keterkejutan; shock adalah kata benda|~sangat mengejutkan; shockingly adalah adverbia
+v119|Bentuk Kata|the distance = jarak (benda)|kata benda|~jauh; distant adalah adjektiva|~dari jauh; distantly adalah adverbia|~berbeda; distinct = jelas berbeda
+v120|Bentuk Kata|answered carefully = dengan hati-hati (adv)|adverbia|~berhati-hati; careful adalah adjektiva|~perhatian; care adalah kata benda|~kehati-hatian; carefulness jarang dipakai
+v121|Pilihan Kata|abstruse = sulit dipahami|sulit dipahami|~mendadak; abrupt = tiba-tiba|~berlimpah; abundant = banyak|~kasar; abrasive = menggores atau ketus
+v122|Pilihan Kata|dismay = kekecewaan mendalam|kekecewaan|~memberhentikan; dismiss adalah kata kerja|~membongkar; dismantle adalah kata kerja|~mengirim; dispatch = mengirim
+v123|Pilihan Kata|flippant = tidak sopan atau main-main|tidak serius|~luwes; flexible = fleksibel|~fasih; fluent = lancar|~hemat; frugal = hemat
+v124|Pilihan Kata|safeguard = menjaga|menjaga|~merusak; sabotage = menyabotase|~menyia-nyiakan; squander = memboroskan|~menekan; suppress = membungkam
+v125|Pilihan Kata|corroborate = menguatkan|menguatkan|~menyangkal; refute berlawanan|~mengabaikan; disregard berlawanan dengan matches|~memperumit; complicate = merumitkan
+v126|Pilihan Kata|eloquent = fasih bicara|fasih|~sulit ditangkap; elusive = licin|~memenuhi syarat; eligible = layak|~lanjut usia; elderly = lansia
+v127|Pilihan Kata|tarnish = menodai|menodai|~menjinakkan; tame = menjinakkan|~menangani; tackle = mengatasi|~merawat; tend = cenderung
+v128|Pilihan Kata|deadlock = kebuntuan|kebuntuan|~terobosan; breakthrough berlawanan|~tonggak; landmark = penanda penting|~jalan pintas; shortcut = jalan singkat
+v129|Pilihan Kata|spurious = palsu atau tidak sahih|tidak sahih|~lapang; spacious = luas|~jarang; sparse = sedikit|~spektakuler; spectacular = menakjubkan
+v130|Pilihan Kata|daunted = gentar|gentar|~dicoreng; daubed = dilumuri|~terpesona; dazzled = silau|~mulai terang; dawned adalah kata kerja aktif
+v131|Pilihan Kata|peppered with = dibumbui|dipenuhi|~bersemangat; pepped tidak lazim di sini|~dilapisi; paved = diaspal|~ditusuk; pierced = ditembus
+v132|Pilihan Kata|wholehearted = tulus sepenuh hati|sepenuh hati|~gandum utuh; whole-wheat = gandum|~menyeluruh; holistic tidak menerangkan welcome|~hampa; hollow = kosong
+v133|Pilihan Kata|naive = naif|naif|~mulia; noble = luhur|~nominal; nominal = sekadar nama|~terkenal buruk; notorious = tersohor jelek
+v134|Pilihan Kata|reckless = ceroboh|ceroboh|~enggan; reluctant = enggan|~relevan; relevant = terkait|~andal; reliable = dapat dipercaya
+v135|Pilihan Kata|meticulous = teliti|teliti|~sedikit; meagre = minim|~membosankan; mundane = biasa|~bersama; mutual = timbal balik
+v136|Pilihan Kata|dispatch = mengirim|dikirim|~dilenyapkan; dispel = menghapus keraguan|~dibuang; dispose = membuang|~dibantah; dispute = memperdebatkan
+v137|Pilihan Kata|abrasive = kasar atau ketus|ketus|~menyerap; absorbent = menyerap|~abstrak; abstract = tak berwujud|~mutlak; absolute = mutlak
+v138|Pilihan Kata|incompatible = tidak cocok|tidak cocok|~tidak lengkap; incomplete = belum lengkap|~luar biasa; incredible = tak terpercaya|~merepotkan; inconvenient = tidak praktis
+v139|Pilihan Kata|glowing review = ulasan sangat positif|sangat positif|~menyilaukan; glaring = mencolok|~muram; gloomy = suram|~mengilap; glossy = licin
+v140|Pilihan Kata|hollow promises = janji kosong|kosong|~tergesa; hasty = terburu-buru|~rendah hati; humble = sederhana|~memusuhi; hostile = bermusuhan
+v141|Pilihan Kata|escalate = meningkat tajam|meningkat|~melarikan diri; escape = lolos|~mengevakuasi; evacuate = mengungsikan|~menaikkan; elevating butuh objek
+v142|Pilihan Kata|consensus = kesepakatan umum|kesepakatan|~izin; consent = persetujuan|~akibat; consequence = konsekuensi|~konsumsi; consumption = pemakaian
+v143|Pilihan Kata|reticent = pendiam|tertutup|~ceroboh; reckless = nekat|~tak kenal lelah; relentless = gigih|~hormat; reverent = penuh hormat
+v144|Pilihan Kata|feasible = layak dilakukan|layak|~lemah; feeble = lemah|~subur; fertile = subur|~hemat; frugal = irit
+v145|Pilihan Kata|uncompromising = tak kenal kompromi|tak kompromi|~tidak lazim; unconventional = nyeleneh|~tidak nyaman; uncomfortable = kurang enak|~tidak pasti; uncertain = belum yakin
+v146|Kolokasi|cast doubt on = menimbulkan keraguan|menimbulkan|~menaruh; place doubt on tidak lazim|~meletakkan; lay doubt on tidak lazim|~menetapkan; set doubt on tidak lazim
+v147|Kolokasi|play a role = berperan|berperan|~melakukan; do a role tidak lazim|~membuat; make a role tidak lazim|~bertindak; act a role tidak lazim
+v148|Kolokasi|under pressure = di bawah tekanan|tekanan|~menekan; press adalah kata kerja|~mendesak; pressing = genting|~ditekan; pressed adalah kata kerja lampau
+v149|Kolokasi|tentative agreement = kesepakatan sementara|sementara|~rapi; tidy = rapi|~cerewet; talkative = banyak bicara|~tak kenal lelah; tireless = gigih
+v150|Kolokasi|meet with resistance = menuai penolakan|penolakan|~menolak; resisting adalah bentuk -ing|~menolak; resists adalah kata kerja|~tahan; resistant adalah adjektiva`;
+
+var VM3=`v151|Kolokasi|fair to say = adil untuk dikatakan|adil|~cocok; fit to say tidak lazim|~suka; fond to say tidak lazim|~cepat; fast to say tidak lazim
+v152|Kolokasi|a body of evidence = sekumpulan bukti|kumpulan|~kelompok; a group of evidence tidak lazim|~ikatan; a bundle of evidence tidak lazim|~tandan; a bunch of evidence tidak lazim
+v153|Kolokasi|around the clock = siang malam|sepanjang waktu|~over the clock tidak lazim|~through the clock tidak lazim|~along the clock tidak lazim
+v154|Kolokasi|seize an opportunity = memanfaatkan peluang|menyambar|~mendudukkan; seat = mendudukkan|~menanam; seed = menyemai|~menyegel; seal = menutup rapat
+v155|Kolokasi|in line with = sejalan dengan|sejalan|~on line with tidak lazim|~at line with tidak lazim|~by line with tidak lazim
+v156|Kolokasi|bilateral talks = pembicaraan dua pihak|dua pihak|~dwibahasa; bilingual = dua bahasa|~dua bulanan; bimonthly = tiap dua bulan|~dua kali setahun; biannual = semesteran
+v157|Kolokasi|conscious effort = upaya sadar|sadar|~hati nurani; conscience adalah kata benda|~kesadaran; consciousness adalah kata benda|~dengan sadar; consciously adalah adverbia
+v158|Kolokasi|bleak picture = gambaran suram|suram|~kosong; blank = kosong|~tumpul; blunt = tumpul|~buta; blind = buta
+v159|Kolokasi|face the consequences = menanggung akibat|menghadapi|~memukul; hit the consequences tidak lazim|~bergabung; join the consequences tidak lazim|~menahan; hold the consequences tidak lazim
+v160|Kolokasi|draw heavily on = banyak bersumber dari|banyak|~sedikit; lightly bertentangan dengan almost every scene|~nyaris tidak; scarcely bertentangan|~jarang; rarely bertentangan
+v161|Phrasal Verb|put up with = mentoleransi|mentoleransi|~come up with = menemukan ide|~catch up with = menyusul|~turn up with tidak lazim
+v162|Phrasal Verb|bring about = menyebabkan|menyebabkan|~take about tidak lazim|~put about = menyebarkan kabar|~held about tidak lazim
+v163|Phrasal Verb|turn down = menolak|menolak|~put down = meletakkan atau mengkritik|~set down = menurunkan atau mencatat|~hold down = menahan
+v164|Phrasal Verb|look into = menyelidiki|menyelidiki|~run into = bertemu tak sengaja|~take into tidak lazim di sini|~keep into tidak lazim
+v165|Phrasal Verb|set up = mendirikan|mendirikan|~hold up = menunda atau merampok|~keep up = mempertahankan|~make up = mengarang atau berdamai
+v166|Phrasal Verb|rule out = menyingkirkan kemungkinan|menyingkirkan|~rub out = menghapus|~row out tidak lazim|~roll out = meluncurkan
+v167|Phrasal Verb|crop up = muncul tak terduga|muncul|~keep up = mempertahankan|~dig up = menggali|~tie up = mengikat
+v168|Phrasal Verb|strike down = membatalkan putusan|membatalkan|~shut down = menutup|~cut down = memangkas|~hit down tidak lazim
+v169|Phrasal Verb|ward off = menangkal|menangkal|~wade off tidak lazim|~wash off = membasuh|~wipe off = mengelap
+v170|Phrasal Verb|go over = meninjau|meninjau|~get over = pulih dari|~take over = mengambil alih|~hand over = menyerahkan
+v171|Phrasal Verb|flare up = meletus|meletus|~fold up = melipat atau bangkrut|~flush up tidak lazim|~flip up tidak lazim
+v172|Phrasal Verb|wear oneself out = kelelahan|kelelahan|~tore herself out tidak lazim|~bore herself out tidak lazim|~swore herself out tidak lazim
+v173|Phrasal Verb|get over = pulih dari|pulih|~go over = meninjau|~run over = menabrak|~pass over = melewati
+v174|Phrasal Verb|drag on = berlarut-larut|berlarut-larut|~pull on = mengenakan|~push on = melanjutkan|~haul on tidak lazim
+v175|Phrasal Verb|step down = mengundurkan diri|mundur|~sit down = duduk|~walk down = berjalan menuruni|~climb down = mengalah
+v176|Sinonim|ubiquitous = ada di mana-mana|ada di mana-mana|~sangat tua; very old bukan artinya|~sangat langka; berlawanan|~sulit terlihat; hard to see bukan artinya
+v177|Sinonim|ephemeral = sesaat|sesaat|~abadi; eternal berlawanan|~rapuh; fragile = mudah pecah|~mulia; glorious = megah
+v178|Sinonim|candid = terus terang|terus terang|~santun; polite = sopan|~ragu; hesitant = ragu-ragu|~bermusuhan; hostile = memusuhi
+v179|Sinonim|ambiguous = bermakna ganda|bermakna ganda|~sangat jelas; berlawanan|~sangat ambisius; ambitious = ambisius|~mustahil; impossible = tidak mungkin
+v180|Sinonim|pragmatic = praktis|praktis|~ideal; ideal = sempurna dalam angan|~keras kepala; stubborn = ngotot|~teoretis; theoretical berlawanan
+v181|Sinonim|scrutinise = menelaah|memeriksa teliti|~mengabaikan; berlawanan|~mengagumi; admire = kagum|~menyembunyikan; hide = menyembunyikan
+v182|Sinonim|exacerbate = memperburuk|memperburuk|~memperjelas; berlawanan|~melebih-lebihkan; exaggerate = membesar-besarkan|~memeriksa; examine = memeriksa
+v183|Sinonim|tenacious = gigih|gigih|~cerewet; talkative = banyak bicara|~tegang; tense = tegang|~rapi; tidy = rapi
+v184|Sinonim|formidable = menggentarkan|menggentarkan|~berbentuk baik; well-formed bukan artinya|~sangat sopan; polite = santun|~kuno; old-fashioned = ketinggalan zaman
+v185|Sinonim|eradicate = membasmi|membasmi|~mengurangi pelan; gradually reduce bukan artinya|~menyelidiki; investigate = menyelidiki|~melemahkan; weaken = melemahkan
+v186|Sinonim|lenient = longgar atau toleran|toleran|~sangat keras; harsh berlawanan|~hati-hati; cautious = waspada|~panjang; lengthy = bertele-tele
+v187|Sinonim|scant = sedikit sekali|sangat sedikit|~melimpah; plentiful berlawanan|~dipindai; scanned = discan|~menakutkan; scary = seram
+v188|Sinonim|tangible = nyata dan dapat diukur|nyata|~khayalan; imaginary berlawanan|~mahal; expensive = mahal|~sementara; temporary = sementara
+v189|Sinonim|viable = layak dijalankan|layak|~terlihat; visible = tampak|~berharga; valuable = bernilai|~kejam; vicious = buas
+v190|Sinonim|lucid = jernih|jernih|~bingung; confused berlawanan|~malas; lazy = malas|~cerah; bright = terang atau cerdas
+v191|Bentuk Kata|the + reliability = keandalan (benda)|kata benda|~andal; reliable adalah adjektiva|~dengan andal; reliably adalah adverbia|~bergantung; rely adalah kata kerja
+v192|Bentuk Kata|great + conviction = keyakinan kuat (benda)|kata benda|~narapidana; convict = terpidana|~meyakinkan; convincing adalah adjektiva|~yakin; convinced adalah adjektiva
+v193|Bentuk Kata|growing awareness = kesadaran (benda)|kata benda|~sadar; aware adalah adjektiva|~bentuk salah; awarely tidak ada|~bentuk salah; awares tidak ada
+v194|Bentuk Kata|the ratification = pengesahan (benda)|kata benda|~mengesahkan; ratify adalah kata kerja|~disahkan; ratified adalah kata kerja lampau|~mengesahkan; ratifying adalah bentuk -ing
+v195|Bentuk Kata|reluctance to = keengganan (benda)|kata benda|~enggan; reluctant adalah adjektiva|~dengan enggan; reluctantly adalah adverbia|~bentuk jamak; reluctances tidak lazim
+v196|Bentuk Kata|notoriously difficult = terkenal sulit (adv)|adverbia|~terkenal buruk; notorious adalah adjektiva|~reputasi buruk; notoriety adalah kata benda|~bentuk jamak; notorieties tidak lazim
+v197|Bentuk Kata|history of rivalry = persaingan (benda)|kata benda|~saingan; rival adalah orang atau kata kerja|~bersaing; rivalled adalah kata kerja lampau|~bentuk salah; rivally tidak ada
+v198|Bentuk Kata|enthusiasm = antusiasme (benda)|kata benda|~antusias; enthusiastic adalah adjektiva|~dengan antusias; enthusiastically adalah adverbia|~bersemangat; enthuse adalah kata kerja
+v199|Bentuk Kata|the closure = penutupan (benda)|kata benda|~ditutup; closed adalah adjektiva|~dengan dekat; closely adalah adverbia|~lemari kecil; closet adalah kata benda lain
+v200|Bentuk Kata|her dedication = dedikasi (benda)|kata benda|~mengabdikan; dedicate adalah kata kerja|~berdedikasi; dedicated adalah adjektiva|~dengan berdedikasi; dedicatedly jarang dipakai`;
+var VMTXT=VM1+"\n"+VM2+"\n"+VM3;
+
+var RMTXT=`r1-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak ada; Teks tidak menyebut pemilik toko membayar|~Tidak ada; Teks tidak membandingkan dengan kota lain|~Tidak ada; Pajak baru tidak disebut
+r2-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak sesuai; Orang yang bekerja dari rumah tidak disebut terdampak|~Tidak sesuai; Pengemudi tidak bergantung pada angkutan umum|~Tidak sesuai; Ekonom bukan kelompok yang terdampak
+r3-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teks tidak menyatakan masalah sudah selesai|~Bertentangan; Teks menyebut baterai dan pengisi daya sedang diuji|~Tidak sesuai; Cuaca panas disebut sebagai masalah jangkauan, bukan manfaat
+r4-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teks menyebut dukungan naik setelah berjalan|~Bertentangan; Teks menyebut dukungan awal cenderung rendah|~Bertentangan; Sikap warga berkaitan dengan hasil
+r5-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Terlalu umum; Teks tidak menyebut selalu lebih mahal|~Bertentangan; Kereta bisa mengangkut kontainer|~Tidak disebut; Ketersediaan terminal tidak dibahas
+r6-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Penambahan ramp tidak direkomendasikan|~Bertentangan; Penulis tidak mengganti standar resmi|~Bertentangan; Penulis justru menganjurkan audit
+r7-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak sesuai; Hasil ujian bukan tujuan utama|~Tidak disebut; PR tidak dibahas|~Tidak disebut; Perekrutan guru tidak dibahas
+r7-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Berlebihan; Peneliti tidak menyatakan terbukti berhasil|~Berlebihan; Peneliti tidak menyatakan terbukti gagal|~Tidak sesuai; Studi mencakup dua puluh sekolah
+r8-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teks menyebut harga biasanya lebih tinggi|~Tidak disebut; Jam buka tidak dibahas|~Bertentangan; Yang dijual hasil petani sendiri
+r8-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Sudah diukur; Penjualan naik seperlima|~Tidak ditanyakan; Nilai voucher disebut sepuluh dolar|~Tidak relevan; Jumlah lapak tidak dibahas
+r9-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Biaya aplikasi tidak dibahas|~Tidak disebut; Tingkat kesulitan tidak dibahas|~Bertentangan; Aplikasi disebut hanya pelengkap
+r9-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teknologi justru bukan masalah utama|~Tidak disebut; Biaya tidak dibahas|~Tidak disebut; Kosakata bukan masalah utama
+r10-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Kecepatan bukan alasan pendanaan|~Tidak disebut; Bandara tidak ditutup|~Tidak disebut; Pariwisata bukan alasan
+r10-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Bahan bakar tidak dibahas|~Tidak disebut; Gaji staf tidak dibahas|~Tidak disebut; Biaya stasiun tidak dibahas
+r11-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Pelajaran tidak dikeluhkan terlalu singkat|~Bertentangan; Ponsel disarankan dititipkan, bukan dilarang di sekolah|~Bertentangan; Perubahan justru menunda jam mulai
+r11-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Olahraga tidak dilarang|~Bertentangan; Peneliti mendukung jam mulai lebih siang|~Tidak masuk akal; Tidur di kelas tidak dianjurkan
+r12-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Pendatang tidak dilarang|~Tidak disebut; Pajak tidak dinaikkan|~Tidak disebut; Toko tidak ditutup
+r12-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Harga justru naik|~Tidak disebut; Perbedaan antar dewan tidak dibahas|~Bertentangan; Pendatang ada
+r13-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Bobot tidak dibahas|~Tidak disebut; Warna tidak dibahas|~Tidak disebut; Penjualan bukan alasan
+r13-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Pembakaran bukan solusi yang dipilih|~Bertentangan; Pengiriman ke luar negeri bukan solusi|~Bertentangan; Pencampuran justru menyulitkan daur ulang
+r14-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Panjang teks tidak dibahas|~Bertentangan; Pembaca tidak selalu memeriksa|~Tidak disebut; Kecepatan perangkat lunak tidak dibahas
+r14-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Peran ini dianggap kurang menarik|~Berlebihan; Peran ini tidak dianggap tidak berguna|~Tidak disebut; Bahaya tidak dibahas
+r15-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Perhatian disebut makin terpecah|~Bertentangan; Kemampuan membaca lama justru menurun|~Bertentangan; Televisi hanya disebut sebagai pembanding kekhawatiran
+r15-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Sikap perusahaan tidak menjadi alasan|~Tidak disebut; Kepuasan pengguna tidak dibahas|~Bertentangan; Televisi hanya pembanding
+r16-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teks menyebut biaya lebih murah|~Tidak disebut; Satwa liar tidak dibahas|~Tidak disebut; Kecepatan pembangunan tidak dibahas
+r16-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Penganjur tidak ingin meninggalkan kota|~Bertentangan; Penganjur tidak hanya mengandalkan tanggul|~Bertentangan; Badai ekstrem tidak diabaikan
+r17-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Kemudahan belajar bukan alasan|~Tidak disebut; Tidak ada kewajiban|~Tidak disebut; Usia bahasa tidak dibahas
+r17-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Teks menyebut dana kurang menentukan|~Tidak disebut; Teknologi tidak dibahas|~Berlebihan; Sekolah imersi saja tidak cukup
+r18-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Lapar tidak dibahas|~Berlebihan; Kecerdasan bukan satu-satunya faktor|~Tidak disebut; Usia anak tidak dibahas
+r18-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Pengulangan tahunan tidak disarankan|~Berlebihan; Tidak ada anjuran melarang uji|~Tidak disebut; Pemberian hadiah tidak dibahas
+r19-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Berlebihan; Tidak ada yang mengusulkan melarang pesawat|~Bertentangan; Baterai terlalu berat untuk jarak jauh|~Bertentangan; Emisi tidak boleh diabaikan
+r19-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; Kedua pihak tidak sepakat soal pajak|~Bertentangan; Bahan bakar berkelanjutan mahal|~Tidak disebut; Penurunan penerbangan tidak dibahas
+r20-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Berlebihan; Teks menyatakan tidak ada jaminan hasil|~Tidak disebut; Durasi rapat tidak dibahas|~Tidak disebut; Senioritas tidak dihapus
+r20-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Skeptis menyebut prosedur tidak cukup|~Bertentangan; Perbedaan pendapat justru perlu disambut|~Tidak disebut; Ukuran kelompok tidak dibahas`;
+
 /* ===== MESIN SOAL ===== */
 var TFNG=["True","False","Not Given"];
 var KIND={vocab:"Kosakata",grammar:"Tata bahasa",reading:"Reading mini"};
@@ -1039,61 +1639,137 @@ function nextQ(){
   var v=document.getElementById("view");if(v&&v.scrollIntoView)v.scrollIntoView();
 }
 
+var GMAP=null;
+function gm(id){
+  if(!GMAP){GMAP={};(GMTXT+"\n"+VMTXT+"\n"+RMTXT).split("\n").forEach(function(l){var f=l.split("|");if(f.length<7)return;var labs=[f[3]],rs=[""];for(var i=4;i<7;i++){var p=f[i].split("~"),r=p.slice(1).join("~"),k=r.indexOf(";");labs.push(k>0?r.slice(0,k).trim():null);r=k>0?r.slice(k+1).trim():r;rs.push(r.charAt(0).toUpperCase()+r.slice(1))}GMAP[f[0]]={t:f[1],p:f[2],l:labs,r:rs,ev:f[7]?f[7].split(","):null}})}
+  return GMAP[id]||null;
+}
+function gmAuto(it){
+  var ls=["Sesuai teks","Bertentangan","Tidak disebut"],r=["","",""],a=it.a;
+  if(a===0){r[1]="Teks tidak bertentangan dengan pernyataan ini";r[2]="Informasinya ada di teks, jadi bukan Not Given"}
+  else if(a===1){r[0]="Teks justru menyatakan hal yang berlawanan";r[2]="Teks membahas hal ini, sehingga bisa dipastikan salah"}
+  else{r[0]="Tidak ada kalimat di teks yang membenarkan pernyataan ini";r[1]="Tidak ada kalimat di teks yang membantah pernyataan ini"}
+  r[a]=it.e;
+  return {t:"True / False / Not Given",p:"Bandingkan pernyataan dengan kalimat di teks",l:ls,r:r,ev:null};
+}
+function tlLines(s){
+  if(s.length<=12)return [s];
+  var mid=s.length/2,best=-1,i;
+  for(i=0;i<s.length;i++){if(s.charAt(i)===" "&&(best<0||Math.abs(i-mid)<Math.abs(best-mid)))best=i}
+  return best<0?[s]:[s.slice(0,best),s.slice(best+1)];
+}
+function tlSvg(ev){
+  var pts=ev.slice(),W=360,y=84,n,xs,s,first=-1;
+  if(pts.indexOf("Sekarang")<0)pts.push("Sekarang");
+  n=pts.length;xs=pts.map(function(_,i){return 52+i*(W-104)/(n-1)});
+  s='<svg viewBox="0 0 '+W+' 124" role="img" aria-label="Garis waktu"><line class="ax" x1="12" y1="'+y+'" x2="'+(W-12)+'" y2="'+y+'"/>'
+   +'<line class="ar" x1="'+xs[0]+'" y1="'+y+'" x2="'+(xs[1]-17)+'" y2="'+y+'"/><path class="arh" d="M'+(xs[1]-18)+','+(y-10)+' L'+(xs[1]-5)+','+y+' L'+(xs[1]-18)+','+(y+10)+'z"/>';
+  pts.forEach(function(p,i){
+    var cls=p==="Sekarang"?"d3":(first<0?(first=i,"d1"):"d2"),ls=tlLines(p),j;
+    s+='<circle class="'+cls+'" cx="'+xs[i]+'" cy="'+y+'" r="11"/>';
+    for(j=0;j<ls.length;j++)s+='<text class="lb" x="'+xs[i]+'" y="'+(ls.length===1?52:40+j*14)+'" text-anchor="middle">'+esc(ls[j])+'</text>';
+  });
+  return s+'</svg>';
+}
+var CATL={"Preposisi":"Preposisi","Kata penghubung":"Kata hubung","Relative clause":"Kata relatif","Artikel":"Artikel","Artikel/determiner":"Determiner","Determiner":"Determiner","Quantifier":"Quantifier","Modal":"Modal","Modal perfect":"Modal perfect","Inversi":"Susunan kata","Gerund/infinitive":"Bentuk verba","Passive":"Aktif / pasif","Conditional":"Pola kondisional","Subjunctive":"Bentuk verba","Participle clause":"Participle","Cleft sentence":"Pola cleft","Reported speech":"Reported speech","Comparison":"Komparasi","Wish/tags":"Pola kalimat","Wish/rather":"Pola kalimat","Causative":"Bentuk verba","Ellipsis":"Pelesapan","Time clause":"Pola waktu","Tenses":"Tense"};
+function autoForm(t){
+  var s=t.toLowerCase(),m;
+  if(/^will have been \w+ing$/.test(s))return "Future Perfect Cont.";
+  if(/^will have \w+$/.test(s))return "Future Perfect";
+  if(/^will be \w+ing$/.test(s))return "Future Continuous";
+  if(/^will be \w+$/.test(s))return "Pasif Future";
+  if(/^will \w+$/.test(s))return "Future Simple";
+  if(/^(has|have) been \w+ing$/.test(s))return "Present Perfect Cont.";
+  if(/^(has|have|haven't|hasn't) (already )?\w+$/.test(s))return "Present Perfect";
+  if(/^had been \w+ing$/.test(s))return "Past Perfect Cont.";
+  if(/^had (already )?\w+$/.test(s)&&s.split(" ").length>1)return "Past Perfect";
+  if(/^(was|were) (already )?\w+ing$/.test(s))return "Past Continuous";
+  if(/^(am|is|are) \w+ing$/.test(s))return "Present Continuous";
+  if(/^(is|are) being \w+$/.test(s))return "Pasif Continuous";
+  if(/^would have \w+$/.test(s))return "would have + V3";
+  if(/^would \w+$/.test(s))return "would + V1";
+  if(/^(can|could|must|might|should|may|needn't|mustn't|shall)\b/.test(s))return "Modal";
+  if(/^to \w+$/.test(s))return "to + V1";
+  if(/^\w+ing$/.test(s))return "V-ing";
+  return null;
+}
+function formOf(G,it,orig){return G.l[orig]||(it.k==="grammar"?autoForm(it.o[orig]):null)||(it.k==="grammar"?CATL[it.cat]:null)||(it.k==="vocab"?"Opsi lain":"Tidak sesuai")}
+function blankify(s,fill){return esc(s).replace(/_{3,}/g,fill?'<span class="fill">'+esc(fill)+'</span>':'<span class="blank"></span>')}
+
 function vSoal(){
   state.ql=state.ql||"all";
   if(!qs)return soalMenu();
   return qs.done?soalDone():soalQ();
 }
 function soalMenu(){
-  var lv=state.ql,cards="",b2=qstat(null,"B2"),hint;
+  var lv=state.ql,cards="",b2=qstat(null,"B2"),hint,
+    meta={vocab:["var(--amber)","Kata dan makna"],grammar:["var(--accent)","Struktur kalimat"],reading:["var(--good)","Baca dan jawab"]};
   ["vocab","grammar","reading"].forEach(function(k){
-    var st=qstat(k,lv);
-    cards+='<div class="panel"><div class="lbl">'+KIND[k]+'</div><p class="small" style="margin:6px 0 10px">'+KDESC[k]+'</p>'
-      +'<div class="mono small" style="margin-bottom:10px">Dikerjakan '+st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n)+'</div>'
-      +'<button class="btn" data-start="'+k+'"'+(st.tot?"":" disabled")+'>Mulai</button></div>';
+    var st=qstat(k,lv),pc=st.tot?Math.round(st.seen/st.tot*100):0;
+    cards+='<div class="panel mode" style="--c:'+meta[k][0]+'"><div class="bandt"></div><div class="bd"><div class="lbl">'+meta[k][1]+'</div><h3>'+KIND[k]+'</h3><p class="small" style="margin:0">'+KDESC[k]+'</p>'
+      +'<div class="meter" aria-hidden="true"><i style="width:'+pc+'%"></i></div>'
+      +'<div class="mono small">'+st.seen+'/'+st.tot+' dikerjakan &middot; akurasi '+pct(st.c,st.n)+'</div>'
+      +'<button class="btn" data-start="'+k+'"'+(st.tot?"":" disabled")+'>Mulai sesi</button></div></div>';
   });
   if(b2.n<15)hint="Mulai dari level B2 atau Campur. Setelah akurasi B2 stabil di atas 80%, pindah ke C1.";
   else if(b2.c/b2.n>=0.8)hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Sudah siap mencoba level C1.";
   else hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Perkuat B2 dulu, lalu naik ke C1.";
   var wk=weakCat(),wkTxt=wk?'<p class="small" style="margin:8px 0 0">Topik tata bahasa terlemah: <b>'+esc(wk.cat)+'</b> (akurasi '+wk.acc+').</p>':"";
   var hist=S.ql.slice().reverse().slice(0,8).map(function(h){return '<tr><td>'+h.d.slice(8)+'/'+h.d.slice(5,7)+'</td><td>'+(KIND[h.k]||h.k)+'</td><td class="n">'+h.c+'/'+h.n+'</td><td class="n">'+pct(h.c,h.n)+'</td></tr>'}).join("");
-  return '<div class="panel"><h2>Latihan soal</h2><div class="field" style="max-width:260px"><label for="qLevel">Level</label><select id="qLevel">'
-    +[["all","Campur (B2 dan C1)"],["B2","B2"],["C1","C1"]].map(function(o){return '<option value="'+o[0]+'"'+(o[0]===lv?" selected":"")+'>'+o[1]+'</option>'}).join("")
-    +'</select></div><p class="small" style="margin:10px 0 0">'+hint+'</p>'+wkTxt
+  return '<div class="panel"><div class="lbl">500 soal &middot; 25 per sesi</div><h2 style="font-size:28px;margin:4px 0 12px">Latihan soal</h2>'
+    +'<div class="lv" role="group" aria-label="Level">'+[["all","Campur"],["B2","B2"],["C1","C1"]].map(function(o){return '<button data-lv="'+o[0]+'" aria-pressed="'+(o[0]===lv)+'">'+o[1]+'</button>'}).join("")+'</div>'
+    +'<p class="small" style="margin:12px 0 0">'+hint+'</p>'+wkTxt
     +'<p class="small" style="margin:8px 0 0">Soal yang salah muncul lagi di sesi berikutnya dan tercatat di tab Kesalahan. Soal ditulis sendiri oleh Claude, bukan soal resmi IELTS atau Cambridge, jadi akurasinya tidak setara dengan skor band.</p></div>'
-    +'<div class="grid g3" style="margin-top:12px">'+cards+'</div>'
-    +(hist?'<div class="panel" style="margin-top:12px"><h2>Sesi terakhir</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Jenis</th><th class="n">Benar</th><th class="n">Akurasi</th></tr></thead><tbody>'+hist+'</tbody></table></div></div>':"");
+    +'<div class="grid g3" style="margin-top:16px">'+cards+'</div>'
+    +(hist?'<div class="panel" style="margin-top:16px"><h2>Sesi terakhir</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Jenis</th><th class="n">Benar</th><th class="n">Akurasi</th></tr></thead><tbody>'+hist+'</tbody></table></div></div>':"");
 }
 function soalQ(){
-  var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,p="";
-  if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">'+esc(P.t)+' &middot; '+P.l+'</div>'+esc(P.x)+'</div>'}
+  var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,num=pad(qs.i+1),L="ABCD",
+    ttl=it.k==="grammar"?"Kasus Diagnostik":it.k==="vocab"?"Kasus Kosakata":"Kasus Bacaan",p="";
+  var prog='<div class="prog" aria-hidden="true">'+qs.items.map(function(_,j){return '<i class="'+(j<qs.res.length?(qs.res[j].ok?"c":"x"):j===qs.i?"n":"")+'"></i>'}).join("")+'</div>';
+  if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">Teks &middot; '+P.l+'</div><h3>'+esc(P.t)+'</h3><div>'+esc(P.x)+'</div></div>'}
   var opts=qs.perm.map(function(orig,i){
     var cls="opt";if(done){if(orig===it.a)cls+=" right";else if(i===qs.picked)cls+=" wrong"}
-    return '<button class="'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">'+"ABCD".charAt(i)+'</span><span>'+esc(it.o[orig])+'</span></button>';
+    return '<button class="'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">['+L.charAt(i)+']</span><span class="ot">'+esc(it.o[orig])+'</span></button>';
   }).join("");
-  var fb=done?'<div class="fb '+(qs.ok?"ok":"no")+'"><b>'+(qs.ok?"Benar.":"Kurang tepat.")+'</b> '+(qs.ok?"":"Jawaban: "+esc(it.o[it.a])+". ")+esc(it.e)+'</div><div class="row" style="margin-top:12px"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Lanjut")+'</button><button class="btn ghost" id="qMenu">Keluar</button></div>':'<div class="row" style="margin-top:12px"><button class="btn ghost" id="qMenu">Keluar</button></div>';
-  return '<div class="panel"><div class="row"><span class="lbl">'+KIND[it.k]+' &middot; '+it.lv+' &middot; '+esc(it.cat)+'</span><span class="mono" style="margin-left:auto">'+(qs.i+1)+'/'+n+'</span></div>'
-    +'<div class="prog"><i style="width:'+Math.round((qs.i+(done?1:0))/n*100)+'%"></i></div>'+p
+  var rv="";
+  if(done){
+    var cl=L.charAt(qs.perm.indexOf(it.a)),G=gm(it.id)||(it.tf?gmAuto(it):null);
+    var ans='<div class="ans '+(qs.ok?"ok":"no")+'">'+(qs.ok?icoOk():icoNo())+'<div>Jawaban: ['+cl+'] '+esc(it.o[it.a])+(qs.ok?'<small>Tepat.</small>':'<small>Anda memilih ['+L.charAt(qs.picked)+'] '+esc(it.o[qs.perm[qs.picked]])+'.</small>')+'</div></div>';
+    var rule=G?'<div class="rule"><div class="rule-t">'+esc(G.t)+'</div><div class="rule-p">Pola: '+esc(G.p)+'</div></div>':"";
+    rv='<div class="reveal"><div class="rv-top" style="'+(G?"":"grid-template-columns:1fr")+'">'+ans+rule+'</div><p class="why">'+esc(it.e)+'</p>';
+    if(G&&G.ev)rv+='<div><h3 class="sec-t">Garis Waktu</h3><div class="tl">'+tlSvg(G.ev)+'</div></div>';
+    if(G){
+      rv+='<div><h3 class="sec-t">Matriks Eliminasi '+num+'</h3><div class="mx"><div class="mx-r mx-th"><span>Opsi</span><span>Status</span><span>'+(it.k==="vocab"?"Arti":it.k==="reading"?"Dasar":"Bentuk")+'</span><span>Alasan logis</span></div>'
+        +qs.perm.map(function(orig,i){var ok=orig===it.a;return '<div class="mx-r'+(ok?" ok":"")+(qs.picked===i?" pick":"")+'"><span class="o">['+L.charAt(i)+'] '+esc(it.o[orig])+'</span><span class="s" style="color:var(--'+(ok?"good":"bad")+')">'+(ok?icoOk():icoNo())+'</span><span class="f">'+esc(formOf(G,it,orig))+'</span><span class="a">'+esc(ok?it.e:G.r[orig])+'</span></div>'}).join("")+'</div></div>';
+    }
+    rv+='<div class="row"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Kasus berikutnya")+'</button></div></div>';
+  }
+  return '<div class="case"><div class="case-h"><div class="case-t">'+ttl+' '+num+'</div><div class="row" style="gap:8px"><span class="chip lvl">'+it.lv+'</span><span class="chip">'+esc(it.cat)+'</span><span class="chip mono">'+(qs.i+1)+'/'+n+'</span><button class="btn ghost" id="qMenu" style="padding:5px 12px;font-size:13px">Keluar</button></div></div>'
+    +prog+p
     +(it.tf?'<p class="small" style="margin:0 0 6px">Sesuai teks: True = sesuai, False = bertentangan, Not Given = tidak disebut.</p>':"")
-    +'<div class="qh">'+esc(it.q)+'</div>'+opts+fb+'</div>';
+    +'<div class="qh">'+blankify(it.q,done?it.o[it.a]:"")+'</div><div class="ogrid">'+opts+'</div>'+rv+'</div>';
 }
 function soalDone(){
-  var n=qs.res.length,c=qs.res.filter(function(r){return r.ok}).length;
-  var wrong=qs.res.filter(function(r){return !r.ok}).map(function(r){var x=BID[r.id];return '<div class="fb no" style="margin-top:10px"><div style="font-weight:600;margin-bottom:4px">'+esc(x.q)+'</div><div class="small">Jawaban: <b>'+esc(x.o[x.a])+'</b>. '+esc(x.e)+'</div></div>'}).join("");
-  return '<div class="panel"><div class="lbl">'+KIND[qs.kind]+' &middot; sesi selesai</div><div class="big" style="margin:6px 0">'+c+'/'+n+' <span class="small">benar ('+pct(c,n)+')</span></div>'
+  var n=qs.res.length,c=qs.res.filter(function(r){return r.ok}).length,pc=n?Math.round(c/n*100):0;
+  var msg=pc>=85?"Sangat baik. Coba level atau jenis soal yang lebih sulit.":pc>=65?"Cukup kuat. Ulangi soal yang salah di bawah ini.":"Masih banyak yang perlu diperkuat. Baca penjelasan di bawah, lalu ulangi sesi.";
+  var wrong=qs.res.filter(function(r){return !r.ok}).map(function(r){var x=BID[r.id];return '<div class="wr"><div style="font-weight:700;margin-bottom:4px">'+blankify(x.q,x.o[x.a])+'</div><div class="small">Jawaban: <b>'+esc(x.o[x.a])+'</b>. '+esc(x.e)+'</div></div>'}).join("");
+  return '<div class="panel"><div class="lbl">'+KIND[qs.kind]+' &middot; sesi selesai</div>'
+    +'<div class="row" style="gap:22px;margin:12px 0 16px;flex-wrap:nowrap"><div class="ring" style="--p:'+pc+'"><b>'+pc+'%</b></div><div><div class="big">'+c+'/'+n+' <span class="small">benar</span></div><p style="margin:6px 0 0">'+msg+'</p></div></div>'
     +'<div class="row"><button class="btn" id="qAgain">Sesi berikutnya</button><button class="btn ghost" id="qMenu">Kembali ke menu</button></div>'
-    +(wrong?'<h2 style="margin-top:18px;font-size:16px">Yang perlu diulang</h2>'+wrong:'<p class="small" style="margin:12px 0 0">Semua benar. Coba level yang lebih tinggi atau jenis soal lain.</p>')+'</div>';
+    +(wrong?'<h2 style="margin:22px 0 4px;font-size:20px">Yang perlu diulang ('+(n-c)+')</h2>'+wrong:'<p class="small" style="margin:14px 0 0">Semua benar.</p>')+'</div>';
 }
 function bindSoal(){
   var $=function(id){return document.getElementById(id)};
   document.querySelectorAll("[data-start]").forEach(function(b){b.onclick=function(){startQuiz(b.dataset.start);render()}});
   document.querySelectorAll("[data-opt]").forEach(function(b){b.onclick=function(){answer(+b.dataset.opt)}});
-  if($("qLevel"))$("qLevel").onchange=function(){state.ql=$("qLevel").value;render()};
+  document.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){state.ql=b.dataset.lv;render()}});
   if($("qNext"))$("qNext").onclick=nextQ;
   if($("qMenu"))$("qMenu").onclick=function(){qs=null;render()};
   if($("qAgain"))$("qAgain").onclick=function(){startQuiz(qs.kind);render()};
 }
 
+window.JI={bid:function(i){return BID[i]},set:function(ids){qs.items=ids.map(function(i){return BID[i]}).concat(qs.items.slice(ids.length));qs.perm=makePerm(qs.items[0]);render()}};
 function vSalah(){
   var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
   var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
@@ -1114,9 +1790,10 @@ function vAtur(){
 }
 function render(){
   var tabs=document.getElementById("tabs");
-  tabs.innerHTML=TABS.map(function(t){return '<button role="tab" aria-selected="'+(state.tab===t[0])+'" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join("");
+  tabs.innerHTML=TABS.map(function(t){return '<button role="tab" aria-selected="'+(state.tab===t[0])+'" data-tab="'+t[0]+'">'+ico(t[0])+t[1]+'</button>'}).join("");
   var wk=planWeek();document.getElementById("wkLbl").textContent=wk.lbl;document.getElementById("wkNum").textContent=wk.n?wk.n+" / 12":"--";
   document.getElementById("tgtTop").textContent=S.target;
+  var sg="",q;for(q=1;q<=12;q++)sg+='<i class="'+(q<wk.n?"on":q===wk.n?"now":"")+'"></i>';document.getElementById("wkSeg").innerHTML=sg;
   var v=document.getElementById("view");
   v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="skor"?vSkor():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
   bind();
@@ -1129,6 +1806,7 @@ function bind(){
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
   if($("doneBtn"))$("doneBtn").onclick=function(){var d=day();d.done=!d.done;save();render()};
+  document.querySelectorAll("[data-km]").forEach(function(b){b.onclick=function(){state.km=b.dataset.km;session=null;render()}});
   document.querySelectorAll("[data-r]").forEach(function(b){b.onclick=function(){rate(b.dataset.r)}});
   if($("flip"))$("flip").onclick=function(){session.flip=true;render()};
   if($("resetSess"))$("resetSess").onclick=function(){session=null;render()};
