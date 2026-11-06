@@ -111,6 +111,23 @@ svg text{font-family:var(--f-mono);font-size:11px}
 .tgt{fill:var(--warn);font-weight:500}
 .empty{padding:20px;border:1px dashed var(--line);border-radius:4px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:no-preference){.btn{transition:filter .15s}.btn:hover{filter:brightness(1.08)}}
+@media (max-width:520px){.board .wk{text-align:left}}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.prog{height:6px;background:var(--soft);border-radius:3px;margin:10px 0 14px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+.passage{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin:0 0 14px;line-height:1.65}
+.qh{font-family:var(--f-display);font-size:20px;font-weight:600;line-height:1.35;margin:6px 0 14px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin-bottom:8px;min-width:0}
+.opt .ol{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:3px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.opt span:last-child{overflow-wrap:anywhere;min-width:0}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt[disabled]{cursor:default;color:var(--ink);opacity:1}
+.opt.right{border-color:var(--good);background:var(--soft)}
+.opt.right .ol{background:var(--good);border-color:var(--good);color:#fff}
+.opt.wrong{border-color:var(--bad)}
+.opt.wrong .ol{background:var(--bad);border-color:var(--bad);color:#fff}
+.fb{margin-top:12px;padding:12px 14px;border-radius:4px;border-left:4px solid var(--good);background:var(--soft)}
+.fb.no{border-left-color:var(--bad)}
 </style>
 
 </head>
@@ -217,7 +234,7 @@ var PLAN=[ // index = getDay(): 0 Minggu
  {d:"Jumat",f:"Writing Task 1",t:"20 menit deskripsi grafik atau diagram, 20 menit cek dan perbaiki.",m:40},
  {d:"Sabtu",f:"Campuran",t:"Satu bagian IELTS sesuai kelemahan, plus 20 menit podcast. Minggu 9-12: tes penuh.",m:60}];
 var START="2026-11-05",END="2027-01-27",NEW_PER_DAY=10,INTERVALS=[0,1,2,4,8,16,32],LS="jalur-ielts-v1";
-var TABS=[["hari","Hari ini"],["kata","Kosakata"],["skor","Skor"],["tulis","Writing"],["bicara","Speaking"],["salah","Kesalahan"],["atur","Sinkron"]];
+var TABS=[["hari","Hari ini"],["kata","Kosakata"],["soal","Soal"],["skor","Skor"],["tulis","Writing"],["bicara","Speaking"],["salah","Kesalahan"],["atur","Sinkron"]];
 var ERR={Reading:["True/False/Not Given","Matching headings","Kosakata tidak paham","Kehabisan waktu","Salah baca soal"],Listening:["Angka atau nama tidak tertangkap","Aksen","Hilang fokus","Salah ejaan","Terkecoh distraktor"],Writing:["Tata bahasa","Kosakata kurang variatif","Struktur paragraf","Tidak menjawab soal","Kurang dari 250 kata","Ejaan dan tanda baca"],Speaking:["Jeda terlalu lama","Pengucapan","Tata bahasa","Jawaban terlalu pendek","Kosakata terbatas"]};
 
 function pad(n){return String(n).padStart(2,"0")}
@@ -226,11 +243,11 @@ function parse(k){var p=k.split("-").map(Number);return new Date(p[0],p[1]-1,p[2
 function today(){return key(new Date())}
 function addDays(k,n){var d=parse(k);d.setDate(d.getDate()+n);return key(d)}
 function diff(a,b){return Math.round((parse(b)-parse(a))/864e5)}
-function def(){return{v:1,target:7,cards:{},daily:{},scores:[],errors:[],updated:0}}
+function def(){return{v:1,target:7,cards:{},daily:{},scores:[],errors:[],q:{},ql:[],updated:0}}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 
 var S=load();
-function load(){try{var r=localStorage.getItem(LS);if(r)return Object.assign(def(),JSON.parse(r))}catch(e){}return def()}
+function load(){var o=null;try{var r=localStorage.getItem(LS);if(r)o=Object.assign(def(),JSON.parse(r))}catch(e){}if(!o)return def();try{return normQ(o)}catch(e){return o}}
 var SYNC={url:"",key:""};
 try{SYNC=Object.assign(SYNC,JSON.parse(localStorage.getItem(LS+"-sync")||"{}"))}catch(e){}
 function syncOn(){return !!(SYNC.url&&SYNC.key)}
@@ -250,13 +267,13 @@ function pull(){
   if(!syncOn()){setSync("off");return Promise.resolve()}
   setSync("busy");
   return call({action:"get"}).then(function(j){
-    if(j.data&&(j.updated||0)>(S.updated||0)){S=Object.assign(def(),j.data);try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
+    if(j.data&&(j.updated||0)>(S.updated||0)){S=normQ(Object.assign(def(),j.data));try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
     else if((S.updated||0)>(j.updated||0)){dirty=true;flush();return}
     setSync("ok");
   }).catch(function(){setSync("fail")});
 }
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
-function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.done))}
+function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done))}
 function streak(){var k=today(),n=0;if(!active(k))k=addDays(k,-1);while(active(k)){n++;k=addDays(k,-1)}return n}
 function planWeek(){var t=today();if(t<START)return{n:0,lbl:"Mulai"};if(t>END)return{n:12,lbl:"Selesai"};return{n:Math.min(12,Math.floor(diff(START,t)/7)+1),lbl:"Minggu ke"}}
 function avg(s){return Math.round((s.L+s.R+s.W+s.S)/4*2)/2}
@@ -388,6 +405,695 @@ function vBicara(){
   return h+'</div>';
 }
 
+/* ===== BANK SOAL (ditulis sendiri, bukan soal resmi IELTS/Cambridge) =====
+   Tambah soal baru di AKHIR array agar riwayat jawaban tidak bergeser. */
+var VQ=[
+["B2","The new metro line should ______ traffic congestion in the city centre.",["alleviate","alienate","allocate","alternate"],0,"alleviate = meringankan (masalah). allocate = mengalokasikan, alienate = menjauhkan, alternate = bergantian."],
+["B2","Heavy rain caused a ______ delay to all flights.",["considerable","considerate","consider","considering"],0,"considerable = cukup besar (adjektiva). considerate berarti penuh perhatian pada orang lain."],
+["B2","The government plans to ______ the new regulations next month.",["implement","imply","impress","import"],0,"implement = melaksanakan. imply = menyiratkan, import = mengimpor."],
+["B2","Many commuters cannot ______ to buy a private car.",["afford","offer","effort","support"],0,"cannot afford to = tidak mampu membeli. effort adalah kata benda."],
+["B2","The company has a good ______ for reliable service.",["reputation","reputable","repetition","requirement"],0,"reputation = reputasi (kata benda setelah 'a good'). reputable adalah adjektiva."],
+["B2","Air pollution has a serious ______ on public health.",["effect","affect","affection","effective"],0,"effect = dampak (kata benda). affect adalah kata kerja."],
+["B2","Cyclists are more ______ to injury than car drivers.",["vulnerable","valuable","variable","visible"],0,"vulnerable to = rentan terhadap. valuable = berharga, variable = berubah-ubah."],
+["B2","The report ______ that car use will fall by 20% by 2030.",["predicts","prevents","pretends","produces"],0,"predict that = memperkirakan bahwa. prevent tidak dipakai dengan 'that' seperti ini."],
+["B2","We need to ______ a balance between economic growth and the environment.",["strike","catch","pull","throw"],0,"Kolokasi tetap: strike a balance = mencari keseimbangan."],
+["B2","The city introduced a congestion charge to ______ drivers from entering the centre.",["discourage","disappoint","disagree","dismiss"],0,"discourage someone from doing = menghalangi seseorang melakukan sesuatu."],
+["B2","Ticket prices ______ depending on the time of day.",["fluctuate","fascinate","flatter","fluent"],0,"fluctuate = naik turun. fluent adalah adjektiva (lancar)."],
+["B2","The government has ______ a ban on single-use plastics.",["imposed","composed","disposed","supposed"],0,"impose a ban = memberlakukan larangan."],
+["B2","The ______ of the new road was delayed by funding problems.",["construction","constructive","constructor","constructed"],0,"Butuh kata benda: construction = pembangunan. constructor = kontraktor (orang)."],
+["B2","The tour guide gave us a short ______ of the city's history.",["overview","overtake","overlook","overcome"],0,"overview = gambaran umum. overlook = melewatkan, overcome = mengatasi."],
+["B2","It is ______ that prices will rise next year, according to analysts.",["likely","likeness","liking","alike"],0,"It is likely that = kemungkinan besar bahwa."],
+["B2","Environmental groups strongly ______ the construction of the new airport.",["oppose","oppress","opposite","opportune"],0,"oppose = menentang. oppress = menindas."],
+["B2","The new tunnel will ______ journey times by half, which commuters will welcome.",["reduce","raise","extend","ensure"],0,"reduce = mengurangi. Konteks 'welcome' menunjukkan perjalanan jadi lebih singkat."],
+["B2","Students must ______ their assignments by Friday.",["submit","submerge","subscribe","substitute"],0,"submit = mengumpulkan/menyerahkan."],
+["B2","Rural areas often lack basic ______ such as electricity and clean water.",["facilities","faculties","facilitators","abilities"],0,"facilities = fasilitas. faculties = fakultas/kemampuan."],
+["B2","Her argument was not very ______; nobody was convinced.",["convincing","convinced","convince","convenient"],0,"convincing = meyakinkan (menyifati argumen). convinced = merasa yakin (menyifati orang)."],
+["C1","The policy has been widely criticised for its ______ impact on low-income households.",["disproportionate","indiscriminate","indispensable","inconspicuous"],0,"disproportionate = tidak seimbang. indispensable = sangat diperlukan."],
+["C1","The airline was ______ to pay compensation to stranded passengers by the regulator.",["compelled","complied","compiled","complemented"],0,"be compelled to = diwajibkan/dipaksa. comply with = mematuhi (tanpa 'to pay')."],
+["C1","The new terminal will ______ the capacity of the airport by 40%.",["augment","adjourn","abolish","abandon"],0,"augment = menambah/meningkatkan. adjourn = menunda sidang."],
+["C1","Cities must ______ their reliance on private cars if they want to meet emission targets.",["curb","curl","curve","curse"],0,"curb = mengekang/membatasi."],
+["C1","The scheme is ______ with problems, from budget overruns to poor planning.",["fraught","frail","fierce","fleeting"],0,"fraught with = penuh dengan (masalah/bahaya)."],
+["C1","The delay was ______ to a combination of factors, including weather and staff shortages.",["attributable","attributive","contributory","accountable"],0,"attributable to = dapat dikaitkan dengan / disebabkan oleh."],
+["C1","Experts have called for a ______ approach that combines rail, bus and cycling networks.",["holistic","hostile","hypothetical","hysterical"],0,"holistic = menyeluruh, memandang semua bagian sebagai satu sistem."],
+["C1","The mayor's plan faced ______ opposition from local residents.",["vehement","vacant","vulnerable","vertical"],0,"vehement = sangat keras/kuat (tentang penentangan)."],
+["C1","Funding for rural roads has ______ in recent years, leaving many villages isolated.",["dwindled","dwelled","dwarfed","deluded"],0,"dwindle = menyusut berangsur-angsur (kata kerja tanpa objek)."],
+["C1","It would be ______ to ignore the environmental consequences of the project.",["imprudent","impartial","improbable","impeccable"],0,"imprudent = tidak bijaksana. impartial = tidak memihak."],
+["C1","The company's profits ______ to a record high after the new ticketing system was introduced.",["soared","soured","sagged","slumped"],0,"soar = melonjak. Hati-hati dengan soured (memburuk) dan slumped (merosot)."],
+["C1","Her proposal was ______ rejected by the committee without any discussion.",["summarily","similarly","simultaneously","sufficiently"],0,"summarily = secara singkat tanpa pertimbangan; cocok dengan 'without any discussion'."],
+["C1","The two projects are mutually ______; we cannot fund both with this budget.",["exclusive","inclusive","excessive","exclusion"],0,"mutually exclusive = saling meniadakan (tidak bisa dua-duanya)."],
+["C1","The reform is expected to ______ the way for private investment.",["pave","pace","pale","peg"],0,"Idiom: pave the way for = membuka jalan bagi."],
+["C1","Critics argue that the subsidy merely ______ the problem rather than solving it.",["perpetuates","perpetrates","permeates","perplexes"],0,"perpetuate = mengekalkan. perpetrate = melakukan (kejahatan)."],
+["C1","Urban planners must ______ the needs of pedestrians, cyclists and drivers.",["reconcile","reconstruct","recollect","recruit"],0,"reconcile = mendamaikan/menyelaraskan kepentingan yang berbeda."],
+["C1","The new law has had unintended ______ for small businesses.",["repercussions","reputations","reproductions","resignations"],0,"repercussions = dampak (biasanya negatif) yang tidak langsung."],
+["C1","The findings were ______ with earlier studies, which showed the same trend.",["consistent","insistent","resistant","existent"],0,"consistent with = sejalan dengan."],
+["C1","He was ______ in his refusal to compromise, despite pressure from colleagues.",["adamant","adequate","addicted","adjacent"],0,"adamant = teguh, tidak mau berubah pendirian."],
+["C1","The article ______ the importance of early intervention by citing several case studies as evidence.",["underscores","undermines","undergoes","underestimates"],0,"underscore = menegaskan. undermine = melemahkan."]
+];
+
+var GQ=[
+["B2","Tenses","By the time we arrived at the station, the train ______.",["had already left","already left","has already left","was already leaving"],0,"Past perfect (had + V3) untuk kejadian yang selesai sebelum titik waktu lampau lain."],
+["B2","Conditional","If I ______ more time, I would study English every day.",["had","have","will have","would have"],0,"Conditional tipe 2 (situasi tidak nyata sekarang): If + past simple, would + V1."],
+["B2","Preposisi","She is very good ______ explaining difficult ideas.",["at","in","on","for"],0,"Kolokasi: good at + V-ing."],
+["B2","Passive","The new bridge ______ by the Minister next month.",["will be opened","will open","is opening","has opened"],0,"Ada pelaku 'by the Minister' dan jembatan dibuka, jadi pasif: will be + V3."],
+["B2","Relative clause","The woman ______ car was stolen called the police.",["whose","who","which","whom"],0,"whose menunjukkan kepemilikan: whose car = mobil milik wanita itu."],
+["B2","Kata penghubung","______ the heavy rain, the match went ahead.",["Despite","Although","However","Because"],0,"Despite diikuti frasa kata benda. Although butuh klausa lengkap."],
+["B2","Gerund/infinitive","I look forward to ______ from you soon.",["hearing","hear","heard","have heard"],0,"look forward to + V-ing (to di sini preposisi)."],
+["B2","Modal","You ______ wear a seatbelt; it is the law.",["must","might","needn't","would"],0,"must = kewajiban. needn't = tidak perlu, bertentangan dengan 'it is the law'."],
+["B2","Tenses","I ______ English for three years now.",["have been studying","study","am studying","studied"],0,"Aktivitas yang dimulai di masa lalu dan berlanjut sampai sekarang: present perfect continuous."],
+["B2","Reported speech","She asked me where ______.",["I lived","did I live","do I live","was I living"],0,"Dalam kalimat tidak langsung, urutan kata seperti kalimat biasa (subjek + kata kerja), tanpa did/do."],
+["B2","Artikel","He is ______ honest man who always tells the truth.",["an","a","the","tanpa artikel"],0,"Kata 'honest' diawali bunyi vokal (h tidak dibaca), jadi pakai an."],
+["B2","Comparison","This route is ______ than the one we took yesterday.",["far more direct","much directer","more directer","the most direct"],0,"Adjektiva panjang: more + adjektiva + than. far memperkuat perbandingan."],
+["B2","Quantifier","There isn't ______ traffic on the roads at night.",["much","many","few","a few"],0,"traffic tidak dapat dihitung, jadi much. many/few untuk yang dapat dihitung."],
+["B2","Time clause","I will call you as soon as I ______ at the hotel.",["arrive","will arrive","arrived","am arriving"],0,"Setelah as soon as untuk masa depan, pakai present simple, bukan will."],
+["B2","Wish","I wish I ______ speak English more fluently.",["could","can","will","would"],0,"wish + past form (could) untuk keinginan yang tidak terwujud sekarang."],
+["C1","Inversi","Not only ______ late, but he also forgot the documents.",["did he arrive","he arrived","he did arrive","arrived he"],0,"Setelah 'Not only' di awal kalimat, kata bantu mendahului subjek: did he arrive."],
+["C1","Inversi","Rarely ______ such a well-organised event.",["have I seen","I have seen","have seen I","I saw"],0,"Kata negatif/terbatas (rarely, seldom, never) di awal menyebabkan inversi: have I seen."],
+["C1","Conditional","______ I known about the delay, I would have taken a different route.",["Had","If","Were","Should"],0,"Conditional tipe 3 dengan inversi: Had + subjek + V3 menggantikan If + had + V3."],
+["C1","Subjunctive","The committee recommended that the proposal ______ immediately.",["be approved","is approved","was approved","would approve"],0,"Setelah recommend/suggest/insist that, pakai bentuk dasar (subjunctive): be approved."],
+["C1","Participle clause","______ the report, she realised that several figures were wrong.",["Having read","To read","Being read","Read"],0,"Having + V3 menyatakan tindakan selesai lebih dulu, subjeknya sama (she)."],
+["C1","Wish/rather","I'd rather you ______ smoke in here.",["didn't","don't","wouldn't","hadn't"],0,"I'd rather + subjek + past simple untuk keinginan tentang perilaku orang lain sekarang."],
+["C1","Cleft sentence","It was the lack of funding ______ caused the project to fail.",["that","what","whose","whom"],0,"Kalimat penegasan (cleft): It was X that + klausa."],
+["C1","Modal perfect","They went straight on, so they ______ the sign.",["must have missed","must miss","should miss","might missing"],0,"must have + V3 = kesimpulan yang hampir pasti tentang masa lalu."],
+["C1","Preposisi","The decision was made ______ consultation with local residents.",["in","on","at","by"],0,"Kolokasi tetap: in consultation with."],
+["C1","Causative","We had the system ______ by an external company last month.",["audited","audit","auditing","to audit"],0,"have + objek + V3 = meminta/mengatur agar sesuatu dikerjakan orang lain."],
+["C1","Kata penghubung","The scheme is expensive; ______, it is likely to save money in the long run.",["Nevertheless","Moreover","Therefore","Similarly"],0,"Nevertheless = meskipun begitu (kontras). Moreover menambah ide sejalan."],
+["C1","Relative clause","The people with ______ I worked were extremely helpful.",["whom","who","which","whose"],0,"Setelah preposisi (with), pakai whom untuk orang."],
+["C1","Tenses","By next June, I ______ in this office for ten years.",["will have worked","will work","have worked","am working"],0,"Future perfect: titik masa depan + durasi (for ten years) memakai will have + V3."],
+["C1","Inversi","______ you encounter any difficulties, please contact us.",["Should","If","Were","Had"],0,"Should + subjek + V1 = bentuk formal dari If you encounter..."],
+["C1","Gerund/infinitive","There is no point ______ a long report if nobody has time to read it.",["in writing","to write","write","written"],0,"There is no point in + V-ing."]
+];
+
+var RP=[
+{t:"Jalur sepeda di pusat kota",l:"B2",x:"Many large cities have begun to build separate bicycle lanes in their centres. Supporters say that these lanes make cycling safer and encourage more people to leave their cars at home. In one European capital, the number of daily cyclists rose by almost 30 percent within two years of a new network opening. However, some shop owners were worried that fewer parking spaces would harm their businesses. A later survey found that most shops had not lost customers, and several reported a small increase in sales from people who passed by on bicycles. City officials admit that the lanes were expensive to build, but they argue that the savings in healthcare costs and reduced road repairs will eventually cover the investment. The council now plans to extend the network to the suburbs by 2030.",
+q:[
+["t","The number of cyclists in the capital rose by about thirty percent.",null,0,"Teks: 'rose by almost 30 percent' (naik hampir 30 persen), jadi True."],
+["t","Most shop owners lost customers after the lanes were built.",null,1,"Survei menemukan sebagian besar toko tidak kehilangan pelanggan, jadi False."],
+["t","The council wants to extend the network to the suburbs.",null,0,"Kalimat terakhir: dewan berencana memperluas jaringan ke pinggiran kota, jadi True."],
+["t","Building the lanes cost more than officials expected.",null,2,"Teks hanya mengatakan biayanya mahal, tidak membandingkannya dengan perkiraan. Not Given."],
+["m","What do city officials say about the cost of the lanes?",["It will eventually be covered by savings elsewhere","It was paid for by local shop owners","It was lower than in other cities","It has been reduced by new taxes"],0,"Teks: penghematan biaya kesehatan dan perbaikan jalan akan menutup investasi."]
+]},
+{t:"Bekerja dari rumah dan pola perjalanan",l:"B2",x:"Since more employees began working from home, travel patterns in many countries have changed. Rush-hour peaks are smaller, but the roads are not necessarily emptier. Researchers found that people who work from home two or three days a week often make more short trips during the day, for example to shops or cafes, and many of these trips are made by car. At the same time, public transport operators report that passenger numbers on Mondays and Fridays remain well below pre-pandemic levels, while midweek services are still busy. Some operators have responded by offering cheaper off-peak tickets. Economists warn that if ticket revenue continues to fall, services may have to be reduced, which would affect people who have no alternative to the bus or train.",
+q:[
+["t","Rush-hour peaks have become smaller in many countries.",null,0,"Kalimat kedua: 'Rush-hour peaks are smaller'. True."],
+["t","People who work from home never travel by car.",null,1,"Banyak perjalanan singkat mereka dilakukan dengan mobil. False."],
+["t","Midweek public transport services are quieter than services on Mondays and Fridays.",null,1,"Senin dan Jumat jauh di bawah level sebelum pandemi, sedangkan tengah pekan masih ramai. False."],
+["t","Most employees now prefer working from home.",null,2,"Teks tidak menyebut preferensi karyawan. Not Given."],
+["m","Who would be most affected if services were reduced?",["People who have no alternative to public transport","People who work from home","Drivers who use the roads at rush hour","Economists who study ticket revenue"],0,"Kalimat terakhir: orang yang tidak punya alternatif selain bus atau kereta."]
+]},
+{t:"Bus listrik di kota-kota Asia",l:"B2",x:"Several cities in Asia have introduced electric buses in an attempt to reduce air pollution. Although the buses cost roughly twice as much as diesel models, their running costs are significantly lower because electricity is cheaper than fuel and the vehicles need less maintenance. The main difficulty has been charging. Depots need powerful connections to the electricity network, and in older neighbourhoods the cables often have to be replaced first. In addition, the buses lose range in very hot weather because the air conditioning uses a lot of power. Engineers are testing larger batteries and faster chargers, but they warn that these will add further to the cost. Despite these obstacles, most of the cities involved say they will continue to expand their electric fleets.",
+q:[
+["t","Electric buses are cheaper to buy than diesel buses.",null,1,"Harga beli bus listrik sekitar dua kali lipat bus diesel. False."],
+["t","Electric buses need less maintenance than diesel models.",null,0,"Teks: 'the vehicles need less maintenance'. True."],
+["t","Diesel buses will soon be banned in Asian cities.",null,2,"Tidak ada informasi tentang larangan bus diesel. Not Given."],
+["t","Very hot weather can reduce the distance an electric bus can travel.",null,0,"Bus kehilangan jarak tempuh (range) di cuaca sangat panas karena AC. True."],
+["m","What does the writer say about larger batteries and faster chargers?",["They may increase costs even further","They have already solved the charging problem","They have not yet been tested","They are only useful in hot weather"],0,"Teks: 'these will add further to the cost'."]
+]},
+{t:"Tarif kemacetan (congestion pricing)",l:"C1",x:"Congestion pricing, whereby drivers pay a fee to enter busy parts of a city, has been credited with cutting traffic in several places where it has been introduced. Proponents argue that it is an efficient way of allocating scarce road space, since those who value a faster journey are willing to pay for it, while others switch to alternatives. Critics, however, contend that the charge is regressive: it takes a larger share of income from poorer drivers, who may have few practical options. Some cities have attempted to address this concern by earmarking the revenue for improvements to bus services, or by offering discounts to residents on low incomes. The evidence on whether these measures are sufficient remains mixed. What is clear is that public acceptance tends to rise after a scheme has begun operating, once people see the effect on congestion, even though opposition is often fierce beforehand.",
+q:[
+["t","Congestion pricing has reduced traffic in some cities where it has been introduced.",null,0,"Teks: 'credited with cutting traffic in several places'. True."],
+["t","Critics believe the charge affects poorer drivers more heavily than wealthier ones.",null,0,"'Regressive: it takes a larger share of income from poorer drivers'. True."],
+["t","Every city with a congestion charge offers discounts to residents on low incomes.",null,1,"Teks hanya menyebut 'some cities'. Pernyataan tentang 'every city' bertentangan. False."],
+["t","Congestion pricing was first introduced in an Asian city.",null,2,"Teks tidak menyebut kota pertama atau lokasinya. Not Given."],
+["m","What does the writer say about public attitudes?",["Support often increases once a scheme is in operation","Opposition usually grows after a scheme begins","Most residents support schemes before they start","Attitudes have no connection with the results"],0,"Kalimat terakhir: penerimaan publik cenderung naik setelah skema berjalan."]
+]},
+{t:"Angkutan barang lewat kereta api",l:"C1",x:"Moving goods by rail produces far fewer emissions per tonne than moving them by road, yet in many countries rail accounts for only a small share of freight. One reason is flexibility: a lorry can collect a load from a factory door and deliver it directly to a shop, whereas a train requires goods to be transferred at terminals at both ends of the journey. These transfers add time and cost, which makes rail uncompetitive over short distances. Another obstacle is that freight trains often have to give way to passenger services, since most tracks are shared. As a result, delivery times can be unpredictable, which manufacturers working with tight schedules find unacceptable. Policymakers have proposed separate freight corridors, but building them would require considerable investment and would take years. In the meantime, some companies are combining the two modes, sending containers by train for the long leg and by lorry for the final delivery.",
+q:[
+["t","Rail freight produces lower emissions per tonne than road freight.",null,0,"Kalimat pertama. True."],
+["t","Rail is more competitive than road over short distances.",null,1,"Transfer di terminal membuat kereta tidak kompetitif untuk jarak pendek. False."],
+["t","Freight trains usually have priority over passenger trains.",null,1,"Kereta barang sering harus mengalah pada kereta penumpang. False."],
+["t","The number of lorries on the roads has doubled in the last decade.",null,2,"Tidak ada data jumlah truk. Not Given."],
+["m","Why do manufacturers with tight schedules often avoid rail?",["Delivery times can be unpredictable","Trains are always more expensive than lorries","Rail cannot carry containers","Terminals are not available in most countries"],0,"Teks: waktu pengiriman bisa tidak dapat diprediksi, dan itu tidak dapat diterima produsen berjadwal ketat."]
+]},
+{t:"Aksesibilitas pejalan kaki",l:"C1",x:"Accessible pedestrian environments are often described in terms of physical features such as ramps, tactile paving and dropped kerbs. However, researchers increasingly argue that accessibility also depends on the continuity of a route. A pavement with a perfect ramp at one end is of little use if the next crossing has no signal, or if parked vehicles block the path halfway along. A study of three districts found that most individual features met official standards, yet fewer than one in five routes could be completed without encountering at least one barrier. The authors recommend auditing complete journeys rather than isolated facilities, and involving people with disabilities in the process. They acknowledge that such audits are time-consuming, but suggest that they are more likely to identify the problems that matter in daily life.",
+q:[
+["t","Researchers say accessibility depends only on physical features such as ramps.",null,1,"Peneliti berpendapat aksesibilitas juga bergantung pada kesinambungan rute. False."],
+["t","A ramp may be of little use if another part of the route is inaccessible.",null,0,"Contoh teks: ramp sempurna tidak berguna jika penyeberangan berikutnya tanpa sinyal. True."],
+["t","In the study, more than half of the routes could be completed without a barrier.",null,1,"Kurang dari satu dari lima rute bebas hambatan. False."],
+["t","The study included people with disabilities as participants.",null,2,"Penulis merekomendasikan melibatkan mereka, tetapi tidak disebut apakah studinya melibatkan. Not Given."],
+["m","What do the authors recommend?",["Auditing complete journeys instead of isolated facilities","Building more ramps in every district","Replacing the official standards","Avoiding audits because they take too long"],0,"Teks: 'auditing complete journeys rather than isolated facilities'."]
+]}
+];
+/* VQ2 bagian A: kosakata B2 (80 soal). Format: [level, jenis, soal, [benar, pengecoh1, pengecoh2, pengecoh3], 0, penjelasan] */
+var VQ2A=[
+["B2","Pilihan kata","The company decided to ______ its operations to three new countries.",["expand","expend","expect","expose"],0,"expand = memperluas. expend = menghabiskan (tenaga/uang)."],
+["B2","Pilihan kata","After years of hard work, she finally ______ her dream of becoming a doctor.",["achieved","arrived","acquired","afforded"],0,"achieve a dream/goal = mencapai impian."],
+["B2","Pilihan kata","He apologised for the ______ caused by the late delivery.",["inconvenience","inconvenient","inconveniently","inconvenienced"],0,"Setelah 'the' butuh kata benda: inconvenience = ketidaknyamanan."],
+["B2","Pilihan kata","It is important to ______ between facts and opinions.",["distinguish","distract","distribute","distort"],0,"distinguish between A and B = membedakan A dan B."],
+["B2","Pilihan kata","The museum has a large ______ of paintings from the eighteenth century.",["collection","collective","collector","collision"],0,"collection = koleksi (kata benda). collector = orang yang mengoleksi."],
+["B2","Pilihan kata","He decided to ______ the meeting until next week.",["postpone","prevent","precede","proceed"],0,"postpone = menunda ke waktu lain."],
+["B2","Pilihan kata","The film was so ______ that I fell asleep halfway through.",["tedious","tidy","tender","thorough"],0,"tedious = membosankan dan berkepanjangan."],
+["B2","Pilihan kata","You should ______ all your options before making a decision.",["consider","construct","consume","contain"],0,"consider = mempertimbangkan."],
+["B2","Pilihan kata","The athlete was ______ from the competition for using banned drugs.",["disqualified","discharged","dismissed","distracted"],0,"be disqualified = didiskualifikasi dari perlombaan."],
+["B2","Pilihan kata","Local residents are ______ against the plan to build a new factory.",["protesting","proving","promoting","protecting"],0,"protest against = menentang/berunjuk rasa menolak."],
+["B2","Pilihan kata","The teacher praised him for his ______ to the project.",["commitment","committee","commission","commodity"],0,"commitment = komitmen/dedikasi."],
+["B2","Pilihan kata","Scientists have ______ a new species of frog in the rainforest.",["discovered","discussed","discouraged","discounted"],0,"discover = menemukan sesuatu yang belum diketahui."],
+["B2","Pilihan kata","The soup tasted ______ because I had forgotten to add salt.",["bland","blunt","blank","bleak"],0,"bland = hambar."],
+["B2","Pilihan kata","She is so ______ that she always arrives at least an hour early.",["punctual","patient","polite","popular"],0,"punctual = tepat waktu."],
+["B2","Pilihan kata","The mountain village is very ______, so you need a car to get there.",["remote","remove","remark","remain"],0,"remote = terpencil."],
+["B2","Pilihan kata","The new software has made our work much more ______.",["efficient","efficiency","efficiently","effects"],0,"much more + adjektiva: efficient = efisien."],
+["B2","Pilihan kata","He gave a ______ explanation that everybody could understand.",["straightforward","strait","straighten","straightly"],0,"straightforward = lugas dan mudah dipahami."],
+["B2","Pilihan kata","The two companies decided to ______ and form a single business.",["merge","mourn","mend","mix"],0,"merge = bergabung menjadi satu."],
+["B2","Pilihan kata","There was a ______ increase in prices last year, about fifteen per cent.",["sharp","sharpen","sharply","shaped"],0,"Sebelum kata benda 'increase' butuh adjektiva: sharp = tajam/besar."],
+["B2","Pilihan kata","I'm afraid I can't ______ your invitation because I'll be abroad.",["accept","except","expect","excerpt"],0,"accept = menerima. except = kecuali."],
+["B2","Pilihan kata","Please ______ me of any changes to the schedule.",["inform","informal","information","informing"],0,"inform someone of = memberi tahu seseorang tentang."],
+["B2","Pilihan kata","The building was badly ______ in the earthquake.",["damaged","damaging","damages","damp"],0,"Pasif: was damaged = rusak."],
+["B2","Pilihan kata","He is a very ______ student who always asks interesting questions.",["curious","courteous","cautious","cruel"],0,"curious = ingin tahu."],
+["B2","Pilihan kata","The organisation's ______ is to provide clean water to remote villages.",["mission","motion","mansion","mention"],0,"mission = misi/tujuan utama."],
+["B2","Pilihan kata","She felt ______ about speaking in front of such a large audience.",["nervous","nervously","nerve","nerves"],0,"felt + adjektiva: nervous = gugup."],
+["B2","Kolokasi","We need to ______ progress before the deadline.",["make","do","take","get"],0,"Kolokasi: make progress = mencapai kemajuan."],
+["B2","Kolokasi","She decided to ______ a risk and start her own business.",["take","make","do","have"],0,"Kolokasi: take a risk = mengambil risiko."],
+["B2","Kolokasi","Could you ______ me a favour and close the window?",["do","make","give","take"],0,"Kolokasi: do someone a favour = membantu seseorang."],
+["B2","Kolokasi","I'd like to ______ a complaint about the service.",["make","do","take","give"],0,"Kolokasi: make a complaint = mengajukan keluhan."],
+["B2","Kolokasi","He tried to ______ attention to himself by shouting.",["attract","attach","attend","attempt"],0,"Kolokasi: attract attention = menarik perhatian."],
+["B2","Kolokasi","We should ______ advantage of the good weather and go for a walk.",["take","make","get","have"],0,"Kolokasi: take advantage of = memanfaatkan."],
+["B2","Kolokasi","The company has ______ a profit for the first time this year.",["made","done","given","taken"],0,"Kolokasi: make a profit = memperoleh laba."],
+["B2","Kolokasi","Please ______ attention to the safety instructions.",["pay","spend","lose","hold"],0,"Kolokasi: pay attention to = memperhatikan."],
+["B2","Kolokasi","It is hard to ______ a living as a musician.",["earn","win","gain","reach"],0,"Kolokasi: earn a living = mencari nafkah."],
+["B2","Kolokasi","They have been ______ in a heated debate all afternoon.",["engaged","enrolled","employed","enjoyed"],0,"Kolokasi: engaged in a debate = terlibat dalam debat."],
+["B2","Kolokasi","The new law will ______ into effect next January.",["come","run","turn","fall"],0,"Kolokasi: come into effect = mulai berlaku."],
+["B2","Kolokasi","Heavy traffic ______ me an hour on my way to work.",["took","spent","lasted","needed"],0,"It takes/took someone + waktu = memakan waktu."],
+["B2","Kolokasi","In the ______ run, investing in education pays off.",["long","far","wide","large"],0,"Kolokasi: in the long run = dalam jangka panjang."],
+["B2","Kolokasi","She has a good ______ of humour.",["sense","feel","taste","sight"],0,"Kolokasi: a sense of humour = selera humor."],
+["B2","Kolokasi","We are ______ short of staff this week.",["badly","hardly","roughly","nearly"],0,"Kolokasi: badly short of = sangat kekurangan."],
+["B2","Phrasal verb","The plane ______ at 6 a.m., so we had to get up very early.",["took off","took on","took up","took out"],0,"take off = lepas landas."],
+["B2","Phrasal verb","I'm trying to ______ smoking, but it's very difficult.",["give up","give in","give out","give away"],0,"give up = berhenti melakukan kebiasaan."],
+["B2","Phrasal verb","Could you ______ the music? I'm trying to study.",["turn down","turn up","turn over","turn into"],0,"turn down = mengecilkan volume. turn up = membesarkan."],
+["B2","Phrasal verb","We ran ______ of milk, so I went to the shop.",["out","off","over","down"],0,"run out of = kehabisan."],
+["B2","Phrasal verb","She takes ______ her mother; they look exactly alike.",["after","over","up","off"],0,"take after = mirip (orang tua/keluarga)."],
+["B2","Phrasal verb","I'll ______ you up at the station at eight o'clock.",["pick","take","pull","put"],0,"pick someone up = menjemput."],
+["B2","Phrasal verb","The match was ______ off due to heavy rain, so it will never be played.",["called","put","held","kept"],0,"call off = membatalkan. put off = menunda."],
+["B2","Phrasal verb","You should ______ up your room before the guests arrive.",["tidy","tie","turn","take"],0,"tidy up = merapikan."],
+["B2","Phrasal verb","I can't ______ out what this word means.",["figure","carry","pass","bring"],0,"figure out = memahami/menemukan jawaban."],
+["B2","Phrasal verb","He ______ up with an excellent idea during the meeting.",["came","got","went","put"],0,"come up with = mencetuskan (ide)."],
+["B2","Phrasal verb","I don't ______ along with my new boss at all.",["get","come","take","turn"],0,"get along with = akur dengan."],
+["B2","Phrasal verb","She ______ up in a small village near the sea.",["grew","raised","rose","brought"],0,"grow up = tumbuh dewasa."],
+["B2","Phrasal verb","We need to ______ down on sugar to stay healthy.",["cut","turn","break","look"],0,"cut down on = mengurangi."],
+["B2","Phrasal verb","The company ______ out a new product last month.",["brought","took","kept","fell"],0,"bring out = meluncurkan produk."],
+["B2","Phrasal verb","The thieves broke ______ the house while the family was away.",["into","over","out","up"],0,"break into = membobol masuk."],
+["B2","Sinonim","Which word is closest in meaning to 'mandatory'?",["compulsory","optional","popular","expensive"],0,"mandatory = wajib = compulsory."],
+["B2","Sinonim","Which word is closest in meaning to 'reluctant'?",["unwilling","eager","unable","unlucky"],0,"reluctant = enggan = unwilling."],
+["B2","Sinonim","Which word is closest in meaning to 'abundant'?",["plentiful","scarce","abrupt","ancient"],0,"abundant = melimpah = plentiful."],
+["B2","Sinonim","Which word is closest in meaning to 'genuine'?",["real","fake","generous","general"],0,"genuine = asli = real."],
+["B2","Sinonim","Which word is closest in meaning to 'trivial'?",["unimportant","urgent","complicated","dangerous"],0,"trivial = sepele = unimportant."],
+["B2","Sinonim","Which word is closest in meaning to 'obvious'?",["clear","hidden","doubtful","unlikely"],0,"obvious = jelas terlihat = clear."],
+["B2","Sinonim","Which word is closest in meaning to 'enormous'?",["huge","tiny","ordinary","empty"],0,"enormous = sangat besar = huge."],
+["B2","Sinonim","Which word is closest in meaning to 'furious'?",["very angry","very tired","very happy","very polite"],0,"furious = sangat marah."],
+["B2","Sinonim","Which word is closest in meaning to 'essential'?",["necessary","optional","pleasant","ordinary"],0,"essential = sangat penting/perlu = necessary."],
+["B2","Sinonim","Which word is closest in meaning to 'fragile'?",["easily broken","very heavy","very old","very bright"],0,"fragile = rapuh = mudah pecah."],
+["B2","Sinonim","Which word is closest in meaning to 'purchase' (verb)?",["buy","sell","borrow","repair"],0,"purchase = membeli."],
+["B2","Sinonim","Which word is closest in meaning to 'assist'?",["help","hinder","inspect","invite"],0,"assist = membantu."],
+["B2","Sinonim","Which word is closest in meaning to 'hesitate'?",["pause before acting","act quickly","refuse strongly","agree happily"],0,"hesitate = ragu-ragu, berhenti sejenak sebelum bertindak."],
+["B2","Sinonim","Which word is closest in meaning to 'ancient'?",["very old","very strange","very large","very rare"],0,"ancient = kuno = sangat tua."],
+["B2","Sinonim","Which word is closest in meaning to 'dependable'?",["reliable","careless","flexible","humble"],0,"dependable = dapat diandalkan = reliable."],
+["B2","Bentuk kata","The teacher was impressed by his ______.",["creativity","creative","creatively","create"],0,"Setelah 'his' butuh kata benda: creativity."],
+["B2","Bentuk kata","She spoke ______ about her experience abroad.",["enthusiastically","enthusiastic","enthusiasm","enthusiast"],0,"Menerangkan kata kerja 'spoke' butuh adverbia."],
+["B2","Bentuk kata","The ______ of the new library will take two years.",["completion","complete","completely","completing"],0,"The ... of = kata benda: completion = penyelesaian."],
+["B2","Bentuk kata","It was ______ of you to help me with my luggage.",["kind","kindness","kindly","kinds"],0,"It was + adjektiva + of you: kind."],
+["B2","Bentuk kata","Their ______ to the project made it a success.",["contribution","contribute","contributor","contributory"],0,"Setelah 'Their' butuh kata benda hal: contribution."],
+["B2","Bentuk kata","She is a very ______ person who rarely loses her temper.",["patient","patience","patiently","patients"],0,"Sebelum 'person' butuh adjektiva: patient."],
+["B2","Bentuk kata","The company's success is ______ on its loyal customers.",["dependent","dependence","depend","dependently"],0,"be dependent on = bergantung pada (adjektiva)."],
+["B2","Bentuk kata","Many people were ______ by the news.",["shocked","shocking","shock","shockingly"],0,"Perasaan orang: shocked (terkejut). shocking = mengejutkan (penyebab)."],
+["B2","Bentuk kata","The ______ between the two cities is about two hundred kilometres.",["distance","distant","distantly","distinct"],0,"The ... between = kata benda: distance = jarak."],
+["B2","Bentuk kata","He answered the question very ______.",["carefully","careful","care","carefulness"],0,"Menerangkan kata kerja: carefully."]
+];
+
+/* VQ2 bagian B: kosakata C1 (80 soal). */
+var VQ2B=[
+["C1","Pilihan kata","The professor's argument was so ______ that even specialists could barely understand it.",["abstruse","abrupt","abundant","abrasive"],0,"abstruse = sulit dipahami (rumit dan tersembunyi maknanya)."],
+["C1","Pilihan kata","The committee's decision was met with widespread ______.",["dismay","dismiss","dismantle","dispatch"],0,"dismay = kekecewaan/keterkejutan yang mendalam."],
+["C1","Pilihan kata","Her ______ remarks offended several members of the audience.",["flippant","flexible","fluent","frugal"],0,"flippant = sembrono, tidak serius pada hal yang penting."],
+["C1","Pilihan kata","The tribe has managed to ______ its traditions despite modernisation.",["safeguard","sabotage","squander","suppress"],0,"safeguard = melindungi. 'managed to ... despite' menunjukkan upaya menjaga."],
+["C1","Pilihan kata","The new evidence ______ the theory, since it matches what the first witnesses reported.",["corroborates","refutes","disregards","complicates"],0,"corroborate = menguatkan dengan bukti tambahan."],
+["C1","Pilihan kata","She is an ______ speaker who can persuade almost anyone with her choice of words.",["eloquent","elusive","eligible","elderly"],0,"eloquent = fasih dan persuasif."],
+["C1","Pilihan kata","The scandal ______ his reputation beyond repair.",["tarnished","tamed","tackled","tended"],0,"tarnish a reputation = menodai nama baik."],
+["C1","Pilihan kata","Negotiations have reached a ______, with neither side willing to compromise.",["deadlock","breakthrough","landmark","shortcut"],0,"deadlock = kebuntuan."],
+["C1","Pilihan kata","The report was full of ______ statistics that proved nothing.",["spurious","spacious","sparse","spectacular"],0,"spurious = palsu/tidak sahih."],
+["C1","Pilihan kata","She was ______ by the amount of work waiting on her desk.",["daunted","daubed","dazzled","dawned"],0,"daunted = ciut/gentar menghadapi sesuatu yang berat."],
+["C1","Pilihan kata","His speech was ______ with humour, which kept the audience laughing.",["peppered","pepped","paved","pierced"],0,"peppered with = penuh dengan (sisipan)."],
+["C1","Pilihan kata","The villagers' ______ welcome made us feel at home.",["wholehearted","whole-wheat","holistic","hollow"],0,"wholehearted = sepenuh hati. hollow = kosong/tidak tulus."],
+["C1","Pilihan kata","It would be ______ to assume that the problem will solve itself.",["naive","noble","nominal","notorious"],0,"naive = naif, terlalu polos."],
+["C1","Pilihan kata","The company's ______ expansion led to serious financial problems.",["reckless","reluctant","relevant","reliable"],0,"reckless = ceroboh, tanpa memikirkan akibat."],
+["C1","Pilihan kata","The detective's ______ attention to detail eventually solved the case.",["meticulous","meagre","mundane","mutual"],0,"meticulous = sangat teliti."],
+["C1","Pilihan kata","After the earthquake, aid was ______ to the affected regions.",["dispatched","dispelled","disposed","disputed"],0,"dispatch = mengirim (bantuan, pesan)."],
+["C1","Pilihan kata","The new manager's ______ approach to staff earned him many enemies.",["abrasive","absorbent","abstract","absolute"],0,"abrasive = kasar, menyakitkan hati."],
+["C1","Pilihan kata","The two theories are ______; they cannot both be true.",["incompatible","incomplete","incredible","inconvenient"],0,"incompatible = tidak dapat berjalan bersama."],
+["C1","Pilihan kata","The film received ______ reviews from critics, who called it a masterpiece.",["glowing","glaring","gloomy","glossy"],0,"glowing review = ulasan sangat memuji."],
+["C1","Pilihan kata","The politician's promises proved to be ______; nothing was ever delivered.",["hollow","hasty","humble","hostile"],0,"hollow promise = janji kosong."],
+["C1","Pilihan kata","Prices have been ______ steadily since the beginning of the year.",["escalating","escaping","evacuating","elevating"],0,"escalate = meningkat secara bertahap (tanpa objek)."],
+["C1","Pilihan kata","There is a growing ______ among scientists that the current model is flawed.",["consensus","consent","consequence","consumption"],0,"consensus = kesepakatan umum."],
+["C1","Pilihan kata","Her ______ nature made it difficult to know what she was thinking.",["reticent","reckless","relentless","reverent"],0,"reticent = pendiam, tidak suka mengungkapkan perasaan."],
+["C1","Pilihan kata","The plan, though ambitious, is perfectly ______ given our resources.",["feasible","feeble","fertile","frugal"],0,"feasible = layak dilaksanakan."],
+["C1","Pilihan kata","The director was known for his ______ attitude, never accepting excuses.",["uncompromising","unconventional","uncomfortable","uncertain"],0,"uncompromising = tak mau berkompromi."],
+["C1","Kolokasi","The findings ______ doubt on the reliability of the earlier study.",["cast","place","lay","set"],0,"Kolokasi: cast doubt on = menimbulkan keraguan terhadap."],
+["C1","Kolokasi","The charity ______ a vital role in supporting refugees.",["plays","does","makes","acts"],0,"Kolokasi: play a role = berperan."],
+["C1","Kolokasi","The government is under growing ______ to reform the tax system.",["pressure","press","pressing","pressed"],0,"Kolokasi: under pressure to = ditekan untuk."],
+["C1","Kolokasi","They reached a ______ agreement after hours of talks.",["tentative","tidy","talkative","tireless"],0,"tentative agreement = kesepakatan sementara."],
+["C1","Kolokasi","The proposal has met with strong ______ from the public.",["resistance","resisting","resists","resistant"],0,"Kolokasi: meet with resistance = menghadapi penolakan."],
+["C1","Kolokasi","It is ______ to say that the plan was a total failure.",["fair","fit","fond","fast"],0,"Kolokasi: It is fair to say = Wajar untuk mengatakan."],
+["C1","Kolokasi","A ______ of evidence suggests that the practice is harmful.",["body","group","bundle","bunch"],0,"Kolokasi: a body of evidence = sekumpulan bukti."],
+["C1","Kolokasi","They have been working ______ the clock to meet the deadline.",["around","over","through","along"],0,"Idiom: around the clock = siang malam tanpa henti."],
+["C1","Kolokasi","He ______ the opportunity to travel abroad with both hands.",["seized","seated","seeded","sealed"],0,"Kolokasi: seize an opportunity = memanfaatkan kesempatan."],
+["C1","Kolokasi","The findings are ______ with previous research.",["in line","on line","at line","by line"],0,"Kolokasi: in line with = sejalan dengan."],
+["C1","Kolokasi","The two leaders held ______ talks on trade.",["bilateral","bilingual","bimonthly","biannual"],0,"bilateral talks = perundingan dua pihak."],
+["C1","Kolokasi","He made a ______ effort to stay calm.",["conscious","conscience","consciousness","consciously"],0,"Sebelum kata benda: conscious effort = upaya yang disengaja."],
+["C1","Kolokasi","The report painted a ______ picture of the economy.",["bleak","blank","blunt","blind"],0,"Kolokasi: a bleak picture = gambaran suram."],
+["C1","Kolokasi","We have no choice but to ______ the consequences.",["face","hit","join","hold"],0,"Kolokasi: face the consequences = menanggung akibat."],
+["C1","Kolokasi","The novel draws ______ on the author's own childhood, with almost every scene based on real events.",["heavily","lightly","scarcely","rarely"],0,"Kolokasi: draw heavily on = banyak bersumber dari."],
+["C1","Phrasal verb","I can't ______ up with this noise any longer.",["put","come","catch","turn"],0,"put up with = menoleransi."],
+["C1","Phrasal verb","The new policy ______ about a significant change in attitudes.",["brought","took","put","held"],0,"bring about = menyebabkan terjadinya."],
+["C1","Phrasal verb","She ______ down the offer because the salary was too low.",["turned","put","set","held"],0,"turn down = menolak."],
+["C1","Phrasal verb","Scientists are ______ into the causes of the outbreak.",["looking","running","taking","keeping"],0,"look into = menyelidiki."],
+["C1","Phrasal verb","The charity was ______ up in 1995 to help homeless people.",["set","held","kept","made"],0,"set up = mendirikan."],
+["C1","Phrasal verb","The doctors were able to ______ out a serious infection.",["rule","rub","row","roll"],0,"rule out = menyingkirkan kemungkinan."],
+["C1","Phrasal verb","Several issues have ______ up during the meeting.",["cropped","kept","dug","tied"],0,"crop up = muncul tiba-tiba."],
+["C1","Phrasal verb","The new rules were ______ down by the court as unconstitutional.",["struck","shut","cut","hit"],0,"strike down = membatalkan (hukum) secara resmi."],
+["C1","Phrasal verb","The pilot managed to ______ off a disaster by landing safely.",["ward","wade","wash","wipe"],0,"ward off = menangkal/mencegah."],
+["C1","Phrasal verb","I'll ______ over the details with you tomorrow.",["go","get","take","hand"],0,"go over = memeriksa/membahas ulang."],
+["C1","Phrasal verb","The tension between the two groups ______ up into open violence.",["flared","folded","flushed","flipped"],0,"flare up = meletus tiba-tiba."],
+["C1","Phrasal verb","She ______ herself out preparing for the exam.",["wore","tore","bore","swore"],0,"wear oneself out = menguras tenaga."],
+["C1","Phrasal verb","It took years to ______ over the shock of his death.",["get","go","run","pass"],0,"get over = pulih dari (kejutan, penyakit)."],
+["C1","Phrasal verb","The lecture ______ on for hours, and many people fell asleep.",["dragged","pulled","pushed","hauled"],0,"drag on = berlarut-larut."],
+["C1","Phrasal verb","The minister was forced to ______ down after the scandal.",["step","sit","walk","climb"],0,"step down = mengundurkan diri dari jabatan."],
+["C1","Sinonim","Which word is closest in meaning to 'ubiquitous'?",["found everywhere","very old","very rare","hard to see"],0,"ubiquitous = ada di mana-mana."],
+["C1","Sinonim","Which word is closest in meaning to 'ephemeral'?",["short-lived","eternal","fragile","glorious"],0,"ephemeral = sekejap, tidak bertahan lama."],
+["C1","Sinonim","Which word is closest in meaning to 'candid'?",["frank","polite","hesitant","hostile"],0,"candid = terus terang = frank."],
+["C1","Sinonim","Which word is closest in meaning to 'ambiguous'?",["open to more than one meaning","extremely clear","very ambitious","impossible"],0,"ambiguous = ambigu, bermakna ganda."],
+["C1","Sinonim","Which word is closest in meaning to 'pragmatic'?",["practical","ideal","stubborn","theoretical"],0,"pragmatic = praktis, berorientasi hasil nyata."],
+["C1","Sinonim","Which phrase is closest in meaning to 'scrutinise'?",["examine closely","ignore","admire","hide"],0,"scrutinise = memeriksa dengan teliti."],
+["C1","Sinonim","Which phrase is closest in meaning to 'exacerbate'?",["make worse","make clearer","exaggerate","examine"],0,"exacerbate = memperburuk."],
+["C1","Sinonim","Which word is closest in meaning to 'tenacious'?",["determined","talkative","tense","tidy"],0,"tenacious = gigih."],
+["C1","Sinonim","Which phrase is closest in meaning to 'formidable'?",["intimidatingly powerful","well-formed","very polite","old-fashioned"],0,"formidable = tangguh dan menakutkan."],
+["C1","Sinonim","Which phrase is closest in meaning to 'eradicate'?",["eliminate completely","gradually reduce","investigate","weaken"],0,"eradicate = memberantas sampai habis."],
+["C1","Sinonim","Which phrase is closest in meaning to 'lenient'?",["not strict","very harsh","cautious","lengthy"],0,"lenient = longgar, tidak keras."],
+["C1","Sinonim","Which phrase is closest in meaning to 'scant'?",["very little","plentiful","scanned","scary"],0,"scant = sangat sedikit."],
+["C1","Sinonim","Which phrase is closest in meaning to 'tangible'?",["real and measurable","imaginary","expensive","temporary"],0,"tangible = nyata dan dapat diukur."],
+["C1","Sinonim","Which word is closest in meaning to 'viable'?",["workable","visible","valuable","vicious"],0,"viable = dapat dijalankan."],
+["C1","Sinonim","Which word is closest in meaning to 'lucid'?",["clear","confused","lazy","bright"],0,"lucid = jernih, mudah dipahami (tentang gagasan atau tulisan)."],
+["C1","Bentuk kata","The ______ of the evidence was never questioned.",["reliability","reliable","reliably","rely"],0,"The ... of = kata benda: reliability = keandalan."],
+["C1","Bentuk kata","She spoke with great ______ about her research.",["conviction","convict","convincing","convinced"],0,"with great + kata benda: conviction = keyakinan."],
+["C1","Bentuk kata","There is a growing ______ of the risks of social media.",["awareness","aware","awarely","awares"],0,"a growing + kata benda: awareness = kesadaran."],
+["C1","Bentuk kata","The ______ of the treaty was celebrated worldwide.",["ratification","ratify","ratified","ratifying"],0,"The ... of = kata benda: ratification = pengesahan."],
+["C1","Bentuk kata","The government's ______ to act has been widely criticised.",["reluctance","reluctant","reluctantly","reluctances"],0,"Setelah 's butuh kata benda: reluctance = keengganan."],
+["C1","Bentuk kata","It is ______ difficult to predict how the market will react.",["notoriously","notorious","notoriety","notorieties"],0,"Menerangkan adjektiva 'difficult' butuh adverbia: notoriously."],
+["C1","Bentuk kata","The two nations have a long history of ______.",["rivalry","rival","rivalled","rivally"],0,"history of + kata benda: rivalry = persaingan."],
+["C1","Bentuk kata","The teacher's ______ encouraged the students to try harder.",["enthusiasm","enthusiastic","enthusiastically","enthuse"],0,"The teacher's + kata benda: enthusiasm."],
+["C1","Bentuk kata","The ______ of the old factory left hundreds unemployed.",["closure","closed","closely","closet"],0,"The ... of = kata benda: closure = penutupan."],
+["C1","Bentuk kata","Her ______ to the cause was never in doubt.",["dedication","dedicate","dedicated","dedicatedly"],0,"Her + kata benda: dedication = pengabdian."]
+];
+var VQ2=VQ2A.concat(VQ2B);
+
+/* GQ2 bagian A: tata bahasa B2 (85 soal). Format: [level, topik, soal, [benar, pengecoh1, pengecoh2, pengecoh3], 0, penjelasan] */
+var GQ2A=[
+["B2","Tenses","She ______ here since 2018.",["has worked","worked","works","is working"],0,"since + titik waktu lampau dengan kondisi berlanjut: present perfect."],
+["B2","Tenses","When I called her, she ______ dinner.",["was cooking","cooked","has cooked","cooks"],0,"Kegiatan yang sedang berlangsung saat terpotong: past continuous."],
+["B2","Tenses","I ______ him for ages; I wonder where he is.",["haven't seen","didn't see","don't see","hadn't seen"],0,"for ages sampai sekarang: present perfect."],
+["B2","Tenses","This time next week, we ______ on the beach.",["will be lying","will lie","are lying","lie"],0,"This time next week = sedang berlangsung di masa depan: future continuous."],
+["B2","Tenses","She ______ in London when she was a student.",["lived","has lived","lives","is living"],0,"Waktu lampau yang sudah selesai (when she was a student): past simple."],
+["B2","Tenses","They ______ dinner when the phone rang.",["were having","had","have had","are having"],0,"Kegiatan yang terpotong oleh kejadian lain: past continuous."],
+["B2","Tenses","I ______ to Japan twice, but I'd love to go again.",["have been","went","was","had been"],0,"Pengalaman hidup sampai sekarang tanpa waktu pasti: present perfect."],
+["B2","Tenses","By the time the film ended, he ______ asleep.",["had fallen","fell","has fallen","was falling"],0,"By the time + past simple: kejadian lebih awal memakai past perfect."],
+["B2","Tenses","He is always ______ his keys; it's so annoying.",["losing","lose","lost","loses"],0,"always + continuous untuk kebiasaan yang mengganggu: is always losing."],
+["B2","Tenses","Water ______ at 100 degrees Celsius.",["boils","is boiling","has boiled","boil"],0,"Fakta ilmiah: present simple (orang ketiga: boils)."],
+["B2","Conditional","If it rains tomorrow, we ______ at home.",["will stay","would stay","stayed","stay"],0,"Conditional tipe 1: If + present, will + V1."],
+["B2","Conditional","If I had known about the party, I ______ come.",["would have","will have","had","would"],0,"Conditional tipe 3: If + had + V3, would have + V3."],
+["B2","Conditional","Unless you ______ harder, you won't pass the exam.",["study","will study","studied","don't study"],0,"Unless = if not, jadi tidak diikuti negatif lagi: study."],
+["B2","Conditional","I would travel the world if I ______ a millionaire.",["were","am","will be","would be"],0,"Conditional tipe 2: If + were/past, would + V1."],
+["B2","Conditional","If you heat ice, it ______.",["melts","will melt","would melt","melted"],0,"Kebenaran umum (zero conditional): present simple di kedua klausa."],
+["B2","Conditional","What would you do if you ______ your job tomorrow?",["lost","lose","will lose","would lose"],0,"If + past simple untuk situasi hipotetis."],
+["B2","Conditional","She wouldn't be so tired if she ______ to bed earlier last night.",["had gone","went","has gone","would go"],0,"Conditional campuran: If + past perfect (masa lalu), would + V1 (sekarang)."],
+["B2","Passive","The window ______ by a football yesterday.",["was broken","broke","has broken","is broken"],0,"Pasif lampau: was/were + V3."],
+["B2","Passive","English ______ all over the world.",["is spoken","speaks","is speaking","spoken"],0,"Pasif sekarang: is/are + V3."],
+["B2","Passive","The house ______ at the moment.",["is being painted","is painting","paints","has painted"],0,"Pasif continuous: is being + V3."],
+["B2","Passive","I ______ to the party by my neighbour.",["was invited","invited","have invited","invite"],0,"Subjek menerima tindakan: was invited."],
+["B2","Passive","The results ______ tomorrow.",["will be announced","will announce","are announcing","announce"],0,"Pasif masa depan: will be + V3."],
+["B2","Passive","The thief ______ by the police before he could escape.",["was caught","caught","was catching","has caught"],0,"Pelaku disebut dengan by: pasif was caught."],
+["B2","Modal","You ______ smoke in the hospital; it is forbidden.",["mustn't","needn't","wouldn't","mightn't"],0,"mustn't = dilarang. needn't = tidak perlu."],
+["B2","Modal","You ______ bring a gift; the invitation says it isn't necessary.",["needn't","mustn't","can't","won't"],0,"needn't = tidak perlu (tidak wajib)."],
+["B2","Modal","I ______ swim when I was five.",["could","can","must","should"],0,"Kemampuan umum di masa lalu: could."],
+["B2","Modal","______ I borrow your pen, please?",["Could","Must","Need","Shall"],0,"Could I...? = permintaan sopan."],
+["B2","Modal","He ______ be at home; his car is outside.",["must","can't","shouldn't","needn't"],0,"must untuk kesimpulan yang hampir pasti."],
+["B2","Modal","She ______ be at work; I saw her at the cinema an hour ago.",["can't","must","should","needn't"],0,"can't untuk kesimpulan negatif yang hampir pasti."],
+["B2","Modal","You ______ see a doctor if the pain continues.",["should","shall","would","will"],0,"should untuk saran."],
+["B2","Relative clause","This is the book ______ I told you about.",["that","what","who","whose"],0,"that menggantikan benda dalam klausa relatif."],
+["B2","Relative clause","The man ______ lives next door is a doctor.",["who","whom","which","whose"],0,"who sebagai subjek untuk orang."],
+["B2","Relative clause","That is the café ______ we first met.",["where","which","who","when"],0,"where untuk tempat."],
+["B2","Relative clause","The year ______ we moved to Canada was the best of my life.",["when","where","which","who"],0,"when untuk waktu."],
+["B2","Relative clause","My brother, ______ lives in Spain, is visiting us.",["who","that","whom","which"],0,"Klausa non-defining (dengan koma) tidak memakai that: who."],
+["B2","Relative clause","Everything ______ she said was true.",["that","what","which","who"],0,"Setelah everything/all/something dipakai that."],
+["B2","Gerund/infinitive","She suggested ______ to the cinema.",["going","to go","go","went"],0,"suggest + V-ing."],
+["B2","Gerund/infinitive","I'd like ______ you about something.",["to ask","asking","ask","asked"],0,"would like + to + V1."],
+["B2","Gerund/infinitive","He avoided ______ the question.",["answering","to answer","answer","answered"],0,"avoid + V-ing."],
+["B2","Gerund/infinitive","They decided ______ the house.",["to sell","selling","sell","sold"],0,"decide + to + V1."],
+["B2","Gerund/infinitive","I'm used to ______ up early.",["getting","get","got","to get"],0,"be used to + V-ing = terbiasa."],
+["B2","Gerund/infinitive","She stopped ______ because she was tired.",["walking","to walk","walk","walked"],0,"stop + V-ing = berhenti melakukan."],
+["B2","Gerund/infinitive","Remember ______ the door when you leave.",["to lock","locking","lock","locked"],0,"remember + to V1 = ingat untuk melakukan."],
+["B2","Gerund/infinitive","He enjoys ______ in the garden.",["working","to work","work","worked"],0,"enjoy + V-ing."],
+["B2","Preposisi","The meeting is ______ Monday morning.",["on","at","in","by"],0,"on + hari."],
+["B2","Preposisi","I'm interested ______ learning Japanese.",["in","on","at","for"],0,"interested in."],
+["B2","Preposisi","She is afraid ______ spiders.",["of","from","for","with"],0,"afraid of."],
+["B2","Preposisi","We arrived ______ the airport an hour early.",["at","in","to","on"],0,"arrive at + tempat (bangunan/titik)."],
+["B2","Preposisi","He's been waiting ______ two hours.",["for","since","during","from"],0,"for + durasi."],
+["B2","Preposisi","I haven't seen her ______ last summer.",["since","for","from","during"],0,"since + titik waktu."],
+["B2","Preposisi","They are married ______ each other.",["to","with","by","for"],0,"married to."],
+["B2","Preposisi","He was born ______ 1995.",["in","on","at","by"],0,"in + tahun."],
+["B2","Kata penghubung","I stayed at home ______ I felt ill.",["because","although","unless","whereas"],0,"because = karena (alasan)."],
+["B2","Kata penghubung","______ it was raining, we went for a walk.",["Although","Because","So","Unless"],0,"Although = meskipun (kontras), diikuti klausa."],
+["B2","Kata penghubung","I'll lend you the money ______ you pay me back next week.",["as long as","unless","although","whereas"],0,"as long as = asalkan."],
+["B2","Kata penghubung","He worked hard; ______, he passed the exam.",["therefore","however","although","unless"],0,"therefore = oleh karena itu (akibat)."],
+["B2","Kata penghubung","She is rich, ______ she is not happy.",["but","so","because","or"],0,"but menyatakan pertentangan."],
+["B2","Kata penghubung","We took umbrellas ______ it rained.",["in case","unless","although","whereas"],0,"in case = berjaga-jaga jika."],
+["B2","Artikel/determiner","She plays ______ piano beautifully.",["the","a","an","tanpa artikel"],0,"play the + alat musik."],
+["B2","Artikel/determiner","______ water is essential for life.",["tanpa artikel","The","A","An"],0,"Benda tak terhitung dalam arti umum tidak memakai artikel."],
+["B2","Artikel/determiner","I'd like ______ information about the course.",["some","an","a","many"],0,"information tak terhitung: some."],
+["B2","Artikel/determiner","He didn't have ______ money left.",["any","some","a","many"],0,"Kalimat negatif: any."],
+["B2","Artikel/determiner","______ of the students passed the test; only two failed.",["Most","Almost","Every","Much"],0,"Most of the + kata benda jamak."],
+["B2","Reported speech","He told me that he ______ the film the night before.",["had seen","saw","has seen","sees"],0,"Dalam kalimat tidak langsung, 'the night before' menandakan past perfect."],
+["B2","Reported speech","She asked me ______ I wanted a coffee.",["if","that","what","which"],0,"Pertanyaan ya/tidak dilaporkan dengan if/whether."],
+["B2","Reported speech","He told me ______ late.",["not to be","don't be","to not being","not being"],0,"told + objek + (not) to V1."],
+["B2","Reported speech","She said she ______ call me the next day.",["would","will","shall","can"],0,"will bergeser menjadi would dalam kalimat tidak langsung."],
+["B2","Reported speech","They asked us where ______.",["we were going","were we going","did we going","we going"],0,"Urutan kata seperti kalimat biasa dan tense bergeser."],
+["B2","Comparison","She is ______ than her sister.",["taller","more tall","tallest","the taller"],0,"Adjektiva pendek: -er + than."],
+["B2","Comparison","This is ______ film I have ever seen.",["the worst","worse","worst","the worse"],0,"Superlatif tak beraturan: the worst."],
+["B2","Comparison","He runs as ______ as a professional.",["fast","faster","fastest","more fast"],0,"as + adjektiva/adverbia dasar + as."],
+["B2","Comparison","The more you practise, ______ you become.",["the better","better","the best","more better"],0,"Pola the + komparatif, the + komparatif."],
+["B2","Comparison","It's ______ expensive than I expected.",["less","least","fewer","little"],0,"less + adjektiva + than."],
+["B2","Wish/tags","I wish I ______ more time to relax.",["had","have","would have","will have"],0,"wish + past simple untuk keinginan yang tidak terwujud sekarang."],
+["B2","Wish/tags","If only I ______ the answer!",["knew","know","will know","would know"],0,"If only + past simple untuk penyesalan sekarang."],
+["B2","Wish/tags","You've finished your homework, ______?",["haven't you","didn't you","aren't you","don't you"],0,"Question tag: pertentangan kata bantu has/have."],
+["B2","Wish/tags","She doesn't like coffee, ______?",["does she","doesn't she","is she","did she"],0,"Kalimat negatif diikuti tag positif: does she."],
+["B2","Wish/tags","Do you know where ______?",["the station is","is the station","the station does","does the station"],0,"Pertanyaan tidak langsung memakai urutan subjek + kata kerja."],
+["B2","Wish/tags","I'm not sure how much ______.",["it costs","does it cost","it cost","costs it"],0,"Pertanyaan tidak langsung: subjek + kata kerja, tanpa do/does."],
+["B2","Quantifier","There are ______ people in the room; it is almost empty.",["few","a few","little","much"],0,"few + benda jamak = hampir tidak ada."],
+["B2","Quantifier","I have ______ time; let's go for a coffee.",["a little","a few","few","many"],0,"a little + tak terhitung = sedikit tetapi cukup."],
+["B2","Quantifier","How ______ sugar do you take in your tea?",["much","many","few","lot"],0,"sugar tak terhitung: how much."],
+["B2","Quantifier","Each of the students ______ a certificate.",["receives","receive","are receiving","have received"],0,"each of + jamak memakai kata kerja tunggal."],
+["B2","Quantifier","Both of my brothers ______ in Australia.",["live","lives","is living","has lived"],0,"Both + kata kerja jamak."],
+["B2","Quantifier","There ______ a lot of traffic this morning.",["was","were","have been","are"],0,"traffic tak terhitung: was."]
+];
+
+/* GQ2 bagian B: tata bahasa C1 (85 soal). */
+var GQ2B=[
+["C1","Inversi","Hardly ______ the house when it started to rain.",["had we left","we had left","did we leave","we left"],0,"Hardly di awal: had + subjek + V3, diikuti when."],
+["C1","Inversi","No sooner had she sat down ______ the phone rang.",["than","when","that","then"],0,"No sooner ... than."],
+["C1","Inversi","Under no circumstances ______ the door be left unlocked.",["should","does","is","has"],0,"Frasa negatif di awal menyebabkan inversi: should + subjek + be."],
+["C1","Inversi","Only after the meeting ______ the real problem.",["did we discover","we discovered","we did discover","discovered we"],0,"Only after di awal: did + subjek + V1."],
+["C1","Inversi","Little ______ that the surprise party was planned for her.",["did she know","she knew","she did know","knew she"],0,"Little di awal bermakna negatif: inversi did she know."],
+["C1","Inversi","On no account ______ the laboratory.",["may visitors enter","visitors may enter","visitors enter","do visitors entering"],0,"On no account di awal: kata bantu mendahului subjek."],
+["C1","Inversi","Not until the report was published ______ the scale of the problem.",["did people realise","people realised","people did realise","realised people"],0,"Not until di awal: did + subjek + V1."],
+["C1","Inversi","So exhausted ______ that he fell asleep at his desk.",["was he","he was","did he","had he"],0,"So + adjektiva di awal: was he."],
+["C1","Conditional","If it ______ for your help, I would never have finished.",["hadn't been","wasn't","weren't","hasn't been"],0,"If it hadn't been for = kalau bukan karena (masa lalu)."],
+["C1","Conditional","Were he ______ the truth, he would be furious.",["to know","knowing","known","know"],0,"Were + subjek + to V1 = bentuk formal dari If he knew."],
+["C1","Conditional","I wish I ______ the exam last year; I'd be a doctor now.",["had passed","passed","have passed","would pass"],0,"wish + past perfect untuk penyesalan masa lalu."],
+["C1","Conditional","If she ______ harder, she might have succeeded.",["had tried","tried","would try","has tried"],0,"Conditional tipe 3: If + had + V3."],
+["C1","Conditional","Supposing you ______ the lottery, what would you do?",["won","will win","would win","winning"],0,"Supposing + past simple untuk situasi hipotetis."],
+["C1","Conditional","I'll come to the party provided that I ______ finished work.",["have","will have","had","would have"],0,"provided that + present (perfect), bukan will."],
+["C1","Conditional","He acts as though he ______ the owner, although he's only an intern.",["were","is","will be","has been"],0,"as though untuk situasi tidak nyata: were."],
+["C1","Subjunctive","It is essential that every student ______ the form by Friday.",["submit","submits","submitted","submitting"],0,"essential that + subjunctive: bentuk dasar tanpa -s."],
+["C1","Subjunctive","I demand that he ______ immediately.",["leave","leaves","left","leaving"],0,"demand that + subjunctive: bentuk dasar."],
+["C1","Subjunctive","It's high time you ______ a decision.",["made","make","will make","have made"],0,"It's high time + past simple."],
+["C1","Subjunctive","She insisted that the meeting ______ postponed.",["be","is","was","were"],0,"insist that + subjunctive: be + V3."],
+["C1","Participle clause","______ from the top of the hill, the town looked tiny.",["Seen","Seeing","Having seen","To see"],0,"Pasif (kota itu dilihat): Seen."],
+["C1","Participle clause","______ tired, she went straight to bed.",["Feeling","Felt","To feel","Having feel"],0,"Alasan yang berlangsung bersamaan: Feeling."],
+["C1","Participle clause","The man ______ by the door is my uncle.",["standing","stood","stands","to stand"],0,"Participle aktif untuk menjelaskan: standing."],
+["C1","Participle clause","Not ______ what to do, she asked for advice.",["knowing","known","to know","having know"],0,"Bentuk negatif: Not knowing."],
+["C1","Participle clause","Anyone ______ to apply should contact the office.",["wishing","wished","to wish","wishes"],0,"Anyone wishing to = siapa pun yang ingin."],
+["C1","Participle clause","______ by the noise, the baby started to cry.",["Frightened","Frightening","Having frighten","Frighten"],0,"Pasif (bayi ditakuti): Frightened."],
+["C1","Cleft sentence","What I need ______ a long holiday.",["is","are","were","have"],0,"What I need + is."],
+["C1","Cleft sentence","It was in 1969 ______ humans first landed on the Moon.",["that","what","whose","whom"],0,"It was ... that untuk penegasan."],
+["C1","Cleft sentence","______ annoys me most is his arrogance.",["What","That","Who","Which"],0,"What sebagai subjek klausa penegasan."],
+["C1","Cleft sentence","The reason ______ I called is to invite you to dinner.",["why","for","what","how"],0,"The reason why."],
+["C1","Cleft sentence","It is John ______ should apologise.",["who","whom","which","whose"],0,"It is + orang + who."],
+["C1","Modal perfect","He ______ the message, otherwise he would have replied.",["can't have received","mustn't have received","shouldn't receive","needn't received"],0,"can't have + V3 = pasti tidak (masa lalu)."],
+["C1","Modal perfect","You ______ me earlier! I would have helped.",["should have told","must have told","would tell","could telling"],0,"should have + V3 = seharusnya (penyesalan)."],
+["C1","Modal perfect","She ______ the train; she's not here yet.",["may have missed","must miss","should missed","can have missed"],0,"may have + V3 = mungkin telah."],
+["C1","Modal perfect","They ______ so much food; most of it was wasted.",["needn't have cooked","mustn't have cooked","couldn't cook","shouldn't cooking"],0,"needn't have + V3 = sebenarnya tidak perlu (sudah dilakukan)."],
+["C1","Modal perfect","I ______ that cake; now I feel sick.",["shouldn't have eaten","needn't eat","couldn't eat","mustn't eat"],0,"shouldn't have + V3 = menyesal telah melakukan."],
+["C1","Modal perfect","He ______ the answer; he looked so confident.",["must have known","can't have known","should know","might knowing"],0,"must have + V3 = pasti (kesimpulan masa lalu)."],
+["C1","Preposisi","She was accused ______ stealing the money.",["of","for","with","about"],0,"accuse someone of."],
+["C1","Preposisi","He apologised ______ being late.",["for","of","about","to"],0,"apologise for."],
+["C1","Preposisi","The company is responsible ______ the accident.",["for","of","to","at"],0,"responsible for."],
+["C1","Preposisi","We are looking forward ______ meeting you.",["to","for","at","on"],0,"look forward to + V-ing."],
+["C1","Preposisi","She prides herself ______ her punctuality.",["on","in","for","at"],0,"pride oneself on."],
+["C1","Preposisi","He is capable ______ solving the problem himself.",["of","to","for","at"],0,"capable of + V-ing."],
+["C1","Preposisi","The two countries are ______ war.",["at","in","on","with"],0,"Kolokasi: at war."],
+["C1","Causative","She had her hair ______ yesterday.",["cut","cutting","to cut","cuts"],0,"have + objek + V3 = pekerjaan dilakukan orang lain."],
+["C1","Causative","I'm going to have my car ______ tomorrow.",["serviced","service","servicing","to service"],0,"have + objek + V3."],
+["C1","Causative","He got his brother ______ him with the move.",["to help","help","helping","helped"],0,"get + orang + to V1."],
+["C1","Kata penghubung","______ the weather was terrible, the event was a success.",["Even though","Despite","In case","Unless"],0,"Even though + klausa = meskipun."],
+["C1","Kata penghubung","The results were disappointing; ______, we will continue the research.",["nonetheless","moreover","consequently","likewise"],0,"nonetheless = meskipun begitu."],
+["C1","Kata penghubung","He saved money ______ he could buy a house.",["so that","in spite of","as though","whereas"],0,"so that = supaya (tujuan)."],
+["C1","Kata penghubung","______ he is talented, he lacks discipline.",["While","Because","Unless","Until"],0,"While = sementara/walaupun (kontras)."],
+["C1","Kata penghubung","She took the job ______ the low salary.",["in spite of","although","even though","whereas"],0,"in spite of + frasa kata benda."],
+["C1","Kata penghubung","Prices rose sharply; ______, demand remained strong.",["even so","for instance","in particular","as a result"],0,"even so = meskipun begitu (kontras)."],
+["C1","Relative clause","The report, ______ was published last week, caused controversy.",["which","that","what","who"],0,"Klausa non-defining untuk benda: which."],
+["C1","Relative clause","She has two sons, both of ______ are doctors.",["whom","who","which","them"],0,"both of whom = keduanya (orang)."],
+["C1","Relative clause","The reason for ______ he resigned remains unclear.",["which","what","whom","whose"],0,"Preposisi + which."],
+["C1","Relative clause","He failed the test, ______ surprised nobody.",["which","what","that","it"],0,"which merujuk pada seluruh klausa sebelumnya."],
+["C1","Relative clause","The house, ______ roof was damaged in the storm, is being repaired.",["whose","which","who's","that"],0,"whose menunjukkan kepemilikan."],
+["C1","Relative clause","This is the village in ______ my grandfather was born.",["which","that","where","what"],0,"Setelah preposisi, pakai which."],
+["C1","Tenses","By the time you arrive, I ______ for three hours.",["will have been waiting","will wait","have waited","am waiting"],0,"Future perfect continuous: durasi sampai titik di masa depan."],
+["C1","Tenses","I ______ him since we were at school, so I know him well.",["have known","know","knew","am knowing"],0,"since + titik lampau: present perfect; know tidak dipakai dalam bentuk continuous."],
+["C1","Tenses","When I arrived, she was exhausted because she ______ all day.",["had been working","was working","has worked","worked"],0,"Past perfect continuous: aktivitas berlanjut sebelum titik lampau."],
+["C1","Tenses","I ______ to the gym every day, but I stopped last year.",["used to go","am used to going","use to go","was used to go"],0,"used to + V1 = kebiasaan lampau yang sudah berhenti."],
+["C1","Tenses","At this moment next year, I ______ in Canada.",["will be living","will live","have lived","live"],0,"Future continuous."],
+["C1","Tenses","The train ______ at 9.15 tomorrow.",["leaves","left","has left","is left"],0,"Jadwal tetap: present simple."],
+["C1","Tenses","It was the first time she ______ abroad.",["had travelled","has travelled","travelled","was travelling"],0,"It was the first time + past perfect."],
+["C1","Tenses","He ______ the report all week and is still not finished.",["has been writing","wrote","is written","writes"],0,"Present perfect continuous: aktivitas berkelanjutan sampai sekarang."],
+["C1","Gerund/infinitive","I regret ______ you that the flight has been cancelled.",["to inform","informing","inform","informed"],0,"regret to + V1 = menyesal harus menyampaikan."],
+["C1","Gerund/infinitive","She admitted ______ the vase.",["breaking","to break","break","broke"],0,"admit + V-ing."],
+["C1","Gerund/infinitive","He is believed ______ the country last night.",["to have left","to leave","leaving","having left"],0,"believed to have + V3 untuk kejadian lampau."],
+["C1","Gerund/infinitive","I can't help ______ that she is hiding something.",["thinking","to think","think","thought"],0,"can't help + V-ing."],
+["C1","Gerund/infinitive","They were made ______ for two hours.",["to wait","wait","waiting","waited"],0,"Pasif make + to V1."],
+["C1","Gerund/infinitive","It's no use ______ over spilt milk.",["crying","to cry","cry","cried"],0,"It's no use + V-ing."],
+["C1","Gerund/infinitive","She is too proud ______ for help.",["to ask","asking","ask","asked"],0,"too + adjektiva + to V1."],
+["C1","Passive","The package is expected ______ tomorrow.",["to arrive","arriving","arrives","to be arrived"],0,"is expected + to V1."],
+["C1","Passive","The painting is believed ______ stolen during the war.",["to have been","to be","being","having been"],0,"believed to have been + V3."],
+["C1","Passive","He doesn't like ______ in public.",["being criticised","criticising","to criticise","criticised"],0,"like + being + V3 untuk pasif gerund."],
+["C1","Passive","Applications ______ no later than 5 p.m. on Friday.",["must be received","must receive","must have received","must receiving"],0,"Pasif dengan modal: must be + V3."],
+["C1","Passive","We were told that the flight ______ because of fog.",["had been delayed","has delayed","was delaying","delayed"],0,"Pasif past perfect: had been + V3."],
+["C1","Ellipsis","She doesn't like jazz, but I ______.",["do","like","am","does"],0,"Pelesapan: ulang kata bantu dari kalimat sebelumnya (do)."],
+["C1","Ellipsis","'I can't swim.' '______ can I.'",["Neither","So","Either","Too"],0,"Neither + kata bantu + subjek = saya juga tidak."],
+["C1","Ellipsis","I thought the film would be boring, and it ______.",["was","did","is","would"],0,"Pelesapan: was (kata kerja be)."],
+["C1","Determiner","______ of the two options is perfect.",["Neither","None","No","Any"],0,"Neither of the two = tidak satu pun dari dua."],
+["C1","Determiner","The government has ______ money to fund the project.",["a great deal of","a great number of","many","few"],0,"money tak terhitung: a great deal of."],
+["C1","Determiner","Not ______ of the applicants had the required qualifications.",["all","every","each","either"],0,"Not all of the + jamak = tidak semua."],
+["C1","Determiner","I have ______ idea what he is talking about.",["no","not","none","any"],0,"I have no idea."]
+];
+var GQ2=GQ2A.concat(GQ2B);
+
+/* RP2: 14 bacaan (p7-p20): 7 B2 + 7 C1, masing-masing 5 soal. "t" = True/False/Not Given (0/1/2), "m" = pilihan ganda (benar di indeks 0). */
+var RP2=[
+{t:"Sekolah dengan empat hari belajar",l:"B2",x:"Several school districts have experimented with a four-day school week, hoping to save money on transport and heating. Under the new timetable, pupils attend longer lessons from Monday to Thursday and stay at home on Fridays. Supporters report that teacher absence has fallen, because staff can book medical appointments on the free day. Critics, however, worry that younger children may find the long days tiring, and that working parents must pay for extra childcare. A study of twenty schools found that test results stayed roughly the same in the first year, although the researchers admit that more time is needed before firm conclusions can be drawn.",q:[
+["t","Pupils go to school from Monday to Thursday under the new timetable.",null,0,"Teks: pupils attend lessons Monday to Thursday. True."],
+["t","Teacher absence has increased since the change.",null,1,"Teks: teacher absence has fallen. False."],
+["t","Most parents support the four-day week.",null,2,"Pendapat mayoritas orang tua tidak disebutkan. Not Given."],
+["m","What was the main aim of the experiment?",["To save money","To improve test results","To reduce homework","To hire more teachers"],0,"Kalimat pertama: hoping to save money on transport and heating."],
+["m","What do the researchers say about their study?",["More time is needed for firm conclusions","It proves the system works","It proves the system fails","It covered only one school"],0,"Kalimat terakhir: more time is needed before firm conclusions."]]},
+{t:"Pasar petani lokal",l:"B2",x:"Farmers' markets have become increasingly popular in recent years, and many towns now host one every weekend. Shoppers often say they prefer to buy vegetables directly from the person who grew them, because the produce is fresher and the origin is clear. Farmers also benefit, since they keep a larger share of the price than when selling through supermarkets. Nevertheless, prices at the stalls are usually higher, which puts some families off. To address this problem, one town introduced a scheme that gives low-income residents vouchers worth ten dollars each month. Organisers say that sales have risen by a fifth since the scheme began, though they have not yet measured its effect on diet.",q:[
+["t","Farmers earn a bigger share of the price at markets than at supermarkets.",null,0,"Teks: they keep a larger share of the price. True."],
+["t","Prices at the stalls are generally lower than in shops.",null,1,"Teks: prices are usually higher. False."],
+["t","The vouchers are paid for by local businesses.",null,2,"Sumber dana voucher tidak disebutkan. Not Given."],
+["m","Why do many shoppers prefer farmers' markets?",["The produce is fresher and its origin is clear","The prices are always lower","They are open every day","They sell imported goods"],0,"Teks: fresher and the origin is clear."],
+["m","What have organisers NOT yet measured?",["The effect on people's diet","The rise in sales","The value of the vouchers","The number of stalls"],0,"Teks: not yet measured its effect on diet."]]},
+{t:"Belajar bahasa lewat aplikasi",l:"B2",x:"Language-learning apps have attracted millions of users, largely because they let people study for a few minutes at a time. Short daily games can build vocabulary and make learners feel they are making progress. Yet teachers point out that apps rarely teach people how to hold a real conversation. One survey of adult learners found that those who combined an app with weekly lessons improved faster than those who used an app alone. The researchers suggest that apps work best as a supplement, helping learners to review words between classes. They also note that motivation is a bigger problem than technology: more than half of the users stopped using their app within a month.",q:[
+["t","Apps allow people to study for short periods.",null,0,"Teks: study for a few minutes at a time. True."],
+["t","Learners using only an app progressed faster than those with lessons.",null,1,"Sebaliknya, yang menggabungkan app dan kelas lebih cepat. False."],
+["t","Most app users are under twenty-five.",null,2,"Usia pengguna tidak disebutkan. Not Given."],
+["m","What do teachers say about apps?",["They rarely teach real conversation","They are too expensive","They are too difficult","They replace lessons completely"],0,"Teks: apps rarely teach people how to hold a real conversation."],
+["m","According to the researchers, what is the bigger problem?",["Motivation","Technology","Cost","Vocabulary"],0,"Teks: motivation is a bigger problem than technology."]]},
+{t:"Transportasi kereta malam",l:"B2",x:"Night trains, once thought to be a thing of the past, are returning across Europe. Rising concern about air travel emissions has persuaded several governments to fund new sleeper routes. Passengers can board in the evening, sleep in a small cabin and arrive in the city centre the next morning, avoiding airport queues. However, tickets are often more expensive than budget flights, and the journeys can take up to fourteen hours. Rail companies say the cost is high because the carriages are old and must be replaced. Even so, bookings on the new routes have exceeded expectations, and two additional lines are planned for next year.",q:[
+["t","Night trains are returning to Europe.",null,0,"Judul teks dan kalimat pertama. True."],
+["t","Sleeper tickets are usually cheaper than budget flights.",null,1,"Teks: often more expensive than budget flights. False."],
+["t","Passengers prefer night trains because of the food served.",null,2,"Makanan tidak disebutkan. Not Given."],
+["m","Why have governments funded new sleeper routes?",["Because of concern about air travel emissions","Because trains are faster","Because airports are closed","Because of tourism"],0,"Teks: concern about air travel emissions."],
+["m","Why are tickets expensive, according to rail companies?",["The carriages are old and must be replaced","Fuel is costly","Staff are paid more","Stations charge high fees"],0,"Teks: the carriages are old and must be replaced."]]},
+{t:"Tidur dan remaja",l:"B2",x:"Many teenagers do not get enough sleep, and scientists believe that early school start times are partly responsible. During adolescence the body clock shifts, so young people naturally feel sleepy later in the evening and wake later in the morning. A school that moved its first lesson from 8.00 to 9.00 reported fewer late arrivals and a small improvement in attendance. Not everyone agrees with the change, however. Some parents argue that later finishing times interfere with sport and part-time jobs. Researchers stress that screens also play a role, and recommend that phones be left outside the bedroom at night.",q:[
+["t","Teenagers' body clocks shift during adolescence.",null,0,"Teks: the body clock shifts. True."],
+["t","The school that changed its timetable saw more late arrivals.",null,1,"Teks: fewer late arrivals. False."],
+["t","Teenagers need nine hours of sleep each night.",null,2,"Jumlah jam tidak disebutkan. Not Given."],
+["m","What concern do some parents have?",["Later finishing times affect sport and jobs","Lessons are too short","Phones are banned","Lessons start too early"],0,"Teks: later finishing times interfere with sport and part-time jobs."],
+["m","What do researchers recommend?",["Leaving phones outside the bedroom","Banning sport","Starting school earlier","Sleeping during lessons"],0,"Kalimat terakhir."]]},
+{t:"Kerja jarak jauh dan kota kecil",l:"B2",x:"As more companies allow staff to work from home, some small towns are attracting new residents who no longer need to commute to a large city. Property prices in these places are lower, and many people appreciate the slower pace of life. Local councils have welcomed the newcomers, since they spend money in shops and cafés. On the other hand, long-term residents complain that house prices have started to rise and that young local people cannot afford to buy. In response, one council has set aside land for affordable housing. It is still too early to say whether the trend will last, as some employers are now asking workers to return to the office.",q:[
+["t","Property prices in small towns are lower than in large cities.",null,0,"Teks: property prices in these places are lower. True."],
+["t","Long-term residents are pleased about the rise in house prices.",null,1,"Mereka mengeluh. False."],
+["t","Most remote workers have children.",null,2,"Tidak disebutkan. Not Given."],
+["m","How has one council responded to the problem?",["By setting aside land for affordable housing","By banning newcomers","By raising taxes","By closing shops"],0,"Teks: set aside land for affordable housing."],
+["m","Why is it too early to judge the trend?",["Some employers want workers back in the office","Prices have fallen","Councils disagree","There are no newcomers"],0,"Kalimat terakhir."]]},
+{t:"Daur ulang plastik",l:"B2",x:"Although most households separate their plastic waste, only a small proportion of it is actually recycled. Different types of plastic cannot be mixed, and food residue can spoil a whole batch. As a result, large amounts are burned or sent abroad. Some companies are now designing packaging from a single material to make recycling easier. Environmental groups welcome the change but argue that reducing the amount of plastic produced is more effective than improving recycling. A recent report estimated that a ban on certain single-use items could cut plastic waste by a third within five years, a claim that manufacturers dispute.",q:[
+["t","Only a small share of plastic waste is recycled.",null,0,"Teks: only a small proportion is recycled. True."],
+["t","Food residue has no effect on recycling.",null,1,"Teks: food residue can spoil a whole batch. False."],
+["t","Manufacturers support a ban on single-use items.",null,2,"Mereka membantah klaim laporan; dukungan tidak disebutkan. Not Given."],
+["m","Why is some packaging now made from a single material?",["To make recycling easier","To lower the weight","To improve the colour","To increase sales"],0,"Teks: to make recycling easier."],
+["m","What do environmental groups think is more effective?",["Producing less plastic","Burning waste","Exporting waste","Mixing plastics"],0,"Teks: reducing the amount produced."]]},
+{t:"Keterbatasan kecerdasan buatan dalam penerjemahan",l:"C1",x:"Machine translation has improved dramatically, to the point where routine business correspondence can often be rendered with few errors. Nevertheless, professional translators remain unconvinced that their craft is obsolete. Idioms, humour and cultural references continue to pose difficulties, because they depend on shared assumptions that no dataset can fully capture. Moreover, errors are not always obvious: a fluent but inaccurate sentence may pass unnoticed by a reader who does not know the source language. For this reason, many agencies now employ translators not to produce text from scratch but to review machine output, a role some regard as less rewarding yet increasingly indispensable.",q:[
+["t","Machine translation handles routine business letters reasonably well.",null,0,"Teks: routine business correspondence with few errors. True."],
+["t","Professional translators believe their profession is obsolete.",null,1,"Teks: remain unconvinced that their craft is obsolete. False."],
+["t","Translators are paid less for reviewing machine output.",null,2,"Gaji tidak disebutkan. Not Given."],
+["m","Why can errors in machine translation go unnoticed?",["Fluent text may hide inaccuracies","The text is always short","Readers check every word","The software is slow"],0,"Teks: a fluent but inaccurate sentence may pass unnoticed."],
+["m","What is the attitude of some translators to reviewing machine output?",["Less rewarding but increasingly essential","Highly rewarding","Pointless","Dangerous"],0,"Teks: less rewarding yet increasingly indispensable."]]},
+{t:"Ekonomi perhatian",l:"C1",x:"The notion that human attention is a scarce commodity has given rise to what some economists call the attention economy. Platforms compete not for money directly but for the minutes users devote to them, since those minutes can be sold to advertisers. Design features such as endless scrolling and notifications are widely believed to exploit psychological tendencies, although companies maintain that they merely improve convenience. A growing number of researchers contend that the cumulative effect is a fragmentation of concentration, with people finding it harder to read for long stretches. Others caution that evidence of lasting harm is still inconclusive, and that similar fears accompanied the arrival of television.",q:[
+["t","Platforms compete for the time users spend on them.",null,0,"Teks: compete for the minutes users devote. True."],
+["t","Companies admit that their designs exploit users.",null,1,"Mereka menyatakan hanya meningkatkan kenyamanan. False."],
+["t","Endless scrolling was invented by a famous engineer.",null,2,"Asal-usul tidak disebutkan. Not Given."],
+["m","What do some researchers contend?",["Concentration is becoming fragmented","Attention has improved","Reading is increasing","Television is harmless"],0,"Teks: fragmentation of concentration."],
+["m","Why do others urge caution?",["Evidence of lasting harm is inconclusive","Companies refuse to talk","Users are happy","Television caused harm"],0,"Teks: evidence of lasting harm is still inconclusive."]]},
+{t:"Kota tahan banjir",l:"C1",x:"Faced with ever more frequent flooding, several coastal cities are abandoning the idea that water can simply be kept out. Instead, planners are creating parks, wetlands and canals designed to absorb excess rainfall and release it slowly. Such 'sponge city' schemes are cheaper than massive sea walls, and they offer recreational space in normal times. Critics, however, point out that the approach requires land, which is scarce and expensive in dense centres, and that it cannot withstand the most extreme storms. Proponents concede the limitation but argue that a combination of soft and hard defences offers the most resilient protection for the money.",q:[
+["t","Sponge city schemes are designed to absorb rainwater.",null,0,"Teks: absorb excess rainfall and release it slowly. True."],
+["t","Sea walls are cheaper than sponge city schemes.",null,1,"Teks: sponge schemes cheaper than massive sea walls. False."],
+["t","Wetlands attract tourists to the cities.",null,2,"Wisatawan tidak disebutkan. Not Given."],
+["m","What is the main criticism of the approach?",["It needs scarce, expensive land","It is too costly","It harms wildlife","It is too slow to build"],0,"Teks: requires land, which is scarce and expensive."],
+["m","What do proponents suggest?",["Combining soft and hard defences","Abandoning cities","Building only sea walls","Ignoring storms"],0,"Kalimat terakhir."]]},
+{t:"Bahasa yang terancam punah",l:"C1",x:"Linguists estimate that about half of the world's languages may disappear by the end of the century. The loss is rarely sudden: it typically occurs over generations, as parents choose to raise children in a dominant language that promises better economic prospects. Each language embodies a distinct way of categorising experience, and its extinction therefore represents the loss of knowledge, including detailed ecological understanding accumulated over centuries. Revitalisation programmes have had mixed success. Immersion schools have produced fluent young speakers in some communities, but without everyday use outside the classroom, fluency tends to fade. Success appears to depend less on funding than on the community's own determination.",q:[
+["t","Language loss usually happens gradually over generations.",null,0,"Teks: not sudden; occurs over generations. True."],
+["t","Revitalisation programmes have always succeeded.",null,1,"Teks: mixed success. False."],
+["t","Governments spend more on language programmes than on schools.",null,2,"Perbandingan anggaran tidak ada. Not Given."],
+["m","Why do parents often choose a dominant language?",["It promises better economic prospects","It is easier to learn","It is mandatory","It is older"],0,"Teks: better economic prospects."],
+["m","What does success depend on, according to the passage?",["The community's determination","Funding","Technology","Immersion schools alone"],0,"Kalimat terakhir."]]},
+{t:"Menunda kepuasan",l:"C1",x:"A famous series of experiments offered young children a single sweet immediately or two if they could wait. Early follow-up studies suggested that those who waited went on to achieve better results in later life, and the findings were widely cited as evidence for the importance of self-control. More recent research, however, has complicated the picture. When differences in family background were taken into account, the link between waiting and later success weakened considerably. It seems that a child's willingness to wait may reflect trust that adults keep their promises as much as an inherent ability to resist temptation. Consequently, psychologists now caution against treating the result as a simple measure of character.",q:[
+["t","Children were offered one sweet now or two later.",null,0,"Teks: a single sweet immediately or two if they could wait. True."],
+["t","Recent research confirmed the early findings without qualification.",null,1,"Teks: complicated the picture. False."],
+["t","The original experiment involved over a thousand children.",null,2,"Jumlah anak tidak disebutkan. Not Given."],
+["m","What might a child's willingness to wait reflect?",["Trust that adults keep promises","Hunger","Intelligence only","Age"],0,"Teks: trust that adults keep their promises."],
+["m","What do psychologists now advise?",["Not treating it as a simple measure of character","Repeating the test yearly","Banning the test","Rewarding patience"],0,"Kalimat terakhir."]]},
+{t:"Penerbangan jarak jauh dan emisi",l:"C1",x:"Aviation accounts for a modest share of global emissions, yet its growth is the fastest of any transport sector, and decarbonising it is notoriously difficult. Batteries are too heavy for long flights, and sustainable fuels remain scarce and several times more expensive than conventional kerosene. Some analysts therefore argue that technology alone will not suffice and that demand must be managed, perhaps through higher taxes on frequent flyers. The industry counters that such measures would penalise ordinary families while doing little to cut emissions overall. What both sides accept is that credible offsets, which are frequently criticised for overstating their benefits, cannot be relied on to close the gap.",q:[
+["t","Aviation is the fastest-growing transport sector in terms of emissions.",null,0,"Teks: its growth is the fastest of any transport sector. True."],
+["t","Batteries are suitable for long flights.",null,1,"Teks: too heavy for long flights. False."],
+["t","Sustainable fuels will become cheaper than kerosene by 2030.",null,2,"Tidak ada prediksi harga. Not Given."],
+["m","What do some analysts propose?",["Managing demand, such as taxing frequent flyers","Banning aircraft","Using only batteries","Ignoring emissions"],0,"Teks: demand must be managed."],
+["m","What do both sides agree on?",["Offsets cannot be relied on to close the gap","Taxes must rise","Fuel is cheap","Flights are declining"],0,"Kalimat terakhir."]]},
+{t:"Kerja tim dan keputusan",l:"C1",x:"Conventional wisdom holds that groups make better decisions than individuals, since they pool a wider range of knowledge. Research, however, paints a more nuanced picture. Groups often converge prematurely on the first plausible option, particularly when a senior member speaks early and others hesitate to disagree. Some organisations have therefore adopted the practice of asking everyone to write down their view before discussion begins. Preliminary evidence suggests that this simple step increases the variety of ideas considered, although it does not guarantee a better outcome. Sceptics add that no procedure can substitute for a culture in which dissent is genuinely welcomed rather than merely tolerated.",q:[
+["t","Groups are believed to benefit from combining knowledge.",null,0,"Teks: pool a wider range of knowledge. True."],
+["t","Senior members rarely influence group decisions.",null,1,"Teks: groups converge when a senior member speaks early. False."],
+["t","Written views were first used by a technology company.",null,2,"Asal praktik tidak disebutkan. Not Given."],
+["m","What is the effect of writing views down first?",["It increases the variety of ideas","It guarantees a better outcome","It shortens meetings","It removes seniority"],0,"Teks: increases the variety of ideas, tetapi tidak menjamin hasil."],
+["m","What do sceptics say?",["Culture matters more than procedure","Procedures always work","Dissent is harmful","Groups should be smaller"],0,"Kalimat terakhir."]]}
+];
+
+
+/* ===== MESIN SOAL ===== */
+var TFNG=["True","False","Not Given"];
+var KIND={vocab:"Kosakata",grammar:"Tata bahasa",reading:"Reading mini"};
+var KDESC={vocab:"Pilihan kata, kolokasi, phrasal verb, sinonim, dan bentuk kata. 25 soal per sesi.",grammar:"Tenses, kondisional, pasif, modal, inversi, klausa relatif, dan lainnya. 25 soal per sesi.",reading:"Lima bacaan pendek, masing-masing lima soal (True/False/Not Given dan pilihan ganda). 25 soal per sesi."};
+var QI=[0,1,3,7,14,30];
+var SESS=25,RSESS=5;
+function D0(){return "2026-01-01"}
+RP=RP.concat(RP2);
+function qget(id){var r=S.q[id];if(!r)return null;if(r.length===4)return{box:r[0],due:addDays(D0(),r[1]),n:r[2],c:r[3]};return r}
+function qset(id,r){S.q[id]=[r.box,diff(D0(),r.due),r.n,r.c]}
+function normQ(o){var q=o.q||{};for(var k in q){var r=q[k];if(r&&!Array.isArray(r))q[k]=[r.box||0,diff(D0(),r.due||key(new Date())),r.n||0,r.c||0]}o.q=q;if(o.errors&&o.errors.length>100)o.errors=o.errors.slice(-100);return o}
+var BANK=[],BID={};
+VQ.forEach(function(r,i){BANK.push({id:"v"+(i+1),k:"vocab",lv:r[0],cat:"Pilihan kata",q:r[1],o:r[2],a:r[3],e:r[4]})});
+GQ.forEach(function(r,i){BANK.push({id:"g"+(i+1),k:"grammar",lv:r[0],cat:r[1],q:r[2],o:r[3],a:r[4],e:r[5]})});
+VQ2.forEach(function(r,i){BANK.push({id:"v"+(i+41),k:"vocab",lv:r[0],cat:r[1],q:r[2],o:r[3],a:r[4],e:r[5]})});
+GQ2.forEach(function(r,i){BANK.push({id:"g"+(i+31),k:"grammar",lv:r[0],cat:r[1],q:r[2],o:r[3],a:r[4],e:r[5]})});
+RP.forEach(function(p,pi){p.q.forEach(function(r,i){BANK.push({id:"r"+(pi+1)+"-"+(i+1),k:"reading",lv:p.l,cat:r[0]==="t"?"True/False/Not Given":"Pilihan ganda",q:r[1],o:r[0]==="t"?TFNG:r[2],a:r[3],e:r[4],p:pi,tf:r[0]==="t"})})});
+BANK.forEach(function(x){BID[x.id]=x});
+var qs=null;
+
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function makePerm(it){if(it.tf)return[0,1,2];return shuf(it.o.map(function(_,i){return i}))}
+function qstat(kind,lv){var n=0,c=0,seen=0,tot=0;BANK.forEach(function(x){if((kind&&x.k!==kind)||(lv!=="all"&&x.lv!==lv))return;tot++;var r=qget(x.id);if(r){seen++;n+=r.n;c+=r.c}});return{n:n,c:c,seen:seen,tot:tot}}
+function pct(c,n){return n?Math.round(c/n*100)+"%":"--"}
+function weakCat(){var m={},w=null;BANK.forEach(function(x){if(x.k!=="grammar")return;var r=qget(x.id);if(!r)return;var o=m[x.cat]||(m[x.cat]={n:0,c:0});o.n+=r.n;o.c+=r.c});Object.keys(m).forEach(function(k){if(m[k].n>=3&&(!w||m[k].c/m[k].n<m[w].c/m[w].n))w=k});return w?{cat:w,acc:pct(m[w].c,m[w].n)}:null}
+
+function pickItems(kind,lv){
+  var t=today(),pool=BANK.filter(function(x){return x.k===kind&&(lv==="all"||x.lv===lv)});
+  if(kind==="reading"){
+    var ps={},sc=[];
+    pool.forEach(function(x){(ps[x.p]=ps[x.p]||[]).push(x)});
+    Object.keys(ps).forEach(function(k){var s=0;ps[k].forEach(function(x){var r=qget(x.id);if(!r)s+=2;else if(r.due<=t)s+=3});sc.push({k:k,s:s+Math.random()})});
+    sc.sort(function(a,b){return b.s-a.s});
+    return sc.slice(0,RSESS).reduce(function(a,o){return a.concat(ps[o.k])},[]);
+  }
+  var due=[],fresh=[],rest=[];
+  pool.forEach(function(x){var r=qget(x.id);if(!r)fresh.push(x);else if(r.due<=t)due.push(x);else rest.push(x)});
+  return shuf(due).concat(shuf(fresh),shuf(rest)).slice(0,SESS);
+}
+function startQuiz(kind){
+  var items=pickItems(kind,state.ql||"all");
+  if(!items.length){qs=null;return}
+  qs={kind:kind,items:items,i:0,picked:null,ok:false,perm:makePerm(items[0]),res:[],done:false};
+}
+function answer(idx){
+  if(!qs||qs.picked!==null)return;
+  var it=qs.items[qs.i],ok=qs.perm[idx]===it.a,r=qget(it.id)||{box:0,due:today(),n:0,c:0};
+  qs.picked=idx;qs.ok=ok;
+  r.n++;
+  if(ok){r.c++;r.box=Math.min(5,r.box+1);r.due=addDays(today(),QI[r.box])}else{r.box=0;r.due=today()}
+  qset(it.id,r);
+  qs.res.push({id:it.id,ok:ok});
+  var dd=day();dd.quiz=(dd.quiz||0)+1;
+  if(!ok){S.errors.push({d:today(),s:KIND[it.k],t:it.cat,n:it.q.slice(0,50)});if(S.errors.length>100)S.errors.splice(0,S.errors.length-100)}
+  save();render();
+}
+function nextQ(){
+  qs.i++;
+  if(qs.i>=qs.items.length){
+    qs.done=true;
+    var c=qs.res.filter(function(r){return r.ok}).length;
+    S.ql.push({d:today(),k:qs.kind,n:qs.res.length,c:c});
+    if(S.ql.length>40)S.ql.splice(0,S.ql.length-40);
+    save();
+  }else{qs.picked=null;qs.perm=makePerm(qs.items[qs.i])}
+  render();
+  var v=document.getElementById("view");if(v&&v.scrollIntoView)v.scrollIntoView();
+}
+
+function vSoal(){
+  state.ql=state.ql||"all";
+  if(!qs)return soalMenu();
+  return qs.done?soalDone():soalQ();
+}
+function soalMenu(){
+  var lv=state.ql,cards="",b2=qstat(null,"B2"),hint;
+  ["vocab","grammar","reading"].forEach(function(k){
+    var st=qstat(k,lv);
+    cards+='<div class="panel"><div class="lbl">'+KIND[k]+'</div><p class="small" style="margin:6px 0 10px">'+KDESC[k]+'</p>'
+      +'<div class="mono small" style="margin-bottom:10px">Dikerjakan '+st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n)+'</div>'
+      +'<button class="btn" data-start="'+k+'"'+(st.tot?"":" disabled")+'>Mulai</button></div>';
+  });
+  if(b2.n<15)hint="Mulai dari level B2 atau Campur. Setelah akurasi B2 stabil di atas 80%, pindah ke C1.";
+  else if(b2.c/b2.n>=0.8)hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Sudah siap mencoba level C1.";
+  else hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Perkuat B2 dulu, lalu naik ke C1.";
+  var wk=weakCat(),wkTxt=wk?'<p class="small" style="margin:8px 0 0">Topik tata bahasa terlemah: <b>'+esc(wk.cat)+'</b> (akurasi '+wk.acc+').</p>':"";
+  var hist=S.ql.slice().reverse().slice(0,8).map(function(h){return '<tr><td>'+h.d.slice(8)+'/'+h.d.slice(5,7)+'</td><td>'+(KIND[h.k]||h.k)+'</td><td class="n">'+h.c+'/'+h.n+'</td><td class="n">'+pct(h.c,h.n)+'</td></tr>'}).join("");
+  return '<div class="panel"><h2>Latihan soal</h2><div class="field" style="max-width:260px"><label for="qLevel">Level</label><select id="qLevel">'
+    +[["all","Campur (B2 dan C1)"],["B2","B2"],["C1","C1"]].map(function(o){return '<option value="'+o[0]+'"'+(o[0]===lv?" selected":"")+'>'+o[1]+'</option>'}).join("")
+    +'</select></div><p class="small" style="margin:10px 0 0">'+hint+'</p>'+wkTxt
+    +'<p class="small" style="margin:8px 0 0">Soal yang salah muncul lagi di sesi berikutnya dan tercatat di tab Kesalahan. Soal ditulis sendiri oleh Claude, bukan soal resmi IELTS atau Cambridge, jadi akurasinya tidak setara dengan skor band.</p></div>'
+    +'<div class="grid g3" style="margin-top:12px">'+cards+'</div>'
+    +(hist?'<div class="panel" style="margin-top:12px"><h2>Sesi terakhir</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Jenis</th><th class="n">Benar</th><th class="n">Akurasi</th></tr></thead><tbody>'+hist+'</tbody></table></div></div>':"");
+}
+function soalQ(){
+  var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,p="";
+  if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">'+esc(P.t)+' &middot; '+P.l+'</div>'+esc(P.x)+'</div>'}
+  var opts=qs.perm.map(function(orig,i){
+    var cls="opt";if(done){if(orig===it.a)cls+=" right";else if(i===qs.picked)cls+=" wrong"}
+    return '<button class="'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">'+"ABCD".charAt(i)+'</span><span>'+esc(it.o[orig])+'</span></button>';
+  }).join("");
+  var fb=done?'<div class="fb '+(qs.ok?"ok":"no")+'"><b>'+(qs.ok?"Benar.":"Kurang tepat.")+'</b> '+(qs.ok?"":"Jawaban: "+esc(it.o[it.a])+". ")+esc(it.e)+'</div><div class="row" style="margin-top:12px"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Lanjut")+'</button><button class="btn ghost" id="qMenu">Keluar</button></div>':'<div class="row" style="margin-top:12px"><button class="btn ghost" id="qMenu">Keluar</button></div>';
+  return '<div class="panel"><div class="row"><span class="lbl">'+KIND[it.k]+' &middot; '+it.lv+' &middot; '+esc(it.cat)+'</span><span class="mono" style="margin-left:auto">'+(qs.i+1)+'/'+n+'</span></div>'
+    +'<div class="prog"><i style="width:'+Math.round((qs.i+(done?1:0))/n*100)+'%"></i></div>'+p
+    +(it.tf?'<p class="small" style="margin:0 0 6px">Sesuai teks: True = sesuai, False = bertentangan, Not Given = tidak disebut.</p>':"")
+    +'<div class="qh">'+esc(it.q)+'</div>'+opts+fb+'</div>';
+}
+function soalDone(){
+  var n=qs.res.length,c=qs.res.filter(function(r){return r.ok}).length;
+  var wrong=qs.res.filter(function(r){return !r.ok}).map(function(r){var x=BID[r.id];return '<div class="fb no" style="margin-top:10px"><div style="font-weight:600;margin-bottom:4px">'+esc(x.q)+'</div><div class="small">Jawaban: <b>'+esc(x.o[x.a])+'</b>. '+esc(x.e)+'</div></div>'}).join("");
+  return '<div class="panel"><div class="lbl">'+KIND[qs.kind]+' &middot; sesi selesai</div><div class="big" style="margin:6px 0">'+c+'/'+n+' <span class="small">benar ('+pct(c,n)+')</span></div>'
+    +'<div class="row"><button class="btn" id="qAgain">Sesi berikutnya</button><button class="btn ghost" id="qMenu">Kembali ke menu</button></div>'
+    +(wrong?'<h2 style="margin-top:18px;font-size:16px">Yang perlu diulang</h2>'+wrong:'<p class="small" style="margin:12px 0 0">Semua benar. Coba level yang lebih tinggi atau jenis soal lain.</p>')+'</div>';
+}
+function bindSoal(){
+  var $=function(id){return document.getElementById(id)};
+  document.querySelectorAll("[data-start]").forEach(function(b){b.onclick=function(){startQuiz(b.dataset.start);render()}});
+  document.querySelectorAll("[data-opt]").forEach(function(b){b.onclick=function(){answer(+b.dataset.opt)}});
+  if($("qLevel"))$("qLevel").onchange=function(){state.ql=$("qLevel").value;render()};
+  if($("qNext"))$("qNext").onclick=nextQ;
+  if($("qMenu"))$("qMenu").onclick=function(){qs=null;render()};
+  if($("qAgain"))$("qAgain").onclick=function(){startQuiz(qs.kind);render()};
+}
+
 function vSalah(){
   var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
   var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
@@ -412,13 +1118,14 @@ function render(){
   var wk=planWeek();document.getElementById("wkLbl").textContent=wk.lbl;document.getElementById("wkNum").textContent=wk.n?wk.n+" / 12":"--";
   document.getElementById("tgtTop").textContent=S.target;
   var v=document.getElementById("view");
-  v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="skor"?vSkor():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
+  v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="skor"?vSkor():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
   bind();
 }
 function go(t){if(state.tab!==t){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render()}
 
 function bind(){
   var $=function(id){return document.getElementById(id)};
+  if(state.tab==="soal")bindSoal();
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
   if($("doneBtn"))$("doneBtn").onclick=function(){var d=day();d.done=!d.done;save();render()};
@@ -463,7 +1170,7 @@ function bind(){
     };
     $("syoNow").onclick=function(){dirty=true;pull().then(flush)};
     $("bkOut").onclick=function(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="jalur-ielts-cadangan-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)};
-    $("bkIn").onchange=function(){var f=$("bkIn").files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||typeof d!=="object"||!d.cards)throw 0;S=Object.assign(def(),d);save();$("bkMsg").textContent="Cadangan dipulihkan.";render()}catch(e){$("bkMsg").textContent="File tidak valid."}};r.readAsText(f)};
+    $("bkIn").onchange=function(){var f=$("bkIn").files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||typeof d!=="object"||!d.cards)throw 0;S=normQ(Object.assign(def(),d));save();$("bkMsg").textContent="Cadangan dipulihkan.";render()}catch(e){$("bkMsg").textContent="File tidak valid."}};r.readAsText(f)};
   }
   document.querySelectorAll("[data-part]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.sp={part:+b.dataset.part,i:rnd(10),phase:"idle"};render()}});
   if($("spNext"))$("spNext").onclick=function(){stopTimer();T.left=0;var n=state.sp.part===2?SP2.length:state.sp.part===1?SP1.length:SP3.length;state.sp={part:state.sp.part,i:rnd(n,state.sp.i%n),phase:"idle"};render()};
