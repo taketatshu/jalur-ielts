@@ -223,6 +223,19 @@ svg text{font-family:var(--f-mono);font-size:11px}
 .tl .d2{fill:var(--accent);stroke:var(--edge);stroke-width:2}
 .tl .d3{fill:var(--muted);stroke:var(--edge);stroke-width:2}
 .tl .lb{fill:var(--ink);font-size:11px}
+.vf{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--edge);border-radius:8px;overflow:hidden;background:var(--surface)}
+.vf div{padding:10px 12px;border-left:2px solid var(--edge);display:flex;flex-direction:column;gap:2px;min-width:0}
+.vf div:first-child{border-left:0}
+.vf span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.vf b{font-family:var(--f-mono);font-size:15px;overflow-wrap:anywhere}
+.vf .on{background:var(--amber);color:#0F2040}
+.vf .on span{color:#0F2040}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:8px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;font-size:15px}
+.steps li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--on-bg);color:var(--on-ink);display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:13px}
+.trap{border:2px solid var(--edge);border-left:8px solid var(--amber);border-radius:8px;background:var(--surface);padding:12px 14px;font-size:14px}
+.exm{border:2px dashed var(--edge);border-radius:8px;padding:12px 14px;background:var(--surface)}
+.exm .exe{font-family:var(--f-display);font-size:18px;font-weight:600;margin:4px 0 2px}
 .sec-t{font-family:var(--f-display);font-size:clamp(20px,5vw,26px);font-weight:700;margin:0 0 8px}
 .mx{border:2px solid var(--edge);border-radius:8px;overflow:hidden;background:var(--surface)}
 .mx-r{display:grid;grid-template-columns:1.15fr 70px .95fr 2.2fr;gap:0;align-items:stretch;border-top:2px solid var(--edge)}
@@ -1570,6 +1583,211 @@ r19-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak disebut; 
 r20-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Berlebihan; Teks menyatakan tidak ada jaminan hasil|~Tidak disebut; Durasi rapat tidak dibahas|~Tidak disebut; Senioritas tidak dihapus
 r20-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Bertentangan; Skeptis menyebut prosedur tidak cukup|~Bertentangan; Perbedaan pendapat justru perlu disambut|~Tidak disebut; Ukuran kelompok tidak dibahas`;
 
+/* GX: penjelasan rinci. id|kata kerja (V1-V2-V3)|bentuk yang dipakai|langkah berpikir (dipisah ;)|jebakan umum|contoh = terjemahan */
+var GX1=`g1|leave-left-left|V3|Ada dua kejadian lampau: kereta berangkat dan kami tiba;Kereta berangkat lebih dulu;Kejadian yang lebih dulu memakai had + V3|Memakai past simple (left) saja sehingga urutan kejadian tidak terlihat.|By the time he called, I had already eaten. = Saat dia menelepon, saya sudah makan.
+g2|have-had-had|V2|Kalimat berisi would, berarti pengandaian tipe 2;Klausa if memakai bentuk lampau;Bentuk lampau dari have adalah had|Memakai would have atau will have di klausa if.|If she had a car, she would drive to work. = Kalau dia punya mobil, dia akan menyetir ke kantor.
+g3||| Kata sifat good diikuti preposisi;Untuk kemampuan atau keahlian, pasangannya at;Setelah at, kata kerja berbentuk V-ing (explaining)|Memilih in karena terbawa good in maths (bidang studi).|He is bad at remembering names. = Dia buruk dalam mengingat nama.
+g4|open-opened-opened|V3|Jembatan tidak membuka dirinya sendiri, jadi pasif;Waktunya next month, jadi masa depan;Pasif masa depan: will be + V3|Memakai will open (aktif) padahal pelakunya adalah Menteri.|The results will be announced on Friday. = Hasilnya akan diumumkan hari Jumat.
+g5||| Ada kata benda dan kepemilikan (car-nya wanita itu);Kepemilikan pada orang memakai whose;Setelah whose langsung kata benda tanpa artikel|Memakai who atau which lalu menambah his atau her.|The man whose phone rang left the room. = Pria yang ponselnya berbunyi itu keluar ruangan.
+g6||| Setelah kata hubung ada frasa kata benda (the heavy rain);Despite berpasangan dengan frasa, bukan klausa;Makna kontras: hujan lebat tetapi pertandingan jalan|Memakai Although yang harus diikuti klausa lengkap (subjek + kata kerja).|Despite his age, he runs every day. = Walau sudah tua, dia berlari setiap hari.
+g7|hear-heard-heard|V-ing|Look forward to memakai to preposisi;Setelah preposisi, kata kerja berbentuk V-ing;Jadi hearing, bukan hear|Memakai hear karena menganggap to bagian dari to-infinitive.|I'm looking forward to seeing you. = Saya menantikan bertemu Anda.
+g8||| Hukum mewajibkan, jadi kewajiban kuat;Kata modal untuk kewajiban: must;Setelah must, kata kerja V1 (wear)|Memilih might yang hanya menyatakan kemungkinan.|You must show your ticket at the gate. = Anda wajib menunjukkan tiket di gerbang.
+g9|study-studied-studied|V-ing|Ada for three years now: durasi sampai sekarang;Kegiatan berlanjut, jadi perfect continuous;Pola: have been + V-ing|Memakai present simple (study) padahal ada durasi.|She has been working here since 2019. = Dia bekerja di sini sejak 2019.
+g10|live-lived-lived|V2|Kalimat dilaporkan, kata kerja bergeser mundur;Urutan kata seperti kalimat biasa (I lived);Tidak memakai did atau urutan tanya|Mempertahankan urutan tanya: where did I live.|He asked me where I worked. = Dia bertanya di mana saya bekerja.
+g11||| Honest dibaca onist (huruf h tidak dibunyikan);Bunyi pertama berupa vokal, jadi an;Kata benda tunggal wajib memakai artikel|Melihat huruf pertama h (konsonan) lalu memilih a.|It was an hour-long meeting. = Itu rapat selama satu jam.
+g12||| Ada kata than, jadi perbandingan;Penguat far boleh sebelum komparatif;Komparatif adjektiva panjang: more + adjektiva|Menulis directer atau more directer (dobel).|This book is far more interesting than that one. = Buku ini jauh lebih menarik daripada yang itu.
+g13||| Traffic tidak dapat dihitung;Kalimat negatif dengan benda tak terhitung memakai much;Bentuk many untuk benda terhitung jamak|Memakai many atau few untuk benda tak terhitung.|There isn't much milk left. = Susunya tinggal sedikit.
+g14|arrive-arrived-arrived|V1|Ada as soon as, yaitu time clause;Masa depan dalam time clause memakai present simple;Jadi arrive, bukan will arrive|Memakai will arrive setelah as soon as.|I'll call you when I get home. = Saya akan menelepon begitu sampai rumah.
+g15||| Wish untuk keadaan yang tidak sesuai harapan sekarang;Kemampuan sendiri: could;Wish tidak diikuti will|Memakai can atau would setelah wish.|I wish I could play the guitar. = Andai saya bisa bermain gitar.
+g16|arrive-arrived-arrived|V1|Not only di awal kalimat menyebabkan inversi;Auxiliary mendahului subjek: did he;Setelah did, kata kerja V1|Menulis Not only he arrived tanpa inversi.|Not only did she win, but she also broke the record. = Dia tidak hanya menang, tetapi juga memecahkan rekor.
+g17|see-saw-seen|V3|Rarely di awal kalimat memicu inversi;Auxiliary have mendahului subjek;Setelah have, kata kerja V3 (seen)|Menulis Rarely I have seen tanpa inversi.|Rarely have I felt so tired. = Jarang sekali saya merasa selelah ini.
+g18|know-knew-known|V3|Tidak ada if, jadi inversi;Kondisi tidak nyata di masa lalu: Had + S + V3;Akibatnya would have + V3|Menulis If + I known atau Had I know.|Had she studied, she would have passed. = Seandainya dia belajar, dia lulus.
+g19|approve-approved-approved|V3|Recommend that memakai subjunctive;Proposal menerima aksi, jadi pasif;Subjunctive pasif: be + V3|Memakai is approved atau was approved.|They insisted that the rule be followed. = Mereka bersikeras aturan itu diikuti.
+g20|read-read-read|V3|Membaca terjadi sebelum menyadari;Kejadian lebih awal memakai Having + V3;Subjek sama (she)|Memakai To read atau Reading yang kurang menunjukkan urutan.|Having finished lunch, he went back to work. = Setelah selesai makan siang, dia kembali bekerja.
+g21|smoke-smoked-smoked|V2|Would rather + subjek berbeda memakai bentuk lampau;Larangan sekarang: didn't smoke;Maknanya: saya lebih suka Anda tidak merokok|Memakai don't atau wouldn't setelah would rather.|I'd rather you stayed home. = Saya lebih suka kamu tinggal di rumah.
+g22||| Pola: It was + frasa + that;Kata that mewakili penyebab;Setelah that langsung kata kerja (caused)|Memakai what atau whose dalam pola cleft.|It was his honesty that impressed me. = Kejujurannyalah yang membuat saya terkesan.
+g23|miss-missed-missed|V3|Kesimpulan tentang masa lalu yang yakin;Bentuk: must have + V3;They went straight on adalah bukti|Memakai must miss yang menyatakan sekarang.|He must have forgotten the key. = Dia pasti lupa kuncinya.
+g24||| Frasa tetap: in consultation with;Preposisi ini harus dihafal sebagai satu paket;Setelahnya pihak yang diajak berunding|Memilih on atau by tanpa dasar kolokasi.|in agreement with the plan = sepakat dengan rencana
+g25|audit-audited-audited|V3|Pola causative: have + objek + V3;Perusahaan lain yang melakukan audit;Kata kerja audit (V3 = audited)|Memakai audit (V1) atau auditing setelah the system.|I had my hair cut yesterday. = Kemarin rambut saya dipotong.
+g26||| Kalimat kedua berlawanan (mahal tetapi hemat);Titik koma + kata hubung formal;Nevertheless = meskipun demikian|Memakai Moreover yang hanya menambah informasi.|The task was hard; nevertheless, she finished it. = Tugasnya sulit; meski begitu, dia menyelesaikannya.
+g27||| Setelah preposisi with, kata ganti objek;Objek orang: whom;Who tidak dipakai setelah preposisi dalam bahasa formal|Memakai who setelah with.|The people to whom I spoke were helpful. = Orang-orang yang saya ajak bicara membantu.
+g28|work-worked-worked|V3|By next June menunjuk titik di masa depan;Durasi sampai titik itu: future perfect;Pola: will have + V3|Memakai will work yang tidak menyatakan durasi sampai titik waktu.|By 2030, she will have lived here for ten years. = Pada 2030, dia sudah tinggal di sini sepuluh tahun.
+g29||| Tidak ada if, jadi pola inversi formal;Kondisi mungkin terjadi di masa depan: Should + S + V1;Maknanya sama dengan If you encounter|Memakai If atau Were yang mengubah makna.|Should you need help, call me. = Kalau Anda butuh bantuan, telepon saya.
+g30|write-wrote-written|V-ing|No point in + V-ing;Setelah preposisi in, V-ing;Writing = menulis|Memakai to write setelah no point.|There is no use in complaining. = Tidak ada gunanya mengeluh.
+g31|work-worked-worked|V3|Since 2018 menunjukkan titik awal sampai sekarang;Kondisi masih berlanjut: present perfect;Subjek she, jadi has + V3|Memakai worked (past simple) yang menandakan sudah berhenti.|He has lived here since 2015. = Dia tinggal di sini sejak 2015.
+g32|cook-cooked-cooked|V-ing|When I called = kejadian singkat yang memotong;Kegiatan lebih panjang yang sedang berjalan: past continuous;Pola: was + V-ing|Memakai cooked yang menyiratkan tindakan selesai.|I was reading when the lights went out. = Saya sedang membaca saat lampu padam.
+g33|see-saw-seen|V3|For ages sampai sekarang;Present perfect untuk periode sampai sekarang;Negatif: haven't + V3|Memakai didn't see yang tidak menjangkau sampai sekarang.|I haven't eaten since morning. = Saya belum makan sejak pagi.
+g34|lie-lay-lain|V-ing|This time next week = sedang berlangsung di masa depan;Future continuous: will be + V-ing;Lie menjadi lying (huruf ie berubah y)|Menulis lieing, atau memakai will lie.|At noon tomorrow, I will be working. = Besok siang saya sedang bekerja.
+g35|live-lived-lived|V2|When she was a student menunjuk masa lampau selesai;Past simple;Lived adalah V2 beraturan|Memakai has lived karena menganggap masih berlaku.|She studied in Paris in 2010. = Dia kuliah di Paris pada 2010.
+g36|have-had-had|V-ing|When the phone rang memotong kegiatan;Kegiatan sedang berlangsung: past continuous;Subjek they, jadi were + V-ing|Memakai had yang tidak menunjukkan kegiatan berlangsung.|We were having lunch when you called. = Kami sedang makan siang saat kamu menelepon.
+g37|be-was/were-been|V3|Pengalaman hidup tanpa waktu pasti;Present perfect;have been to = pernah ke|Memakai went yang membutuhkan waktu pasti.|Have you ever been to Bali? = Pernahkah kamu ke Bali?
+g38|fall-fell-fallen|V3|By the time + past simple menandai titik lampau;Tertidur terjadi lebih dulu;Past perfect: had + V3 (fallen)|Memakai fell (V2) tanpa had.|By the time we arrived, they had left. = Saat kami tiba, mereka sudah pergi.
+g39|lose-lost-lost|V-ing|Always + continuous = kebiasaan yang mengganggu;Pola: is always + V-ing;Lose menjadi losing (e dihapus)|Memakai loses yang tidak menandai rasa kesal.|She is always complaining about the noise. = Dia selalu mengeluh soal kebisingan.
+g40|boil-boiled-boiled|V1+s|Fakta ilmiah;Present simple;Subjek tunggal, kata kerja + s|Memakai is boiling yang untuk kejadian sedang berlangsung.|Ice melts at zero degrees. = Es mencair pada nol derajat.
+g41|stay-stayed-stayed|V1|Ada If + present simple (rains);Tipe 1: kemungkinan nyata;Akibat memakai will + V1|Memakai would stay yang menandakan pengandaian.|If you study, you will pass. = Kalau kamu belajar, kamu lulus.
+g42|come-came-come|V3|If I had known = tipe 3;Akibat: would have + V3;Come adalah V3 sama dengan V1|Memakai will have atau would saja.|If I had called, he would have come. = Kalau saya menelepon, dia sudah datang.
+g43|study-studied-studied|V1|Unless sudah bermakna if not;Setelah unless, kalimat positif;Present simple (study)|Menulis unless you don't study (negatif ganda).|Unless it rains, we will go. = Kecuali hujan, kami pergi.
+g44|be-was/were-been|were|Pengandaian yang tidak nyata (a millionaire);Tipe 2: If + V2;Be menjadi were untuk semua subjek|Memakai am atau will be.|If I were you, I would apologise. = Kalau saya jadi kamu, saya akan minta maaf.
+g45|melt-melted-melted|V1+s|Kebenaran umum, zero conditional;If + present, present;Subjek it, kata kerja + s|Memakai will melt (tipe 1).|If you heat water, it boils. = Kalau air dipanaskan, dia mendidih.
+g46|lose-lost-lost|V2|What would you do = tipe 2;If + V2;Lost adalah V2 tak beraturan|Memakai lose atau will lose di klausa if.|If I won, I would travel. = Kalau saya menang, saya akan bepergian.
+g47|go-went-gone|V3|Last night = masa lalu, tetapi akibatnya sekarang;Kondisi lampau: had + V3 (gone);Akibat sekarang: wouldn't be + adjektiva|Memakai went atau has gone.|If I had slept, I would not be tired. = Kalau saya tidur, saya tidak lelah sekarang.
+g48|break-broke-broken|V3|Jendela dikenai aksi, jadi pasif;Lampau: was + V3;Break menjadi broken|Memakai broke (aktif) padahal subjeknya jendela.|The cup was broken by the child. = Cangkirnya dipecahkan anak itu.
+g49|speak-spoke-spoken|V3|English tidak berbicara sendiri, jadi pasif;Sekarang: is + V3;Speak menjadi spoken|Memakai speaks (aktif).|French is spoken in Canada. = Bahasa Prancis dipakai di Kanada.
+g50|paint-painted-painted|V3|At the moment = sedang berlangsung;Pasif continuous: is being + V3;Rumah dikenai aksi|Memakai is painting (aktif).|The road is being repaired. = Jalannya sedang diperbaiki.`;
+
+var GX2=`g51|invite-invited-invited|V3|Saya menerima undangan, bukan memberi;Pasif lampau: was + V3;Pelaku disebut dengan by|Memakai invited (aktif) padahal pelakunya tetangga.|She was told the news by her boss. = Dia diberi tahu kabar itu oleh atasannya.
+g52|announce-announced-announced|V3|Hasil diumumkan oleh pihak lain;Masa depan: will;Pasif: will be + V3|Memakai will announce yang membuat results sebagai pelaku.|The winner will be named tomorrow. = Pemenangnya akan diumumkan besok.
+g53|catch-caught-caught|V3|Pencuri dikenai aksi oleh polisi;Lampau pasif: was + V3;Caught adalah V3 tak beraturan|Memakai caught (V2) sehingga kalimat menjadi aktif.|The suspect was arrested last night. = Tersangka ditangkap tadi malam.
+g54|smoke-smoked-smoked|V1 setelah modal|Ada larangan resmi;Larangan: mustn't + V1;Needn't berarti tidak perlu, bukan dilarang|Mengira needn't sama dengan mustn't.|You mustn't park here. = Anda dilarang parkir di sini.
+g55|bring-brought-brought|V1 setelah modal|Undangan menyatakan tidak wajib;Tidak wajib: needn't + V1;Berbeda dari mustn't (dilarang)|Memakai mustn't yang berarti dilarang.|You needn't come early. = Kamu tidak perlu datang awal.
+g56|swim-swam-swum|V1 setelah modal|Ada when I was five, jadi masa lalu;Kemampuan masa lalu: could + V1;Can hanya untuk sekarang|Memakai can yang bukan masa lampau.|She could read at four. = Dia sudah bisa membaca pada umur empat.
+g57|borrow-borrowed-borrowed|V1 setelah modal|Permintaan sopan;Could I + V1;Setelah I langsung V1 (borrow)|Memakai Must I yang berarti kewajiban.|Could I use your phone? = Bolehkah saya memakai ponselmu?
+g58|be-was/were-been|V1 setelah modal|Ada bukti mobilnya di luar;Kesimpulan hampir pasti positif: must + V1;Bentuk: must be|Memakai can't yang bermakna sebaliknya.|The lights are on, so he must be home. = Lampu menyala, jadi dia pasti di rumah.
+g59|be-was/were-been|V1 setelah modal|Ada bukti dia di bioskop;Kesimpulan hampir pasti negatif: can't + V1;Bentuk: can't be|Memakai must be yang menandakan dia di kantor.|He can't be asleep; I hear him talking. = Dia tidak mungkin tidur; saya dengar dia bicara.
+g60|see-saw-seen|V1 setelah modal|Ada rasa sakit yang berlanjut;Saran: should + V1;Bentuk: should see|Memakai shall atau would untuk saran.|You should rest more. = Kamu sebaiknya lebih banyak istirahat.
+g61||| Ada kata benda benda (book);Klausa relatif untuk benda boleh memakai that;What tidak dipakai di sini|Memakai what yang bukan kata penghubung klausa relatif.|The film that I saw was great. = Film yang saya tonton bagus.
+g62||| Orang sebagai subjek klausa relatif;Pakai who;Setelah who langsung kata kerja (lives)|Memakai whom yang untuk objek.|The girl who sits there is my sister. = Gadis yang duduk di situ adalah adik saya.
+g63||| Kata benda tempat (café);Where menggantikan in which;Setelah where, kalimat lengkap|Memakai which tanpa preposisi.|This is the room where we meet. = Ini ruangan tempat kami bertemu.
+g64||| Kata benda waktu (year);When menggantikan in which;Setelah when, klausa lengkap|Memakai where atau which untuk waktu.|I remember the day when we met. = Saya ingat hari ketika kami bertemu.
+g65||| Ada koma dan informasi tambahan;Klausa non-defining tidak memakai that;Orang sebagai subjek: who|Memakai that setelah koma.|My teacher, who is kind, helped me. = Guru saya, yang baik hati, membantu saya.
+g66||| Setelah everything, that dipakai;What tidak dipakai setelah everything;That mewakili benda|Memakai what atau which setelah everything.|All that glitters is not gold. = Semua yang berkilau bukan emas.
+g67|go-went-gone|V-ing|Suggest diikuti V-ing;Tanpa to;Kegiatan bersama|Memakai to go setelah suggest.|He suggested taking a taxi. = Dia menyarankan naik taksi.
+g68|ask-asked-asked|V1 (to-infinitive)|Would like menyatakan keinginan sopan;Pola: would like + to + V1;Bukan V-ing|Memakai asking setelah would like.|I'd like to book a table. = Saya ingin memesan meja.
+g69|answer-answered-answered|V-ing|Avoid diikuti V-ing;Menghindari kegiatan;Bukan to + V1|Memakai to answer setelah avoid.|She avoided talking about it. = Dia menghindari membicarakannya.
+g70|sell-sold-sold|V1 (to-infinitive)|Decide diikuti to + V1;Keputusan;Bukan V-ing|Memakai selling setelah decide.|They decided to leave early. = Mereka memutuskan pulang lebih awal.
+g71|get-got-got|V-ing|Be used to = terbiasa;To di sini preposisi;Setelahnya V-ing (getting)|Mengira used to + V1.|He is used to working late. = Dia terbiasa bekerja larut.
+g72|walk-walked-walked|V-ing|Stop + V-ing = berhenti melakukan;Bukan stop to + V1 (berhenti untuk);Karena lelah, dia berhenti berjalan|Memakai to walk yang berarti berhenti untuk berjalan.|He stopped smoking last year. = Dia berhenti merokok tahun lalu.
+g73|lock-locked-locked|V1 (to-infinitive)|Remember to = ingat untuk melakukan;Tindakan belum dilakukan;Bentuk: to + V1|Memakai locking yang berarti ingat sudah mengunci.|Remember to call me later. = Ingat untuk menelepon saya nanti.
+g74|work-worked-worked|V-ing|Enjoy diikuti V-ing;Kegiatan yang disukai;Bukan to + V1|Memakai to work setelah enjoy.|She enjoys swimming. = Dia suka berenang.
+g75||| Waktu berupa hari (Monday);Hari memakai on;At untuk jam, in untuk bulan atau tahun|Memakai at atau in untuk hari.|on Friday = hari Jumat
+g76||| Interested diikuti in;Bukan interested on atau at;Setelahnya V-ing|Memakai at karena terbawa good at.|She is interested in art. = Dia tertarik pada seni.
+g77||| Afraid diikuti of;Ketakutan pada sesuatu;Setelahnya kata benda atau V-ing|Memakai from atau for.|He is afraid of heights. = Dia takut ketinggian.
+g78||| Arrive diikuti at untuk tempat spesifik;Bandara adalah titik;Untuk kota besar memakai in|Memakai to yang tidak dipakai setelah arrive.|We arrived at the hotel late. = Kami tiba di hotel terlambat.
+g79||| Durasi: two hours;Durasi memakai for;Since dipakai untuk titik waktu|Memakai since dengan durasi.|for three days = selama tiga hari
+g80||| Last summer adalah titik waktu;Titik waktu memakai since;For dipakai untuk durasi|Memakai for dengan titik waktu.|since Monday = sejak hari Senin
+g81||| Married diikuti to;Pasangan memakai to;Bukan with atau by|Memakai with.|She is married to a doctor. = Dia menikah dengan dokter.
+g82||| Tahun memakai in;Hari memakai on;Jam memakai at|Memakai on atau at untuk tahun.|in 2020 = pada tahun 2020
+g83||| Ada alasan (merasa sakit);Because = karena;Diikuti klausa|Memakai although yang bermakna kontras.|I stayed because it rained. = Saya tinggal karena hujan.
+g84||| Dua fakta saling berlawanan (hujan, tetap jalan);Although = meskipun;Diikuti klausa|Memakai because yang bermakna sebab.|Although it was late, we kept working. = Meski sudah larut, kami terus bekerja.
+g85||| Ada syarat pinjaman uang;As long as = asalkan;Diikuti klausa|Memakai unless yang bermakna kecuali.|You may go as long as you finish. = Kamu boleh pergi asalkan selesai.
+g86||| Ada sebab (bekerja keras) dan akibat (lulus);Therefore = oleh karena itu;Setelah titik koma|Memakai however yang menandai kontras.|He studied hard; therefore, he passed. = Dia belajar keras; karena itu dia lulus.
+g87||| Dua fakta kontras (kaya tetapi tidak bahagia);But = tetapi;Di antara dua klausa|Memakai so atau because.|She is rich, but unhappy. = Dia kaya, tetapi tidak bahagia.
+g88||| Membawa payung untuk berjaga-jaga;In case = kalau-kalau;Diikuti klausa|Memakai unless atau although.|Take a jacket in case it gets cold. = Bawa jaket kalau-kalau dingin.
+g89||| Play + alat musik memakai the;Piano adalah alat musik;Bukan tanpa artikel|Menghilangkan the setelah play.|He plays the guitar. = Dia bermain gitar.
+g90||| Water di sini umum dan tak terhitung;Tidak memakai artikel;Kalimat umum|Memakai the atau a.|Music is important. = Musik penting.
+g91||| Information tak terhitung;Some untuk kalimat positif;Bukan a atau an|Memakai an information.|I need some advice. = Saya butuh saran.
+g92||| Kalimat negatif;Any dipakai di negatif;Some untuk positif|Memakai some di kalimat negatif.|I don't have any time. = Saya tidak punya waktu.
+g93||| Dua yang gagal dari banyak siswa;Most of the = sebagian besar;Almost butuh all atau every|Memakai Almost yang tidak bisa berdiri sendiri.|Most of the cars were old. = Sebagian besar mobil itu tua.
+g94|see-saw-seen|V3|The night before menunjuk lebih awal dari titik lampau;Past perfect: had + V3;Seen adalah V3|Memakai saw tanpa had.|She said she had finished. = Dia bilang dia sudah selesai.
+g95||| Pertanyaan ya atau tidak;Kalimat tidak langsung memakai if atau whether;Urutan normal|Memakai that atau what.|He asked if I was ready. = Dia bertanya apakah saya siap.
+g96|be-was/were-been|not to + V1|Perintah dilaporkan;told + objek + to V1;Negatif: not to V1|Memakai don't be (perintah langsung).|She told me not to worry. = Dia menyuruh saya jangan khawatir.
+g97||| Will bergeser menjadi would;Kalimat dilaporkan;Setelah would, V1|Memakai will yang tidak bergeser.|She said she would help. = Dia bilang dia akan membantu.
+g98|go-went-gone|V-ing|Pertanyaan dilaporkan;Urutan subjek + kata kerja;Past continuous: were going|Memakai were we going (urutan tanya).|He asked where I was living. = Dia bertanya di mana saya tinggal.
+g99||| Adjektiva pendek (tall);Komparatif: -er + than;Bukan more tall|Memakai more tall atau tallest.|She is older than me. = Dia lebih tua dari saya.
+g100||| Ada ever seen, jadi superlatif;The + superlatif;Bad menjadi worst|Memakai worse (komparatif) atau worst tanpa the.|It was the best day ever. = Itu hari terbaik.
+g101||| As ... as memakai bentuk dasar;Fast adalah adjektiva atau adverbia;Bukan komparatif|Memakai faster setelah as.|He is as tall as his father. = Dia setinggi ayahnya.
+g102||| Pola the + komparatif, the + komparatif;Makin banyak, makin baik;Bukan more better|Memakai better tanpa the.|The sooner, the better. = Makin cepat makin baik.
+g103||| Less + adjektiva + than;Kebalikan more;Bukan fewer (benda terhitung)|Memakai fewer di depan adjektiva.|This is less difficult than I thought. = Ini tidak sesulit yang saya kira.
+g104|have-had-had|V2|Wish untuk keadaan sekarang;Wish + V2;Have menjadi had|Memakai have atau would have.|I wish I had a bike. = Andai saya punya sepeda.
+g105|know-knew-known|V2|If only untuk penyesalan sekarang;If only + V2;Know menjadi knew|Memakai know atau would know.|If only I knew her name! = Andai saya tahu namanya!
+g106||| Kalimat positif memakai have;Tag harus berlawanan polaritas;Jadi haven't you|Memakai didn't you karena abai auxiliary.|She has left, hasn't she? = Dia sudah pergi, bukan?
+g107||| Kalimat negatif;Tag harus positif;Auxiliary does|Memakai doesn't she (tag negatif).|He isn't late, is he? = Dia tidak terlambat, kan?
+g108||| Pertanyaan tidak langsung;Subjek lalu kata kerja;Tidak memakai is di awal|Memakai is the station.|Do you know where she is? = Apakah kamu tahu dia di mana?
+g109|cost-cost-cost|V1+s|How much dalam pertanyaan tidak langsung;Urutan subjek + kata kerja;Subjek it, kata kerja + s|Memakai does it cost.|I wonder what it costs. = Saya penasaran berapa harganya.
+g110||| People terhitung jamak;Few = hampir tidak ada;Hampir kosong, jadi few|Memakai a few yang berarti beberapa.|Few people came. = Hampir tidak ada yang datang.
+g111||| Time tak terhitung;A little = sedikit tetapi cukup;Bukan a few|Memakai a few untuk benda tak terhitung.|I have a little money. = Saya punya sedikit uang.
+g112||| Sugar tak terhitung;How much = berapa banyak;How many untuk terhitung|Memakai many.|How much water do you drink? = Berapa banyak air yang kamu minum?
+g113|receive-received-received|V1+s|Each of diikuti kata kerja tunggal;Subjek tunggal, kata kerja + s;Meski ada students jamak|Memakai receive karena melihat students.|Each of them has a bag. = Masing-masing punya tas.
+g114|live-lived-lived|V1|Both diikuti kata kerja jamak;Tanpa s;Dua orang|Memakai lives setelah both.|Both of them work here. = Keduanya bekerja di sini.
+g115|be-was/were-been|V2|Traffic tak terhitung;Tunggal: was;Lampau (this morning)|Memakai were karena membayangkan jamak.|There was a lot of noise. = Ada banyak kebisingan.`;
+
+var GX3=`g116|leave-left-left|V3|Hardly di awal kalimat memicu inversi;Pola: Hardly + had + S + V3 + when;Kejadian pertama sudah selesai lalu yang kedua terjadi|Menulis Hardly we had left tanpa inversi.|Hardly had he arrived when it rained. = Begitu dia tiba, hujan turun.
+g117||| No sooner berpasangan dengan than;Bukan when (itu untuk hardly);Pola: No sooner + had + S + V3 + than|Memakai when seperti pada hardly.|No sooner had she left than he called. = Begitu dia pergi, dia menelepon.
+g118|leave-left-left|should + be + V3|Under no circumstances di awal memicu inversi;Auxiliary mendahului subjek: should the door;Maknanya: dilarang keras|Menulis Under no circumstances the door should be left.|Never should you open this door. = Jangan pernah membuka pintu ini.
+g119|discover-discovered-discovered|V1 setelah did|Only after di awal kalimat memicu inversi;did + subjek + V1;Discover kembali ke V1|Menulis Only after the meeting we discovered tanpa inversi.|Only then did I understand. = Baru saat itu saya paham.
+g120|know-knew-known|V1 setelah did|Little bermakna hampir tidak;Little di awal memicu inversi;did she know|Memakai Little she knew tanpa inversi.|Little did he suspect the truth. = Dia sama sekali tidak curiga.
+g121|enter-entered-entered|V1 setelah may|On no account bermakna negatif;Memicu inversi: may + subjek;Setelah subjek, V1 (enter)|Menulis On no account visitors may enter.|Not once did he complain. = Sekali pun dia tidak mengeluh.
+g122|realise-realised-realised|V1 setelah did|Not until di awal memicu inversi;did + subjek + V1;Hanya klausa utama yang diinversi|Menulis Not until the report was published people realised.|Not until midnight did he sleep. = Baru tengah malam dia tidur.
+g123|be-was/were-been|was he|So + adjektiva di awal memicu inversi;Kata kerja be mendahului subjek;So exhausted was he that|Menulis So exhausted he was.|So loud was the noise that nobody slept. = Kebisingannya begitu keras sampai tak ada yang tidur.
+g124|be-was/were-been|V3 (been)|If it hadn't been for = kalau bukan karena;Kondisi tidak nyata di masa lalu;Pola: had + been|Memakai wasn't atau weren't.|If it hadn't been for you, I would have failed. = Kalau bukan karena kamu, saya gagal.
+g125|know-knew-known|to + V1|Were + subjek + to + V1 = bentuk formal if;Setelah to, V1;Bermakna pengandaian|Memakai knowing atau known.|Were she to leave, we would be sad. = Seandainya dia pergi, kami sedih.
+g126|pass-passed-passed|V3|I wish dengan masa lalu;Wish + had + V3;Penyesalan atas kejadian lampau|Memakai passed yang untuk keinginan sekarang.|I wish I had listened. = Andai saya mendengarkan.
+g127|try-tried-tried|V3|Hasil lampau yang mungkin;Tipe 3: If + had + V3;Akibat: might have + V3|Memakai tried atau would try.|If he had asked, I would have helped. = Kalau dia meminta, saya akan membantu.
+g128|win-won-won|V2|Supposing = seandainya;Supposing + V2;Won adalah V2 dari win|Memakai will win setelah supposing.|Supposing you lost your job, what would you do? = Seandainya kamu kehilangan pekerjaan, apa yang kamu lakukan?
+g129|finish-finished-finished|have + V3|Provided that = asalkan;Masa depan dalam klausa syarat memakai present;Tanpa will|Memakai will have atau would have.|I'll go provided that you come. = Saya pergi asalkan kamu ikut.
+g130|be-was/were-been|were|As though untuk situasi tidak nyata;Be menjadi were untuk semua subjek;Bukan is atau will be|Memakai is yang menandakan fakta.|He talks as though he were the boss. = Dia bicara seolah-olah dia bos.
+g131|submit-submitted-submitted|V1 (subjunctive)|Essential that = harus;Subjunctive memakai bentuk dasar;Tanpa s|Memakai submits atau submitted.|It is vital that she attend. = Penting bahwa dia hadir.
+g132|leave-left-left|V1 (subjunctive)|Demand that = menuntut;Subjunctive memakai bentuk dasar;Tanpa s|Memakai leaves atau left.|They demanded that he resign. = Mereka menuntut dia mundur.
+g133|make-made-made|V2|It's high time = sudah saatnya;It's high time + V2;Make menjadi made|Memakai make atau will make.|It's time you went to bed. = Sudah waktunya kamu tidur.
+g134|postpone-postponed-postponed|be + V3|Insist that + subjunctive;Rapat ditunda, jadi pasif;Bentuk: be + V3|Memakai was atau is.|They insisted that it be done. = Mereka bersikeras itu dilakukan.
+g135|see-saw-seen|V3|Kota dilihat dari atas bukit;Participle pasif: V3;Bukan Seeing karena kota tidak melihat|Memakai Seeing yang berarti kota yang melihat.|Written in 1990, the book remains popular. = Ditulis tahun 1990, buku itu tetap populer.
+g136|feel-felt-felt|V-ing|She yang merasa lelah;Participle aktif: V-ing;Alasan bersamaan dengan tindakan utama|Memakai Felt yang bermakna pasif.|Walking home, I met an old friend. = Saat berjalan pulang, saya bertemu teman lama.
+g137|stand-stood-stood|V-ing|Klausa relatif tereduksi (who is standing);Participle aktif: standing;Menerangkan the man|Memakai stood atau stands.|The woman talking to him is my aunt. = Wanita yang berbicara dengannya adalah bibi saya.
+g138|know-knew-known|Not + V-ing|Bentuk negatif participle;Not + V-ing;Not knowing = karena tidak tahu|Memakai Not known atau Not to know.|Not wanting to be late, he ran. = Karena tidak mau terlambat, dia berlari.
+g139|wish-wished-wished|V-ing|Anyone wishing to = siapa pun yang ingin;Klausa relatif tereduksi;Bukan wished|Memakai wished atau wishes.|Anyone wanting tickets should queue. = Siapa pun yang ingin tiket harus antre.
+g140|frighten-frightened-frightened|V3|Bayi merasakan ketakutan;Participle pasif: V3;Frightened = ketakutan|Memakai Frightening yang bermakna menakuti.|Surprised by the news, he sat down. = Terkejut oleh kabar itu, dia duduk.
+g141||| What I need = hal yang saya butuhkan;Klausa what dianggap tunggal;Diikuti is|Memakai are karena menganggap jamak.|What he wants is peace. = Yang dia inginkan adalah kedamaian.
+g142||| It was + waktu + that;Penegasan waktu;That setelah frasa|Memakai when atau what.|It was last year that we met. = Tahun lalu kami bertemu.
+g143||| What sebagai subjek klausa nominal;What annoys me = hal yang mengganggu saya;Diikuti is|Memakai That atau Which di awal.|What matters is trust. = Yang penting adalah kepercayaan.
+g144||| Reason diikuti why;The reason why = alasan mengapa;Bukan for atau how|Memakai for.|That is the reason why I left. = Itulah alasan saya pergi.
+g145||| It is + orang + who;Penegasan orang;Who sebagai subjek|Memakai whom karena menganggap objek.|It was Tom who broke it. = Tomlah yang memecahkannya.
+g146|receive-received-received|V3|Kalau dia menerima, pasti balas;Dia tidak membalas, jadi tidak mungkin;Can't have + V3|Memakai mustn't have yang bukan deduksi.|She can't have heard us. = Dia tidak mungkin mendengar kami.
+g147|tell-told-told|V3|Saya tidak diberi tahu, padahal bisa membantu;Penyesalan: should have + V3;Told adalah V3 tak beraturan|Memakai must have yang menunjukkan kesimpulan.|You should have asked me. = Seharusnya kamu bertanya kepada saya.
+g148|miss-missed-missed|V3|Kemungkinan, belum pasti;May have + V3;Dia belum sampai|Memakai must miss atau should missed.|He may have lost his way. = Dia mungkin tersesat.
+g149|cook-cooked-cooked|V3|Makanan sudah dimasak dan terbuang;Tidak perlu tetapi dilakukan: needn't have + V3;Bukan mustn't|Memakai mustn't have cooked.|You needn't have come. = Sebenarnya kamu tidak perlu datang.
+g150|eat-ate-eaten|V3|Sekarang sakit, jadi menyesal;Shouldn't have + V3;Eaten adalah V3|Memakai needn't eat atau couldn't eat.|I shouldn't have said that. = Seharusnya saya tidak mengatakan itu.
+g151|know-knew-known|V3|Dia terlihat sangat yakin;Kesimpulan masa lalu: must have + V3;Known adalah V3|Memakai can't have known yang berlawanan.|They must have left early. = Mereka pasti pergi lebih awal.
+g152||| Accused diikuti of;Tuduhan: accuse someone of + V-ing;Bukan for atau with|Memakai for karena terbawa blame for.|He was accused of lying. = Dia dituduh berbohong.
+g153||| Apologise diikuti for;Permintaan maaf atas sesuatu;Setelah for, V-ing|Memakai of atau about.|I apologise for the delay. = Saya minta maaf atas keterlambatan.
+g154||| Responsible diikuti for;Bertanggung jawab atas sesuatu;Bukan of|Memakai of.|She is responsible for the team. = Dia bertanggung jawab atas tim.
+g155||| Look forward diikuti to;To di sini preposisi;Setelahnya V-ing|Memakai for atau at.|I look forward to hearing from you. = Saya menantikan kabar dari Anda.
+g156||| Pride oneself on;Berbangga atas sesuatu;Setelah on, V-ing atau kata benda|Memakai in atau for.|He prides himself on his honesty. = Dia membanggakan kejujurannya.
+g157||| Capable diikuti of;Mampu melakukan;Setelah of, V-ing|Memakai to atau for.|She is capable of leading. = Dia mampu memimpin.
+g158||| At war = sedang berperang;Frasa tetap;Bukan in war|Memakai in.|The two countries are at peace. = Kedua negara itu damai.
+g159|cut-cut-cut|V3|Rambut dipotong orang lain;Causative: have + objek + V3;Cut sama bentuknya|Memakai cutting atau to cut.|I had my phone repaired. = Ponsel saya diperbaiki.
+g160|service-serviced-serviced|V3|Mobil diservis orang lain;Have + objek + V3;Serviced adalah V3|Memakai service atau servicing.|We had the roof fixed. = Atap kami diperbaiki.
+g161|help-helped-helped|to + V1|Get + orang + to + V1;Meminta orang melakukan;To setelah objek|Memakai help atau helping.|I got him to sign. = Saya membuat dia menandatangani.
+g162||| Even though + klausa;Meskipun ada fakta kontras;Despite butuh frasa|Memakai Despite yang diikuti frasa.|Even though it rained, we left. = Meski hujan, kami pergi.
+g163||| Hasil kontras dengan laporan buruk;Nonetheless = meskipun demikian;Didahului titik koma|Memakai moreover yang menambah.|It was hard; nonetheless, she won. = Sulit; meski begitu, dia menang.
+g164||| Tujuan menabung: membeli rumah;So that + klausa;Menyatakan tujuan|Memakai in spite of yang menyatakan kontras.|I whispered so that he wouldn't hear. = Saya berbisik supaya dia tidak mendengar.
+g165||| Dua hal kontras (berbakat tetapi tidak disiplin);While = sementara itu atau meskipun;Diikuti klausa|Memakai Because yang bermakna sebab.|While I like it, it's expensive. = Meski saya suka, ini mahal.
+g166||| In spite of + frasa kata benda;The low salary adalah frasa;Although butuh klausa|Memakai although the low salary.|In spite of the rain, we went. = Walau hujan, kami pergi.
+g167||| Harga naik tetapi permintaan tetap;Even so = meskipun begitu;Di awal klausa kedua|Memakai as a result yang bermakna akibat.|It was late; even so, we continued. = Sudah larut; meski begitu kami terus.
+g168||| Ada koma dan informasi tambahan;Which untuk benda;That tidak dipakai setelah koma|Memakai that.|The book, which I read, was long. = Buku yang saya baca itu panjang.
+g169||| Both of + whom = keduanya (orang);Setelah of, whom;Who tidak setelah preposisi|Memakai who setelah of.|She has two sons, both of whom live abroad. = Dia punya dua putra, keduanya tinggal di luar negeri.
+g170||| Preposisi + which;For which = untuk alasan itu;Bukan what|Memakai what setelah preposisi.|The reason for which he left is unknown. = Alasan dia pergi tidak diketahui.
+g171||| Which merujuk pada seluruh klausa sebelumnya;He failed the test = seluruh peristiwa;Surprised nobody adalah akibatnya|Memakai that atau what.|He passed, which pleased us. = Dia lulus, yang membuat kami senang.
+g172||| Whose menunjukkan kepemilikan;Roof milik house;Setelah whose langsung kata benda|Memakai which atau who's.|The man whose car was stolen called. = Pria yang mobilnya dicuri menelepon.
+g173||| Preposisi in + which;Where bisa menggantikan, tetapi bukan setelah preposisi;In which = di mana|Memakai that setelah in.|The house in which he lived is old. = Rumah tempat dia tinggal sudah tua.
+g174|wait-waited-waited|V-ing|By the time + present menunjuk titik masa depan;Durasi sampai titik itu: future perfect continuous;will have been + V-ing|Memakai will wait yang tidak menunjukkan durasi.|By June, I will have been working here for a year. = Pada Juni, saya sudah setahun bekerja di sini.
+g175|know-knew-known|V3|Know adalah kata kerja statis;Statis tidak dipakai continuous;Since + titik lampau memakai present perfect|Memakai am knowing yang tidak lazim.|I have known her for years. = Saya sudah mengenalnya bertahun-tahun.
+g176|work-worked-worked|V-ing|Aktivitas berlanjut sebelum titik lampau;Past perfect continuous;had been + V-ing|Memakai was working yang tidak menunjukkan urutan.|She had been waiting for an hour. = Dia sudah menunggu sejam.
+g177|go-went-gone|V1|Kebiasaan lampau yang sudah berhenti;used to + V1;Bukan be used to (terbiasa)|Memakai am used to going.|I used to live here. = Dulu saya tinggal di sini.
+g178|live-lived-lived|V-ing|At this moment next year = berlangsung di masa depan;Future continuous;will be + V-ing|Memakai will live yang tidak menunjukkan berlangsung.|This time tomorrow, I will be flying. = Besok jam segini saya sedang terbang.
+g179|leave-left-left|V1+s|Jadwal tetap di masa depan;Present simple;Subjek the train, jadi leaves|Memakai will leave atau left.|The film starts at eight. = Film mulai jam delapan.
+g180|travel-travelled-travelled|V3|It was the first time = pengalaman pertama di masa lalu;Pola: first time + had + V3;Travelled adalah V3|Memakai has travelled atau travelled.|It was the first time he had flown. = Itu pertama kalinya dia terbang.
+g181|write-wrote-written|V-ing|All week = durasi sampai sekarang;Masih berlanjut;has been + V-ing|Memakai wrote atau writes.|He has been writing all day. = Dia menulis seharian.
+g182|inform-informed-informed|to + V1|Regret to inform = menyesal memberi tahu;Bukan regret + V-ing (menyesali yang telah terjadi);Formal|Memakai informing yang berarti menyesali telah memberi tahu.|We regret to announce the delay. = Kami menyesal mengumumkan keterlambatan.
+g183|break-broke-broken|V-ing|Admit + V-ing;Mengakui sudah melakukan;Bukan to break|Memakai to break.|He admitted lying. = Dia mengaku berbohong.
+g184|leave-left-left|to have + V3|Believed to have + V3;Peristiwa lampau yang dipercaya;Left adalah V3|Memakai to leave yang bermakna sekarang atau masa depan.|He is said to have won. = Dia dikatakan telah menang.
+g185|think-thought-thought|V-ing|Can't help + V-ing;Tidak bisa menahan;Bukan to think|Memakai to think.|I can't help laughing. = Saya tidak bisa menahan tawa.
+g186|wait-waited-waited|to + V1|Make dalam pasif memakai to;They were made to wait;Pola: be made + to V1|Memakai wait tanpa to setelah pasif.|He was made to apologise. = Dia dipaksa minta maaf.
+g187|cry-cried-cried|V-ing|It's no use + V-ing;Tidak ada gunanya;Bukan to cry|Memakai to cry.|It's no use arguing. = Tidak ada gunanya berdebat.
+g188|ask-asked-asked|to + V1|Too + adjektiva + to V1;Terlalu bangga untuk meminta;Setelah to, V1|Memakai asking.|He is too tired to drive. = Dia terlalu lelah untuk menyetir.
+g189|arrive-arrived-arrived|to + V1|Expected + to + V1;Paket diharapkan tiba;Arrive tak berpasif|Memakai to be arrived.|She is expected to arrive soon. = Dia diharapkan segera tiba.
+g190|be-was/were-been|to have been + V3|Believed to have been + V3;Pasif lampau;Stolen adalah V3|Memakai to be yang bermakna sekarang.|It is thought to have been lost. = Itu dianggap hilang.
+g191|criticise-criticised-criticised|being + V3|Dia menerima kritik, jadi pasif;Like + being + V3;Criticised adalah V3|Memakai criticising yang aktif.|She hates being interrupted. = Dia benci disela.
+g192|receive-received-received|be + V3|Aplikasi menerima aksi, jadi pasif;Modal pasif: must be + V3;Received adalah V3|Memakai must receive (aktif).|The form must be signed. = Formulir harus ditandatangani.
+g193|delay-delayed-delayed|V3|Penundaan terjadi sebelum diberi tahu;Past perfect pasif;had been + V3|Memakai delayed atau was delaying.|He said the train had been cancelled. = Dia bilang kereta sudah dibatalkan.
+g194|like-liked-liked|do|Kalimat pertama memakai doesn't like;Pelesapan memakai auxiliary yang sama;Subjek I, jadi do|Memakai like atau am.|She doesn't smoke, but I do. = Dia tidak merokok, tetapi saya iya.
+g195||| I can't swim, saya juga tidak;Neither + auxiliary + subjek;Can I|Memakai So yang untuk persetujuan positif.|Neither do I. = Saya juga tidak.
+g196|be-was/were-been|was|Kalimat pertama memakai would be;Pelesapan: was;Be mengikuti tense|Memakai did atau is.|I thought it was easy, and it was. = Saya kira mudah, dan memang mudah.
+g197||| Dua pilihan, tidak satu pun sempurna;Neither of the two;Bukan none yang untuk lebih dari dua|Memakai None.|Neither of them knows. = Tidak satu pun dari mereka tahu.
+g198||| Money tak terhitung;A great deal of = banyak sekali;A great number of untuk terhitung|Memakai a great number of.|She spends a great deal of time reading. = Dia banyak menghabiskan waktu membaca.
+g199||| Tidak semua pelamar;Not all of the + jamak;Bukan every|Memakai every atau each.|Not all of the students passed. = Tidak semua siswa lulus.
+g200||| Have no idea = sama sekali tidak tahu;No + kata benda;Bukan not atau none|Memakai not atau none.|I have no doubt. = Saya tidak ragu.`;
+var GXTXT=GX1+"\n"+GX2+"\n"+GX3;
+
 /* ===== MESIN SOAL ===== */
 var TFNG=["True","False","Not Given"];
 var KIND={vocab:"Kosakata",grammar:"Tata bahasa",reading:"Reading mini"};
@@ -1643,6 +1861,23 @@ var GMAP=null;
 function gm(id){
   if(!GMAP){GMAP={};(GMTXT+"\n"+VMTXT+"\n"+RMTXT).split("\n").forEach(function(l){var f=l.split("|");if(f.length<7)return;var labs=[f[3]],rs=[""];for(var i=4;i<7;i++){var p=f[i].split("~"),r=p.slice(1).join("~"),k=r.indexOf(";");labs.push(k>0?r.slice(0,k).trim():null);r=k>0?r.slice(k+1).trim():r;rs.push(r.charAt(0).toUpperCase()+r.slice(1))}GMAP[f[0]]={t:f[1],p:f[2],l:labs,r:rs,ev:f[7]?f[7].split(","):null}})}
   return GMAP[id]||null;
+}
+var GXMAP=null;
+function gx(id){
+  if(!GXMAP){GXMAP={};GXTXT.split("\n").forEach(function(l){var f=l.split("|");if(f.length<6)return;GXMAP[f[0]]={v:f[1]?f[1].split("-"):null,u:f[2].trim(),s:f[3].trim().split(";"),t:f[4].trim(),x:f[5].split(" = ")}})}
+  return GXMAP[id]||null;
+}
+function gxHtml(X){
+  var h="",hi=/^V3/.test(X.u)?2:/^V2/.test(X.u)?1:/^(V1|to|not to|be|were|do|have|V-ing)/.test(X.u)?(X.u==="V-ing"?-1:0):-1,i,L=["V1","V2","V3"];
+  if(X.v){
+    h+='<div><h3 class="sec-t">Bentuk Kata Kerja</h3><div class="vf">';
+    for(i=0;i<3;i++)h+='<div class="'+(i===hi?"on":"")+'"><span>'+L[i]+'</span><b>'+esc(X.v[i]||"")+'</b></div>';
+    h+='</div>'+(X.u?'<p class="small" style="margin:8px 0 0">Dipakai di soal ini: <b>'+esc(X.u)+'</b></p>':'')+'</div>';
+  }
+  h+='<div><h3 class="sec-t">Langkah Berpikir</h3><ol class="steps">'+X.s.map(function(t){return '<li>'+esc(t.trim())+'</li>'}).join("")+'</ol></div>';
+  if(X.t)h+='<div class="trap"><b>Jebakan umum.</b> '+esc(X.t)+'</div>';
+  if(X.x[0])h+='<div class="exm"><div class="lbl">Contoh lain</div><div class="exe">'+esc(X.x[0])+'</div>'+(X.x[1]?'<div class="small">'+esc(X.x[1])+'</div>':'')+'</div>';
+  return h;
 }
 function gmAuto(it){
   var ls=["Sesuai teks","Bertentangan","Tidak disebut"],r=["","",""],a=it.a;
@@ -1738,6 +1973,7 @@ function soalQ(){
     var ans='<div class="ans '+(qs.ok?"ok":"no")+'">'+(qs.ok?icoOk():icoNo())+'<div>Jawaban: ['+cl+'] '+esc(it.o[it.a])+(qs.ok?'<small>Tepat.</small>':'<small>Anda memilih ['+L.charAt(qs.picked)+'] '+esc(it.o[qs.perm[qs.picked]])+'.</small>')+'</div></div>';
     var rule=G?'<div class="rule"><div class="rule-t">'+esc(G.t)+'</div><div class="rule-p">Pola: '+esc(G.p)+'</div></div>':"";
     rv='<div class="reveal"><div class="rv-top" style="'+(G?"":"grid-template-columns:1fr")+'">'+ans+rule+'</div><p class="why">'+esc(it.e)+'</p>';
+    var X=it.k==="grammar"?gx(it.id):null;if(X)rv+=gxHtml(X);
     if(G&&G.ev)rv+='<div><h3 class="sec-t">Garis Waktu</h3><div class="tl">'+tlSvg(G.ev)+'</div></div>';
     if(G){
       rv+='<div><h3 class="sec-t">Matriks Eliminasi '+num+'</h3><div class="mx"><div class="mx-r mx-th"><span>Opsi</span><span>Status</span><span>'+(it.k==="vocab"?"Arti":it.k==="reading"?"Dasar":"Bentuk")+'</span><span>Alasan logis</span></div>'
