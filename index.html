@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}@media (prefers-color-scheme:dark){html:not([data-theme="light"]){color-scheme:dark}}</style>
+<title>Jalur IELTS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: departure-board header, ticket-style flashcards, one tab per skill. Blue signal + amber board text. */
+:root{
+  --bg:#EDF0F5; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#58657A; --line:#D3D9E3;
+  --accent:#1F4FD8; --accent-ink:#FFFFFF; --board:#101B2E; --board-ink:#F5B82E; --board-dim:#8FA0BA;
+  --good:#12805C; --warn:#B26A00; --bad:#C23B3B; --soft:#E4EAF6;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A111C; --surface:#121C2B; --ink:#E7ECF4; --muted:#93A1B6; --line:#24344B;
+  --accent:#7AA2FF; --accent-ink:#0A111C; --board:#060B13; --board-ink:#F2B93B; --board-dim:#6F8099;
+  --good:#4FC79C; --warn:#E0A64A; --bad:#EF7B7B; --soft:#17243A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A111C; --surface:#121C2B; --ink:#E7ECF4; --muted:#93A1B6; --line:#24344B;
+  --accent:#7AA2FF; --accent-ink:#0A111C; --board:#060B13; --board-ink:#F2B93B; --board-dim:#6F8099;
+  --good:#4FC79C; --warn:#E0A64A; --bad:#EF7B7B; --soft:#17243A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+.board{background:var(--board);color:var(--board-ink);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:18px max(16px,env(safe-area-inset-left,0px)) 16px}
+.board .in{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.board h1{font-size:30px;color:#fff;letter-spacing:-.01em}
+.board .sub{font-family:var(--f-mono);font-size:12px;color:var(--board-dim);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.board .wk{font-family:var(--f-mono);font-size:13px;text-align:right}
+.board .wk b{display:block;font-size:22px;font-weight:500;color:var(--board-ink)}
+.sync{font-family:var(--f-mono);font-size:11px;color:var(--board-dim);text-transform:uppercase;letter-spacing:.06em}
+
+nav{display:flex;gap:2px;overflow-x:auto;margin:16px 0;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;color:var(--muted);font-weight:500;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px;min-width:0}
+.panel h2{font-size:18px;margin-bottom:10px}
+.lbl{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.big{font-family:var(--f-mono);font-size:30px;font-weight:500;line-height:1.1;margin-top:4px}
+.small{font-size:13px;color:var(--muted)}
+
+.today{display:grid;grid-template-columns:auto 1fr auto;gap:8px 16px;align-items:center}
+.today .day{font-family:var(--f-mono);text-transform:uppercase;font-size:13px;color:var(--muted)}
+.today .focus{font-family:var(--f-display);font-size:24px;font-weight:700}
+@media (max-width:520px){.today{grid-template-columns:1fr}}
+
+.btn{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:4px;padding:9px 16px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.warn{background:transparent;border-color:var(--warn);color:var(--warn)}
+.btn.bad{background:transparent;border-color:var(--bad);color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.week div{border:1px solid var(--line);border-radius:3px;padding:6px 2px;text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.week div.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.week div.now{outline:2px solid var(--board-ink);outline-offset:1px}
+
+.ticket{display:grid;grid-template-columns:96px 1fr;background:var(--surface);border:1px solid var(--line);border-radius:4px;min-height:230px}
+.ticket .stub{background:var(--board);color:var(--board-ink);padding:14px 10px;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;display:flex;flex-direction:column;justify-content:space-between;border-right:2px dashed var(--bg)}
+.ticket .stub b{font-size:22px;font-weight:500;display:block;color:#fff}
+.ticket .face{padding:20px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.ticket .word{font-family:var(--f-display);font-size:34px;font-weight:700;overflow-wrap:anywhere}
+.ticket .mean{font-size:20px;font-weight:600}
+.ticket .ex{color:var(--muted);font-style:italic}
+@media (max-width:520px){.ticket{grid-template-columns:1fr}.ticket .stub{flex-direction:row;border-right:0;border-bottom:2px dashed var(--bg);align-items:center}}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+
+textarea,input[type=number],select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px;min-width:0}
+textarea{min-height:260px;resize:vertical;line-height:1.6}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.timer{font-family:var(--f-mono);font-size:44px;font-weight:500;letter-spacing:.02em}
+.timer.low{color:var(--bad)}
+.card-cue{border:1px solid var(--line);border-left:4px solid var(--board-ink);padding:12px 16px;background:var(--soft);border-radius:3px}
+.card-cue ul{margin:6px 0 0;padding-left:20px}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:84px 1fr 36px;gap:8px;align-items:center;font-size:13px}
+.bar i{display:block;height:10px;background:var(--soft);border-radius:2px;position:relative}
+.bar i span{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:2px}
+.bar i em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--board-ink)}
+svg text{font-family:var(--f-mono);font-size:11px}
+.gl{stroke:var(--line);stroke-width:1}
+.tx{fill:var(--muted)}
+.ln{fill:none;stroke:var(--accent);stroke-width:2.5}
+.dot{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+.tg{stroke:var(--board-ink);stroke-width:2;stroke-dasharray:6 4}
+.tgt{fill:var(--warn);font-weight:500}
+.empty{padding:20px;border:1px dashed var(--line);border-radius:4px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:no-preference){.btn{transition:filter .15s}.btn:hover{filter:brightness(1.08)}}
+</style>
+
+</head>
+<body>
+<div class="board"><div class="in">
+  <div><h1>Jalur IELTS</h1><div class="sub">Target rata-rata <span id="tgtTop">7</span> &middot; 5 Nov 2026 &ndash; 27 Jan 2027</div></div>
+  <div class="wk"><span id="wkLbl">Minggu</span><b id="wkNum">--</b><span class="sync" id="sync">Sinkron belum diatur</span></div>
+</div></div>
+<div class="wrap">
+  <nav role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var VOCAB=[
+["mitigate","mengurangi dampak","Better public transport can mitigate traffic congestion."],
+["sustainable","berkelanjutan","Cities need sustainable transport systems."],
+["infrastructure","infrastruktur","Investment in infrastructure supports economic growth."],
+["congestion","kemacetan","Congestion costs the economy billions every year."],
+["commuter","penglaju","Commuters often spend two hours a day travelling."],
+["emission","emisi","Electric buses reduce carbon emissions."],
+["accessible","mudah diakses","Stations must be accessible to people with disabilities."],
+["pedestrian","pejalan kaki","Pedestrian safety is a priority in dense areas."],
+["integrate","mengintegrasikan","The plan integrates rail, bus and ferry services."],
+["multimodal","multimoda","Multimodal transport links several modes in one journey."],
+["regulation","peraturan","New regulations require operators to publish timetables."],
+["enforce","menegakkan","Authorities must enforce traffic laws consistently."],
+["subsidy","subsidi","Fuel subsidies can distort the market."],
+["implement","melaksanakan","The ministry will implement the policy next year."],
+["priority","prioritas","Road safety should be a top priority."],
+["allocate","mengalokasikan","Funds were allocated to rural roads."],
+["beneficial","bermanfaat","Cycle lanes are beneficial for public health."],
+["significant","signifikan","There was a significant rise in rail passengers."],
+["consequence","akibat","A serious consequence of sprawl is longer commutes."],
+["alleviate","meringankan","Park-and-ride schemes alleviate pressure on city centres."],
+["deteriorate","memburuk","Air quality deteriorated as car use increased."],
+["fluctuate","berfluktuasi","Ridership fluctuated throughout the year."],
+["surge","lonjakan","A surge in demand overwhelmed the stations."],
+["decline","menurun","Bus usage declined sharply after the fare rise."],
+["comprehensive","menyeluruh","A comprehensive plan covers roads, rail and walking."],
+["feasible","layak dilakukan","Free public transport is not financially feasible everywhere."],
+["stakeholder","pemangku kepentingan","All stakeholders were consulted before the decision."],
+["efficiency","efisiensi","Digital ticketing improves operational efficiency."],
+["capacity","kapasitas","The line is running at full capacity."],
+["demand","permintaan","Demand for housing near stations keeps growing."],
+["supply","pasokan","Fuel supply was disrupted by the strike."],
+["afford","mampu membeli","Many families cannot afford a private car."],
+["inevitable","tak terhindarkan","Some delay is inevitable during construction."],
+["outweigh","melebihi manfaatnya","The benefits outweigh the costs."],
+["advocate","menganjurkan","Experts advocate a shift to rail freight."],
+["encourage","mendorong","Tax breaks encourage people to buy electric vehicles."],
+["discourage","menghalangi","High parking fees discourage drivers from entering the centre."],
+["reliable","dapat diandalkan","Commuters want a reliable service above all."],
+["hazardous","berbahaya","Hazardous goods require special handling."],
+["vulnerable","rentan","Elderly people are especially vulnerable on busy roads."],
+["urban sprawl","perluasan kota tak terkendali","Urban sprawl increases dependence on cars."],
+["modal shift","peralihan moda","A modal shift from road to rail cuts emissions."],
+["public transit","angkutan umum","Public transit should connect suburbs to jobs."],
+["last-mile connectivity","konektivitas lintasan terakhir","Last-mile connectivity decides whether people use the train."],
+["fare","tarif","A flat fare makes travel easier to understand."],
+["freight","angkutan barang","Freight accounts for a large share of road traffic."],
+["logistics","logistik","Efficient logistics lower the price of goods."],
+["bottleneck","titik penyumbatan","The port is a bottleneck for exports."],
+["retrofit","memasang pembaruan","Old stations were retrofitted with lifts."],
+["gridlock","kemacetan total","Gridlock paralysed the city during the storm."],
+["carpool","berbagi kendaraan","Carpooling cuts the number of cars on the road."],
+["pollutant","zat pencemar","Diesel engines release harmful pollutants."],
+["revenue","pendapatan","Ticket sales are the main source of revenue."],
+["budget","anggaran","The transport budget was cut by ten percent."],
+["trade-off","pertukaran / kompromi","There is a trade-off between speed and cost."],
+["prevalent","lazim","Motorcycle use is prevalent in Southeast Asia."],
+["diminish","berkurang","Congestion diminished after the new line opened."],
+["undermine","melemahkan","Poor maintenance undermines public trust."],
+["pave the way for","membuka jalan bagi","The reform paved the way for private investment."]
+];
+var WRITING=[
+"Some people believe governments should invest more in public transport than in building new roads. To what extent do you agree or disagree?",
+"Traffic congestion is a growing problem in large cities. What are the causes, and what measures can be taken to solve it?",
+"Many people now work from home instead of commuting. Do the advantages of this trend outweigh the disadvantages?",
+"Some argue that city centres should be closed to private cars. Discuss both views and give your own opinion.",
+"More and more people use ride-hailing apps instead of owning a car. Is this a positive or negative development?",
+"Pedestrian facilities in many cities are poor. What problems does this cause, and how can they be improved?",
+"Some say the best way to reduce pollution is to raise fuel prices. Do you agree or disagree?",
+"Freight is mostly moved by road in many countries. Should governments encourage rail and sea transport instead?",
+"Young people today are less interested in learning to drive. Why is this, and is it a good thing?",
+"Governments should spend money on public services rather than on international sports events. To what extent do you agree?"];
+var SP1=["Do you prefer public transport or a private vehicle? Why?","How do you usually get to work?","What is the traffic like in your city?","Do you think you will change your job in the future?","What do you do in your free time?","Do you enjoy cooking?","Is there a place in your hometown you would recommend?","How important is English for you?","Do you prefer to study alone or with others?","What kind of weather do you like?"];
+var SP2=[
+["Describe a journey that you remember well.",["where you went","who you were with","what happened on the way","and explain why you remember it"]],
+["Describe a time when you helped someone.",["who you helped","what the problem was","what you did","and explain how you felt afterwards"]],
+["Describe a public place that you like to visit.",["where it is","how often you go there","what you do there","and explain why you like it"]],
+["Describe a rule or law that you think is important.",["what the rule is","who it applies to","how it is enforced","and explain why it matters"]],
+["Describe a skill you would like to learn.",["what the skill is","how you would learn it","how long it might take","and explain why you want it"]],
+["Describe a time when you were delayed or stuck in traffic.",["where you were going","what caused the delay","what you did while waiting","and explain how you felt"]]];
+var SP3=["How can cities encourage people to use public transport?","Do you think technology will change the way people travel in the future?","What are the advantages and disadvantages of building more highways?","Should governments make public transport free?","How has transport changed in your country over the last few decades?","Why do some people resist changing their habits even when a better option exists?","To what extent should the government regulate private vehicles?","Is it more important to improve roads or public transport? Why?"];
+var PLAN=[ // index = getDay(): 0 Minggu
+ {d:"Minggu",f:"Review ringan",t:"15 menit review kosakata dan catat skor minggu ini.",m:15},
+ {d:"Senin",f:"Reading",t:"25 menit latihan reading, 10 menit cek jawaban dan catat kata baru.",m:35},
+ {d:"Selasa",f:"Writing Task 2",t:"40 menit tulis esai, 20 menit bandingkan dengan band descriptor.",m:60},
+ {d:"Rabu",f:"Listening",t:"30 menit latihan listening, 15 menit cek transkrip bagian yang salah.",m:45},
+ {d:"Kamis",f:"Speaking",t:"15 menit rekam jawaban Part 2, 10 menit dengar ulang dan catat kesalahan.",m:25},
+ {d:"Jumat",f:"Writing Task 1",t:"20 menit deskripsi grafik atau diagram, 20 menit cek dan perbaiki.",m:40},
+ {d:"Sabtu",f:"Campuran",t:"Satu bagian IELTS sesuai kelemahan, plus 20 menit podcast. Minggu 9-12: tes penuh.",m:60}];
+var START="2026-11-05",END="2027-01-27",NEW_PER_DAY=10,INTERVALS=[0,1,2,4,8,16,32],LS="jalur-ielts-v1";
+var TABS=[["hari","Hari ini"],["kata","Kosakata"],["skor","Skor"],["tulis","Writing"],["bicara","Speaking"],["salah","Kesalahan"],["atur","Sinkron"]];
+var ERR={Reading:["True/False/Not Given","Matching headings","Kosakata tidak paham","Kehabisan waktu","Salah baca soal"],Listening:["Angka atau nama tidak tertangkap","Aksen","Hilang fokus","Salah ejaan","Terkecoh distraktor"],Writing:["Tata bahasa","Kosakata kurang variatif","Struktur paragraf","Tidak menjawab soal","Kurang dari 250 kata","Ejaan dan tanda baca"],Speaking:["Jeda terlalu lama","Pengucapan","Tata bahasa","Jawaban terlalu pendek","Kosakata terbatas"]};
+
+function pad(n){return String(n).padStart(2,"0")}
+function key(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function parse(k){var p=k.split("-").map(Number);return new Date(p[0],p[1]-1,p[2])}
+function today(){return key(new Date())}
+function addDays(k,n){var d=parse(k);d.setDate(d.getDate()+n);return key(d)}
+function diff(a,b){return Math.round((parse(b)-parse(a))/864e5)}
+function def(){return{v:1,target:7,cards:{},daily:{},scores:[],errors:[],updated:0}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+var S=load();
+function load(){try{var r=localStorage.getItem(LS);if(r)return Object.assign(def(),JSON.parse(r))}catch(e){}return def()}
+var SYNC={url:"",key:""};
+try{SYNC=Object.assign(SYNC,JSON.parse(localStorage.getItem(LS+"-sync")||"{}"))}catch(e){}
+function syncOn(){return !!(SYNC.url&&SYNC.key)}
+var saveT=null,saving=false,dirty=false;
+function save(){S.updated=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,900)}
+function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":"Sinkron belum diatur"}
+function call(body){
+  return fetch(SYNC.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:SYNC.key},body))})
+    .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error||"error");return j});
+}
+function flush(){
+  if(!syncOn()||saving||!dirty)return;
+  saving=true;dirty=false;setSync("busy");
+  call({action:"set",updated:S.updated,data:S}).then(function(){setSync("ok")},function(){dirty=true;setSync("fail")}).then(function(){saving=false});
+}
+function pull(){
+  if(!syncOn()){setSync("off");return Promise.resolve()}
+  setSync("busy");
+  return call({action:"get"}).then(function(j){
+    if(j.data&&(j.updated||0)>(S.updated||0)){S=Object.assign(def(),j.data);try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
+    else if((S.updated||0)>(j.updated||0)){dirty=true;flush();return}
+    setSync("ok");
+  }).catch(function(){setSync("fail")});
+}
+function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
+function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.done))}
+function streak(){var k=today(),n=0;if(!active(k))k=addDays(k,-1);while(active(k)){n++;k=addDays(k,-1)}return n}
+function planWeek(){var t=today();if(t<START)return{n:0,lbl:"Mulai"};if(t>END)return{n:12,lbl:"Selesai"};return{n:Math.min(12,Math.floor(diff(START,t)/7)+1),lbl:"Minggu ke"}}
+function avg(s){return Math.round((s.L+s.R+s.W+s.S)/4*2)/2}
+
+/* flashcards */
+var session=null;
+function buildQueue(){
+  var t=today(),due=[],fresh=[];
+  VOCAB.forEach(function(v,i){var c=S.cards[i];if(!c)fresh.push(i);else if(c.due<=t)due.push(i)});
+  var left=Math.max(0,NEW_PER_DAY-(day().newSeen||0));
+  return due.concat(fresh.slice(0,left));
+}
+function dueCount(){return buildQueue().length}
+function mastered(){var n=0;for(var k in S.cards){if(S.cards[k].box>=4)n++}return n}
+function rate(r){
+  var i=session.q[session.i],c=S.cards[i],t=today(),dd=day();
+  if(!c){c={box:0,due:t};dd.newSeen=(dd.newSeen||0)+1}
+  if(r==="again"){c.box=0;c.due=t;session.q.push(i)}
+  else if(r==="hard"){c.box=Math.max(1,c.box);c.due=addDays(t,1)}
+  else{c.box=Math.min(6,c.box+1);c.due=addDays(t,INTERVALS[c.box])}
+  S.cards[i]=c;dd.reviewed=(dd.reviewed||0)+1;
+  session.i++;session.flip=false;save();render();
+}
+
+/* timers */
+var T={id:null,left:0,run:false,onEnd:null,el:null};
+function stopTimer(){clearInterval(T.id);T.id=null;T.run=false}
+function fmt(s){return pad(Math.floor(s/60))+":"+pad(s%60)}
+function startTimer(sec,onEnd){stopTimer();T.left=sec;T.run=true;T.onEnd=onEnd;tickPaint();T.id=setInterval(function(){T.left--;tickPaint();if(T.left<=0){stopTimer();if(T.onEnd)T.onEnd()}},1000)}
+function tickPaint(){var e=document.getElementById("timer");if(e){e.textContent=fmt(Math.max(0,T.left));e.classList.toggle("low",T.left<=60&&T.left>0&&state.tab==="tulis")}}
+
+/* ui state */
+var state={tab:"hari",wp:0,sp:{part:1,i:0,phase:"idle"},draft:""};
+try{state.draft=localStorage.getItem(LS+"-draft")||""}catch(e){}
+function rnd(n,not){var r;do{r=Math.floor(Math.random()*n)}while(n>1&&r===not);return r}
+
+/* chart */
+function chart(){
+  var sc=S.scores.slice(-12),W=640,H=230,L=34,R=18,Tp=16,B=30,lo=4,hi=9;
+  function y(v){v=Math.max(lo,Math.min(hi,v));return Tp+(hi-v)/(hi-lo)*(H-Tp-B)}
+  function x(i){return sc.length<2?L+(W-L-R)/2:L+i*(W-L-R)/(sc.length-1)}
+  var g="";
+  for(var v=lo;v<=hi;v++){g+='<line class="gl" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text class="tx" x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end">'+v+'</text>'}
+  g+='<line class="tg" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(S.target)+'" y2="'+y(S.target)+'"/><text class="tgt" x="'+(W-R)+'" y="'+(y(S.target)-6)+'" text-anchor="end">target '+S.target+'</text>';
+  if(sc.length){
+    var pts=sc.map(function(s,i){return x(i)+","+y(avg(s))}).join(" ");
+    g+='<polyline class="ln" points="'+pts+'"/>';
+    sc.forEach(function(s,i){g+='<circle class="dot" cx="'+x(i)+'" cy="'+y(avg(s))+'" r="5"/>'});
+    var last=sc[sc.length-1],lx=x(sc.length-1),ly=y(avg(last));
+    g+='<text class="tx" x="'+(lx>W-60?lx-10:lx+10)+'" y="'+(ly-10)+'" text-anchor="'+(lx>W-60?"end":"start")+'" style="fill:var(--ink);font-weight:500">'+avg(last).toFixed(1)+'</text>';
+    g+='<text class="tx" x="'+x(0)+'" y="'+(H-8)+'" text-anchor="'+(sc.length>1?"start":"middle")+'">'+sc[0].d.slice(5).split("-").reverse().join("/")+'</text>';
+    if(sc.length>1)g+='<text class="tx" x="'+x(sc.length-1)+'" y="'+(H-8)+'" text-anchor="end">'+last.d.slice(5).split("-").reverse().join("/")+'</text>';
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Grafik rata-rata band per tes dibanding target">'+g+'</svg>';
+}
+
+/* views */
+function vHari(){
+  var p=PLAN[new Date().getDay()],dd=day(),t=today(),n=dueCount();
+  var wk="",i,k;
+  for(i=6;i>=0;i--){k=addDays(t,-i);wk+='<div class="'+(active(k)?"on":"")+(i===0?" now":"")+'">'+PLAN[parse(k).getDay()].d.slice(0,3)+'</div>'}
+  var sc=S.scores.length?avg(S.scores[S.scores.length-1]).toFixed(1):"--";
+  return '<div class="panel"><div class="today"><div class="day">'+p.d+' &middot; '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+'</div>'
+   +'<div><div class="focus">'+p.f+'</div><div class="small">'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</div></div>'
+   +'<button class="btn '+(dd.done?"good":"")+'" id="doneBtn">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div>'
+   +'<div class="grid g4" style="margin-top:12px">'
+   +'<div class="panel"><div class="lbl">Streak</div><div class="big">'+streak()+' <span class="small">hari</span></div></div>'
+   +'<div class="panel"><div class="lbl">Kartu menunggu</div><div class="big">'+n+'</div><button class="btn ghost" style="margin-top:8px" data-go="kata">'+(n?"Mulai":"Lihat")+'</button></div>'
+   +'<div class="panel"><div class="lbl">Kata dikuasai</div><div class="big">'+mastered()+'<span class="small">/'+VOCAB.length+'</span></div></div>'
+   +'<div class="panel"><div class="lbl">Skor terakhir</div><div class="big">'+sc+'<span class="small"> / '+S.target+'</span></div></div></div>'
+   +'<div class="grid g2" style="margin-top:12px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:10px 0 0">Hari aktif: kartu dikerjakan atau ditandai selesai.</p></div>'
+   +'<div class="panel"><h2>Menuju band '+S.target+'</h2>'+(S.scores.length?chart():'<div class="empty">Belum ada skor. Kerjakan tes diagnostik lalu catat hasilnya di tab Skor.</div>')+'</div></div>';
+}
+function vKata(){
+  if(!session)session={q:buildQueue(),i:0,flip:false,total:0},session.total=session.q.length;
+  if(session.i>=session.q.length){
+    var nxt=null;for(var k in S.cards){if(!nxt||S.cards[k].due<nxt)nxt=S.cards[k].due}
+    return '<div class="panel"><h2>Kosakata hari ini selesai</h2><p>'+(session.total?session.total+' kartu sudah dikerjakan. ':'')+'Kartu baru dibatasi '+NEW_PER_DAY+' per hari supaya ulangan tetap ringan.'+(nxt&&nxt>today()?' Kartu berikutnya jatuh tempo '+nxt.slice(8)+'/'+nxt.slice(5,7)+'.':'')+'</p><button class="btn ghost" id="resetSess">Muat ulang antrean</button></div>';
+  }
+  var i=session.q[session.i],v=VOCAB[i],c=S.cards[i];
+  var face=session.flip
+   ?'<div class="word">'+esc(v[0])+'</div><div class="mean">'+esc(v[1])+'</div><div class="ex">'+esc(v[2])+'</div>'
+   :'<div class="word">'+esc(v[0])+'</div><div class="small">Ingat artinya, lalu balik kartu.</div>';
+  return '<div class="ticket"><div class="stub"><div>Kartu<b>'+(session.i+1)+'/'+session.q.length+'</b></div><div>'+(c?"Kotak "+c.box:"Baru")+'</div></div><div class="face">'+face+'</div></div>'
+   +(session.flip
+     ?'<div class="rate"><button class="btn bad" data-r="again">Lupa</button><button class="btn warn" data-r="hard">Sulit</button><button class="btn good" data-r="good">Ingat</button></div>'
+     :'<div class="rate" style="grid-template-columns:1fr"><button class="btn" id="flip">Balik kartu</button></div>')
+   +'<p class="small">Lupa: muncul lagi sesi ini. Sulit: besok. Ingat: jarak ulangan makin panjang (1, 2, 4, 8, 16, 32 hari).</p>';
+}
+function vSkor(){
+  var L=S.scores.length?S.scores[S.scores.length-1]:null,names=[["L","Listening"],["R","Reading"],["W","Writing"],["S","Speaking"]],bars="";
+  if(L){names.forEach(function(n){var v=L[n[0]];bars+='<div class="bar"><span>'+n[1]+'</span><i><span style="width:'+(v/9*100)+'%"></span><em style="left:'+(S.target/9*100)+'%"></em></i><b class="mono">'+v.toFixed(1)+'</b></div>'});}
+  var rows=S.scores.slice().reverse().slice(0,10).map(function(s,j){var idx=S.scores.length-1-j;return '<tr><td>'+s.d.slice(8)+'/'+s.d.slice(5,7)+'</td><td class="n">'+s.L.toFixed(1)+'</td><td class="n">'+s.R.toFixed(1)+'</td><td class="n">'+s.W.toFixed(1)+'</td><td class="n">'+s.S.toFixed(1)+'</td><td class="n"><b>'+avg(s).toFixed(1)+'</b></td><td><button class="btn ghost" data-del="'+idx+'" aria-label="Hapus skor">Hapus</button></td></tr>'}).join("");
+  var weak="";if(L){var m=names.slice().sort(function(a,b){return L[a[0]]-L[b[0]]})[0];weak='<p class="small" style="margin:12px 0 0">Bagian terlemah: <b>'+m[1]+'</b>. Beri 60% waktu latihan ke bagian ini minggu depan. Garis kuning = target.</p>'}
+  return '<div class="grid g2"><div class="panel"><h2>Catat skor latihan</h2><form id="scoreForm" class="grid" style="grid-template-columns:1fr 1fr">'
+   +names.map(function(n){return '<div class="field"><label for="s'+n[0]+'">'+n[1]+'</label><input id="s'+n[0]+'" type="number" min="0" max="9" step="0.5" inputmode="decimal" required></div>'}).join("")
+   +'<div style="grid-column:1/-1" class="row"><button class="btn" type="submit">Simpan skor</button><span class="small" id="avgPrev"></span></div></form>'
+   +'<div class="field" style="margin-top:14px;max-width:160px"><label for="tgt">Target rata-rata</label><input id="tgt" type="number" min="4" max="9" step="0.5" value="'+S.target+'"></div></div>'
+   +'<div class="panel"><h2>Perkembangan</h2>'+(S.scores.length?chart()+'<div class="bars" style="margin-top:12px">'+bars+'</div>'+weak:'<div class="empty">Belum ada skor. Satu tes diagnostik penuh akan menjadi titik awal.</div>')+'</div></div>'
+   +(S.scores.length?'<div class="panel" style="margin-top:12px"><h2>Riwayat</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th class="n">L</th><th class="n">R</th><th class="n">W</th><th class="n">S</th><th class="n">Rata-rata</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':"");
+}
+function vTulis(){
+  var wc=(state.draft.trim()?state.draft.trim().split(/\s+/).length:0);
+  return '<div class="grid g2" style="grid-template-columns:minmax(0,1fr)"><div class="panel"><div class="lbl">Task 2 &middot; minimal 250 kata &middot; 40 menit</div>'
+   +'<h2 style="margin:6px 0 12px;font-size:20px" id="prompt">'+esc(WRITING[state.wp])+'</h2>'
+   +'<div class="row"><button class="btn ghost" id="newPrompt">Soal lain</button><span class="timer" id="timer" style="margin-left:auto">'+fmt(T.run||T.left?T.left:2400)+'</span></div>'
+   +'<div class="row" style="margin:10px 0"><button class="btn" id="tStart">'+(T.run?"Jeda":"Mulai 40 menit")+'</button><button class="btn ghost" id="tReset">Reset</button></div>'
+   +'<div class="small" style="margin-bottom:8px">Kerangka 5 menit: pendapat, alasan 1, alasan 2, contoh, kesimpulan. Sisakan 5 menit akhir untuk memeriksa.</div>'
+   +'<textarea id="essay" placeholder="Tulis esai di sini..." spellcheck="true">'+esc(state.draft)+'</textarea>'
+   +'<div class="row" style="margin-top:8px"><span class="mono" id="wc">'+wc+' kata</span><button class="btn ghost" id="copyEssay" style="margin-left:auto">Salin esai + soal</button><button class="btn ghost" id="clearEssay">Kosongkan</button></div>'
+   +'<p class="small" id="copyMsg" style="margin:8px 0 0">Tempel hasil salinan ke obrolan dengan Claude untuk dinilai berdasarkan band descriptor.</p></div></div>';
+}
+function vBicara(){
+  var sp=state.sp,h='<div class="panel"><div class="row" style="margin-bottom:12px">';
+  [1,2,3].forEach(function(p){h+='<button class="btn '+(sp.part===p?"":"ghost")+'" data-part="'+p+'">Part '+p+'</button>'});
+  h+='</div>';
+  if(sp.part===2){
+    var c=SP2[sp.i%SP2.length],lbl=sp.phase==="prep"?"Persiapan":sp.phase==="speak"?"Bicara":sp.phase==="done"?"Selesai":"Siap";
+    h+='<div class="card-cue"><b>'+esc(c[0])+'</b><div class="small" style="margin-top:6px">You should say:</div><ul>'+c[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div>'
+     +'<div class="row" style="margin-top:12px"><span class="lbl">'+lbl+'</span><span class="timer" id="timer" style="margin-left:auto">'+fmt(sp.phase==="idle"||sp.phase==="done"?60:T.left)+'</span></div>'
+     +'<div class="row" style="margin-top:8px"><button class="btn" id="spStart">'+(sp.phase==="idle"||sp.phase==="done"?"Mulai persiapan 1 menit":"Ulangi")+'</button><button class="btn ghost" id="spNext">Kartu lain</button></div>'
+     +'<p class="small">Setelah 1 menit persiapan, timer 2 menit berjalan otomatis. Rekam suara Anda dengan perekam di HP, lalu dengarkan ulang untuk cek kecepatan, jeda, dan pengucapan.</p>';
+  }else{
+    var qs=sp.part===1?SP1:SP3;
+    h+='<div class="lbl">'+(sp.part===1?"Jawab 2-3 kalimat, lalu beri alasan atau contoh":"Beri pendapat, bandingkan, dan beri contoh nyata")+'</div>'
+     +'<h2 style="margin:8px 0 12px;font-size:22px">'+esc(qs[sp.i%qs.length])+'</h2>'
+     +'<div class="row"><button class="btn" id="spNext">Pertanyaan lain</button><span class="timer" id="timer" style="margin-left:auto;font-size:30px">'+fmt(T.run?T.left:sp.part===1?30:60)+'</span><button class="btn ghost" id="spTime">Mulai timer</button></div>';
+  }
+  return h+'</div>';
+}
+
+function vSalah(){
+  var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
+  var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
+  var cnt={};S.errors.forEach(function(e){var k=e.s+" - "+e.t;cnt[k]=(cnt[k]||0)+1});
+  var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}).slice(0,5),max=top.length?cnt[top[0]]:1;
+  var bars=top.map(function(k){return '<div class="bar" style="grid-template-columns:150px 1fr 28px"><span>'+esc(k)+'</span><i><span style="width:'+(cnt[k]/max*100)+'%"></span></i><b class="mono">'+cnt[k]+'</b></div>'}).join("");
+  var rows=S.errors.slice().reverse().slice(0,15).map(function(e,j){var idx=S.errors.length-1-j;return '<tr><td>'+e.d.slice(8)+'/'+e.d.slice(5,7)+'</td><td>'+esc(e.s)+'</td><td>'+esc(e.t)+'</td><td>'+esc(e.n||"")+'</td><td><button class="btn ghost" data-edel="'+idx+'">Hapus</button></td></tr>'}).join("");
+  return '<div class="grid g2"><div class="panel"><h2>Catat kesalahan</h2><form id="errForm" class="grid"><div class="field"><label for="eS">Skill</label><select id="eS">'+opts+'</select></div><div class="field"><label for="eT">Jenis kesalahan</label><select id="eT">'+types+'</select></div><div class="field"><label for="eN">Catatan (opsional)</label><input id="eN" type="text" maxlength="160" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px" placeholder="Contoh: Cambridge 17 Test 2, Passage 3"></div><div><button class="btn" type="submit">Tambah</button></div></form></div>'
+   +'<div class="panel"><h2>Kesalahan terbanyak</h2>'+(top.length?'<div class="bars">'+bars+'</div><p class="small" style="margin:12px 0 0">Fokus minggu ini: <b>'+esc(top[0])+'</b>. Latih jenis ini lebih dulu.</p>':'<div class="empty">Belum ada catatan. Setiap selesai latihan, catat 1-3 kesalahan utama.</div>')+'</div></div>'
+   +(rows?'<div class="panel" style="margin-top:12px"><h2>Catatan terbaru</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Skill</th><th>Jenis</th><th>Catatan</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':"");
+}
+function vAtur(){
+  return '<div class="grid g2"><div class="panel"><h2>Sinkron ke Google Sheets</h2><p class="small" style="margin-top:0">Isi alamat web app Apps Script dan kunci rahasia (lihat PANDUAN.md). Pengaturan ini hanya disimpan di perangkat ini, jadi isi di setiap perangkat.</p>'
+   +'<div class="field"><label for="syUrl">Alamat web app</label><input id="syUrl" type="text" value="'+esc(SYNC.url)+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px"></div>'
+   +'<div class="field" style="margin-top:8px"><label for="syKey">Kunci rahasia</label><input id="syKey" type="password" value="'+esc(SYNC.key)+'" autocomplete="off" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px"></div>'
+   +'<div class="row" style="margin-top:12px"><button class="btn" id="syoSave">Simpan dan tes</button><button class="btn ghost" id="syoNow">Sinkron sekarang</button></div><p class="small" id="syMsg" style="margin:8px 0 0"></p></div>'
+   +'<div class="panel"><h2>Cadangan manual</h2><p class="small" style="margin-top:0">Unduh semua progres sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn ghost" id="bkOut">Unduh cadangan</button><label class="btn ghost" for="bkIn" style="display:inline-block">Pulihkan dari file</label><input id="bkIn" type="file" accept="application/json,.json" hidden></div><p class="small" id="bkMsg" style="margin:8px 0 0"></p></div></div>';
+}
+function render(){
+  var tabs=document.getElementById("tabs");
+  tabs.innerHTML=TABS.map(function(t){return '<button role="tab" aria-selected="'+(state.tab===t[0])+'" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join("");
+  var wk=planWeek();document.getElementById("wkLbl").textContent=wk.lbl;document.getElementById("wkNum").textContent=wk.n?wk.n+" / 12":"--";
+  document.getElementById("tgtTop").textContent=S.target;
+  var v=document.getElementById("view");
+  v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="skor"?vSkor():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
+  bind();
+}
+function go(t){if(state.tab!==t){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render()}
+
+function bind(){
+  var $=function(id){return document.getElementById(id)};
+  document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
+  document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  if($("doneBtn"))$("doneBtn").onclick=function(){var d=day();d.done=!d.done;save();render()};
+  document.querySelectorAll("[data-r]").forEach(function(b){b.onclick=function(){rate(b.dataset.r)}});
+  if($("flip"))$("flip").onclick=function(){session.flip=true;render()};
+  if($("resetSess"))$("resetSess").onclick=function(){session=null;render()};
+  if($("scoreForm")){
+    var f=$("scoreForm");
+    var prev=function(){var v=["L","R","W","S"].map(function(k){return parseFloat($("s"+k).value)});if(v.every(function(x){return !isNaN(x)}))$("avgPrev").textContent="Rata-rata: "+avg({L:v[0],R:v[1],W:v[2],S:v[3]}).toFixed(1)};
+    f.oninput=prev;
+    f.onsubmit=function(e){e.preventDefault();var v=["L","R","W","S"].map(function(k){return Math.max(0,Math.min(9,Math.round(parseFloat($("s"+k).value)*2)/2))});if(v.some(isNaN))return;S.scores.push({d:today(),L:v[0],R:v[1],W:v[2],S:v[3]});save();render()};
+    $("tgt").onchange=function(){var v=parseFloat($("tgt").value);if(v>=4&&v<=9){S.target=Math.round(v*2)/2;save();render()}};
+    document.querySelectorAll("[data-del]").forEach(function(b){b.onclick=function(){if(b.dataset.armed){S.scores.splice(+b.dataset.del,1);save();render()}else{b.dataset.armed="1";b.textContent="Yakin?";}}});
+  }
+  if($("essay")){
+    var ta=$("essay");
+    ta.oninput=function(){state.draft=ta.value;try{localStorage.setItem(LS+"-draft",state.draft)}catch(e){}var n=state.draft.trim()?state.draft.trim().split(/\s+/).length:0;$("wc").textContent=n+" kata"};
+    $("newPrompt").onclick=function(){state.wp=rnd(WRITING.length,state.wp);$("prompt").textContent=WRITING[state.wp]};
+    $("tStart").onclick=function(){
+      if(T.run){stopTimer();render();return}
+      startTimer(T.left>0?T.left:2400,function(){render()});render();
+    };
+    $("tReset").onclick=function(){stopTimer();T.left=0;render()};
+    $("clearEssay").onclick=function(){state.draft="";try{localStorage.removeItem(LS+"-draft")}catch(e){}render()};
+    $("copyEssay").onclick=function(){
+      var txt="Soal: "+WRITING[state.wp]+"\n\nEsai saya ("+(state.draft.trim()?state.draft.trim().split(/\s+/).length:0)+" kata):\n"+state.draft+"\n\nTolong nilai berdasarkan band descriptor IELTS Writing Task 2 (Task Response, Coherence, Lexical Resource, Grammar) dan beri 3 perbaikan terpenting.";
+      var done=function(ok){$("copyMsg").textContent=ok?"Tersalin. Tempel ke obrolan dengan Claude.":"Gagal menyalin otomatis. Blok teks esai lalu salin manual."};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){done(true)},function(){done(false)});else done(false);
+    };
+  }
+  if($("errForm")){
+    $("eS").onchange=function(){state.errSkill=$("eS").value;render()};
+    $("errForm").onsubmit=function(e){e.preventDefault();S.errors.push({d:today(),s:$("eS").value,t:$("eT").value,n:$("eN").value.trim()});save();render()};
+    document.querySelectorAll("[data-edel]").forEach(function(b){b.onclick=function(){if(b.dataset.armed){S.errors.splice(+b.dataset.edel,1);save();render()}else{b.dataset.armed="1";b.textContent="Yakin?"}}});
+  }
+  if($("syoSave")){
+    $("syoSave").onclick=function(){
+      SYNC={url:$("syUrl").value.trim(),key:$("syKey").value};
+      try{localStorage.setItem(LS+"-sync",JSON.stringify(SYNC))}catch(e){}
+      $("syMsg").textContent="Menguji koneksi...";
+      pull().then(function(){$("syMsg").textContent=document.getElementById("sync").textContent==="Tersinkron"?"Terhubung.":"Gagal terhubung. Periksa alamat, kunci, dan pengaturan akses deployment."});
+    };
+    $("syoNow").onclick=function(){dirty=true;pull().then(flush)};
+    $("bkOut").onclick=function(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="jalur-ielts-cadangan-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)};
+    $("bkIn").onchange=function(){var f=$("bkIn").files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||typeof d!=="object"||!d.cards)throw 0;S=Object.assign(def(),d);save();$("bkMsg").textContent="Cadangan dipulihkan.";render()}catch(e){$("bkMsg").textContent="File tidak valid."}};r.readAsText(f)};
+  }
+  document.querySelectorAll("[data-part]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.sp={part:+b.dataset.part,i:rnd(10),phase:"idle"};render()}});
+  if($("spNext"))$("spNext").onclick=function(){stopTimer();T.left=0;var n=state.sp.part===2?SP2.length:state.sp.part===1?SP1.length:SP3.length;state.sp={part:state.sp.part,i:rnd(n,state.sp.i%n),phase:"idle"};render()};
+  if($("spTime"))$("spTime").onclick=function(){startTimer(state.sp.part===1?30:60,function(){render()});};
+  if($("spStart"))$("spStart").onclick=function(){
+    state.sp.phase="prep";startTimer(60,function(){state.sp.phase="speak";render();startTimer(120,function(){state.sp.phase="done";render()})});render();
+  };
+}
+
+render();
+setSync(syncOn()?"busy":"off");
+pull();
+})();
+</script>
+
+</body>
+</html>
