@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>html{color-scheme:light}body{margin:0}@media (prefers-color-scheme:dark){html:not([data-theme="light"]){color-scheme:dark}}</style>
 <title>Jalur IELTS</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
 /* Tema "kertas kotak-kotak": tinta navy, garis tebal, bayangan keras, label mono. Ada mode terang dan gelap. */
 :root{
@@ -14,8 +14,8 @@
   --good:#1C8A5A; --good-bg:#DCEFE3; --bad:#CF3F3F; --bad-bg:#F8E2DF; --warn:#A8640A;
   --slate:#BCCBD8; --soft:#E1EADC; --sh:#BCCBD8; --on-bg:#0F2040; --on-ink:#FFFFFF;
   --board:#0F2040; --board-ink:#F2B632; --board-dim:#93A5C3;
-  --f-display:"Space Grotesk","Segoe UI",system-ui,sans-serif;
-  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -362,6 +362,43 @@ select{cursor:pointer}
 .kicker,.kicker *,.sync{font-size:12px}
 :root{--good:#177A50}
 
+
+/* ===== Perbaikan hasil kritik Impeccable ===== */
+/* Hari ini: satu aksi utama */
+.hero{align-items:flex-end}
+.hero .when{margin-top:10px;font-size:13px;color:var(--navy-dim)}
+.hero-act{display:flex;flex-direction:column;gap:6px;min-width:min(100%,270px);flex:0 1 300px}
+.hero .btn.cta-main{min-height:58px;font-size:17px;padding-inline:26px;box-shadow:4px 4px 0 var(--navy-ink)}
+.hero .hint{margin:0;font-size:13px;color:var(--navy-dim);text-align:center}
+.hero .sub-act{justify-content:space-between;gap:4px 16px}
+.lnk{background:none;border:0;padding:8px 2px;min-height:44px;color:var(--navy-ink);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px;cursor:pointer}
+.lnk:hover{color:var(--amber)}
+.lnk.done{color:var(--amber)}
+.lnk.tgtbtn{min-height:0;padding:0;font-size:13px;color:var(--amber)}
+.hero .when .lnk.tgtbtn{vertical-align:baseline}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:16px 0 0;padding:0;box-shadow:2px 2px 0 var(--sh)}
+.strip>div{padding:12px 16px;border-left:2px solid var(--line);min-width:0}
+.strip>div:first-child{border-left:0}
+.strip dt{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.strip dd{margin:2px 0 0;font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.strip dd small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted)}
+@media (max-width:620px){.strip{grid-template-columns:1fr 1fr}.strip>div:nth-child(3){border-left:0}.strip>div:nth-child(n+3){border-top:2px solid var(--line)}.hero-act{flex:1 1 100%}}
+.tgtcard{margin-bottom:16px;border-color:var(--accent);box-shadow:4px 4px 0 var(--accent)}
+.sec-h{font-size:22px;margin:0 0 10px}
+.fold>summary{cursor:pointer;font-family:var(--f-display);font-size:20px;font-weight:700;min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
+.fold[open]>summary{margin-bottom:10px}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+/* status cadangan di header: terbaca dan bisa diklik */
+button.sync{background:none;border:0;padding:6px 0;min-height:44px;text-align:left;cursor:pointer;color:#C9D5E8;font-size:12px;text-transform:none;letter-spacing:.02em;text-decoration:underline;text-underline-offset:3px}
+button.sync.warn{color:var(--amber)}
+/* bukan sekadar garis warna di sisi kiri */
+.resume,.card-cue,.trap,.wr{border-left-width:2px}
+.wr{background:var(--bad-bg)}
+.resume{border-top:6px solid var(--accent)}
+.card-cue,.trap{border-top:6px solid var(--amber)}
+/* tab: fokus keyboard jelas */
+nav button:focus-visible{outline-offset:-3px}
+
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
@@ -370,8 +407,8 @@ select{cursor:pointer}
 </head>
 <body>
 <header class="top"><div class="in">
-  <div><div class="kicker">IELTS Academic &middot; target <span id="tgtTop">7</span></div><h1>Jalur IELTS</h1><div class="sub">5 Nov 2026 &ndash; 27 Jan 2027 &middot; dari B1-B2 menuju C1</div></div>
-  <div class="wkbox"><div class="wkt"><span id="wkLbl">Minggu</span><b id="wkNum">--</b></div><div class="seg12" id="wkSeg"></div><span class="sync" id="sync">Sinkron belum diatur</span></div>
+  <div><h1>Jalur IELTS</h1><div class="sub">IELTS Academic, target band <span id="tgtTop">7</span> &middot; 5 Nov 2026 &ndash; 27 Jan 2027 &middot; dari B1-B2 menuju C1</div></div>
+  <div class="wkbox"><div class="wkt"><span id="wkLbl">Minggu</span><b id="wkNum">--</b></div><div class="seg12" id="wkSeg" aria-hidden="true"></div><button type="button" class="sync" id="sync" aria-label="Status cadangan. Buka tab Sinkron">Belum dicadangkan</button></div>
 </div></header>
 <div class="wrap">
   <nav role="tablist" id="tabs"></nav>
@@ -616,7 +653,13 @@ try{localStorage.removeItem(LS+"-sync")}catch(e){}
 function syncOn(){return GD.on}
 var saveT=null,saving=false,dirty=false;
 function save(){S.updated=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,900)}
-function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Belum sinkron, tekan Sinkron sekarang":"Sinkron belum diatur"}
+function bkStamp(){try{localStorage.setItem(LS+"-bk",String(Date.now()))}catch(e){}}
+function bkAge(){try{var t=+localStorage.getItem(LS+"-bk");if(!t)return null;return Math.floor((Date.now()-t)/864e5)}catch(e){return null}}
+function setSync(m){var e=document.getElementById("sync");if(!e)return;
+  if(m==="ok")bkStamp();
+  var a=bkAge(),off=a===null?"Belum dicadangkan. Atur cadangan":a===0?"Dicadangkan hari ini (file)":"Dicadangkan "+a+" hari lalu. Atur cadangan";
+  e.className="sync"+(m==="fail"||(m==="off"&&(a===null||a>=3))||m==="login"?" warn":"");
+  e.textContent=m==="ok"?"Tersinkron ke Drive":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Belum sinkron. Buka Sinkron":off}
 function call(body){return driveCall(body)}
 var flushP=null,lastOk=false;
 function flush(){
@@ -719,23 +762,32 @@ function icoNo(){return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=
 var POS={mitigate:"v",sustainable:"adj",infrastructure:"n",congestion:"n",commuter:"n",emission:"n",accessible:"adj",pedestrian:"n",integrate:"v",multimodal:"adj",regulation:"n",enforce:"v",subsidy:"n",implement:"v",priority:"n",allocate:"v",beneficial:"adj",significant:"adj",consequence:"n",alleviate:"v",deteriorate:"v",fluctuate:"v",surge:"n",decline:"v",comprehensive:"adj",feasible:"adj",stakeholder:"n",efficiency:"n",capacity:"n",demand:"n",supply:"n",afford:"v",inevitable:"adj",outweigh:"v",advocate:"v",encourage:"v",discourage:"v",reliable:"adj",hazardous:"adj",vulnerable:"adj",urban:"adj",sprawl:"n","urban sprawl":"n","modal shift":"n","public transit":"n","last-mile":"adj","last-mile connectivity":"n",connectivity:"n",fare:"n",freight:"n",logistics:"n",bottleneck:"n",retrofit:"v",gridlock:"n",carpool:"v",pollutant:"n",revenue:"n",budget:"n","trade-off":"n",prevalent:"adj",diminish:"v",undermine:"v","pave the way for":"phrase"};
 function posOf(w){return "v"}
 
+function nextKind(){
+  var p=PLAN[new Date().getDay()],kind=p.f==="Reading"?"reading":null;
+  if(!kind){var best=1e9;["vocab","grammar","reading"].forEach(function(k){var st=qstat(k,"all"),r=st.tot?st.seen/st.tot:1;if(r<best){best=r;kind=k}})}
+  return kind;
+}
+function quick(kind){stopTimer();T.left=0;state.tab="soal";if(!qs||qs.done){if(S.ss&&S.ss.ids)ssResume();if(!qs||qs.done)startQuiz(kind)}render();window.scrollTo(0,0)}
+function tgtCard(){
+  var first=!S.onb&&!S.ql.length&&!Object.keys(S.cards).length&&!Object.keys(S.daily).some(function(k){return active(k)});
+  if(!first&&!state.tgtEdit)return "";
+  var o=[5.5,6,6.5,7,7.5,8,8.5].map(function(b){return '<option value="'+b+'"'+(+S.target===b?" selected":"")+'>'+b+'</option>'}).join("");
+  return '<section class="panel tgtcard"><h2>'+(first?'Atur target band, lalu mulai hari 1':'Ubah target band')+'</h2><p class="small" style="margin:0 0 12px">'+(first?'Target ini tampil di bagian atas dan membantu menjaga fokus. Bisa diubah kapan saja lewat tombol target di kartu hari ini.':'Pilih band yang disyaratkan beasiswa atau kampus tujuan.')+'</p><div class="row"><div class="field" style="min-width:140px"><label for="tgtSel">Target band</label><select id="tgtSel">'+o+'</select></div><button class="btn" id="tgtSave">Simpan target</button><button class="btn ghost" id="tgtLater">'+(first?'Nanti saja':'Tutup')+'</button></div></section>';
+}
 function vHari(){
   var p=PLAN[new Date().getDay()],dd=day(),t=today(),n=dueCount(),wk="",i,k;
   for(i=6;i>=0;i--){k=addDays(t,-i);wk+='<div class="'+(active(k)?"on":"")+(i===0?" now":"")+'">'+PLAN[parse(k).getDay()].d.slice(0,3)+'</div>'}
-  var sc=S.scores.length?avg(S.scores[S.scores.length-1]).toFixed(1):"--";
-  var qn=dd.quiz||0;
-  return '<section class="hero"><div><div class="kick">'+p.d+' &middot; '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+'</div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p></div>'
-   +'<button class="btn '+(dd.done?"good":"amber")+'" id="doneBtn">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></section>'
-   +'<div class="grid g4" style="margin-top:16px">'
-   +'<div class="panel stat"><span class="ic">'+ico("api")+'</span><div class="lbl">Streak</div><div class="big">'+streak()+' <span class="small">hari</span></div></div>'
-   +'<div class="panel stat"><span class="ic">'+ico("kartu")+'</span><div class="lbl">Kartu menunggu</div><div class="big">'+n+'</div></div>'
-   +'<div class="panel stat"><span class="ic">'+ico("bintang")+'</span><div class="lbl">Kata dikuasai</div><div class="big">'+mastered()+'<span class="small">/'+VOCAB.length+'</span></div></div>'
-   +'<div class="panel stat"><span class="ic">'+ico("target")+'</span><div class="lbl">Soal dikerjakan</div><div class="big">'+qstat(null,"all").seen+'<span class="small">/'+BANK.length+'</span></div></div></div>'
-   +'<div class="grid g2" style="margin-top:16px">'
-   +'<div class="panel cta"><div><div class="lbl">Latihan hari ini</div><h2>25 kasus diagnostik</h2><div class="small">'+(qn?qn+' soal sudah dijawab hari ini.':'Kosakata, tata bahasa, atau Reading mini.')+'</div></div><button class="btn" data-go="soal">Mulai soal</button></div>'
-   +'<div class="panel cta alt"><div><div class="lbl">Kosakata</div><h2>25 kata baru</h2><div class="small">'+(n?n+' kartu menunggu untuk diulang.':'Antrean kartu kosong.')+'</div></div><button class="btn ghost" data-go="kata">Buka</button></div></div>'
+  var kind=nextKind(),resume=S.ss&&S.ss.ids?S.ss:null,total=diff(START,END)+1,dn=t<START?0:Math.min(total,diff(START,t)+1);
+  var when=p.d+', '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+(dn?' &middot; hari ke-'+dn+' dari '+total:' &middot; mulai '+parse(START).getDate()+'/'+(parse(START).getMonth()+1));
+  var qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
+  var sq=qstat(null,"all");
+  var prog=["vocab","grammar","reading"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+(st.seen?st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n):'belum mulai &middot; '+st.tot+' soal')+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("");
+  return tgtCard()
+   +'<section class="hero"><div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p><p class="when">'+when+' &middot; <button class="lnk tgtbtn" data-tgt type="button">target band '+S.target+'</button></p></div>'
+   +'<div class="hero-act"><button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button><p class="hint">'+(resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
+   +'<dl class="strip panel"><div><dt>Streak</dt><dd>'+streak()+'<small> hari</small></dd></div><div><dt>Kartu menunggu</dt><dd>'+n+'</dd></div><div><dt>Kata dikuasai</dt><dd>'+mastered()+'<small>/'+VOCAB.length+'</small></dd></div><div><dt>Soal dikerjakan</dt><dd>'+sq.seen+'<small>/'+BANK.length+'</small></dd></div></dl>'
    +'<div class="grid g2" style="margin-top:16px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:12px 0 0">Hari aktif: kartu atau soal dikerjakan, atau ditandai selesai.</p></div>'
-   +'<div class="panel"><h2>Progres soal</h2>'+["vocab","grammar","reading"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n)+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("")+'</div></div>';
+   +'<div class="panel"><h2>Progres soal</h2>'+prog+'</div></div>';
 }
 
 function newWords(){var r=[];VOCAB.forEach(function(v,i){if(!S.cards[i]&&r.length<NEW_PER_DAY)r.push(i)});return r}
@@ -3164,8 +3216,8 @@ function soalMenu(){
     meta={vocab:["var(--amber)","Kata dan makna"],grammar:["var(--accent)","Struktur kalimat"],reading:["var(--good)","Baca dan jawab"]};
   ["vocab","grammar","reading"].forEach(function(k){
     var st=qstat(k,lv),pc=st.tot?Math.round(st.seen/st.tot*100):0;
-    cards+='<div class="panel mode" style="--c:'+meta[k][0]+'"><div class="bandt"></div><div class="bd"><div class="lbl">'+meta[k][1]+'</div><h3>'+KIND[k]+'</h3><p class="small" style="margin:0">'+KDESC[k]+'</p>'
-      +'<div class="big"><b>'+pc+'%</b><span>'+st.seen+' dari '+st.tot+' soal sudah dikerjakan<br>sisa '+(st.tot-st.seen)+' soal baru</span></div><div class="meter" aria-hidden="true"><i style="width:'+pc+'%"></i></div>'
+    cards+='<div class="panel mode" style="--c:'+meta[k][0]+'"><div class="bandt"></div><div class="bd"><h3>'+KIND[k]+'</h3><p class="small" style="margin:0">'+meta[k][1]+'. '+KDESC[k]+'</p>'
+      +(st.seen?'<div class="big"><b>'+pc+'%</b><span>'+st.seen+' dari '+st.tot+' soal sudah dikerjakan<br>sisa '+(st.tot-st.seen)+' soal baru</span></div>':'<div class="big"><b>'+st.tot+'</b><span>soal baru siap<br>belum ada yang dikerjakan</span></div>')+'<div class="meter" aria-hidden="true"><i style="width:'+pc+'%"></i></div>'
       +'<div class="acc"><span>Akurasi</span><b>'+pct(st.c,st.n)+'</b></div>'+(k==="reading"?'<label class="tmr"><input type="checkbox" id="tmChk"'+(state.timed?" checked":"")+'> Berwaktu 20 menit</label>':"")
       +'<button class="btn" data-start="'+k+'"'+(st.tot?"":" disabled")+'>Mulai sesi</button></div></div>';
   });
@@ -3175,8 +3227,8 @@ function soalMenu(){
   var wk=weakCat(),wkTxt=wk?'<p class="small" style="margin:8px 0 0">Topik tata bahasa terlemah: <b>'+esc(wk.cat)+'</b> (akurasi '+wk.acc+').</p>':"";
   var hist=S.ql.slice().reverse().slice(0,8).map(function(h){return '<tr><td>'+h.d.slice(8)+'/'+h.d.slice(5,7)+'</td><td>'+(KIND[h.k]||h.k)+'</td><td class="n">'+h.c+'/'+h.n+'</td><td class="n">'+pct(h.c,h.n)+'</td></tr>'}).join("");
   var tt=qstat(null,"all"),sums='<div class="sums"><div><b>'+tt.seen+'</b><span>Dikerjakan</span></div><div><b>'+pct(tt.c,tt.n)+'</b><span>Akurasi</span></div><div><b>'+S.ql.length+'</b><span>Sesi</span></div></div>';
-  var ss=S.ss&&S.ss.ids?S.ss:null,resume=ss?'<div class="panel resume"><div><div class="lbl">Sesi belum selesai</div><h3 style="margin:4px 0">'+KIND[ss.kind]+' &middot; soal '+(ss.i+1)+' dari '+ss.ids.length+'</h3><p class="small" style="margin:0">'+ss.res.length+' soal sudah dijawab'+(ss.timed?' &middot; berwaktu':'')+'. Sesi ini ikut tersinkron, jadi bisa dilanjutkan di perangkat lain.</p></div><div class="row"><button class="btn" id="ssGo">Lanjutkan sesi</button><button class="btn ghost" id="ssDrop">Buang sesi</button></div></div>':'';
-  return resume+'<div class="panel mhead"><div><div class="lbl">1000 soal &middot; 25 per sesi</div><h2 style="font-size:28px;margin:4px 0 12px">Latihan soal</h2>'
+  var ss=S.ss&&S.ss.ids?S.ss:null,resume=ss?'<div class="panel resume"><div><h3 style="margin:0 0 4px">Sesi belum selesai: '+KIND[ss.kind]+' &middot; soal '+(ss.i+1)+' dari '+ss.ids.length+'</h3><p class="small" style="margin:0">'+ss.res.length+' soal sudah dijawab'+(ss.timed?' &middot; berwaktu':'')+'. Sesi ini ikut tersinkron, jadi bisa dilanjutkan di perangkat lain.</p></div><div class="row"><button class="btn" id="ssGo">Lanjutkan sesi</button><button class="btn ghost" id="ssDrop">Buang sesi</button></div></div>':'';
+  return resume+'<div class="panel mhead"><div><h2 style="font-size:28px;margin:0 0 4px">Latihan soal</h2><p class="small" style="margin:0 0 12px">1000 soal, 25 per sesi.</p>'
     +'<div class="lv" role="group" aria-label="Level">'+[["all","Campur"],["B2","B2"],["C1","C1"]].map(function(o){return '<button data-lv="'+o[0]+'" aria-pressed="'+(o[0]===lv)+'">'+o[1]+'</button>'}).join("")+'</div>'
     +'<p class="small" style="margin:12px 0 0">'+hint+'</p>'+wkTxt
     +'<p class="small" style="margin:8px 0 0">Soal yang salah muncul lagi di sesi berikutnya dan tercatat di tab Kesalahan. Soal ditulis sendiri oleh Claude, bukan soal resmi IELTS atau Cambridge, jadi akurasinya tidak setara dengan skor band.</p></div>'+sums+'</div>'
@@ -3257,12 +3309,15 @@ function vAtur(){
     +'<label class="chk"><input type="checkbox" id="vpHuman"'+(VP.human?" checked":"")+'> Pakai rekaman penutur asli bila ada</label>'
     +'<label class="chk"><input type="checkbox" id="vpSlow"'+(VP.slow?" checked":"")+'> Putar lebih pelan</label>'
     +'<div class="row" style="margin-top:8px"><button class="btn ghost" id="vpTest">Tes suara: eloquent</button></div></div>';
-  return '<div class="grid g2">'+gdUi+vpUi+''
-   +'<div class="panel"><h2>Cadangan manual</h2><p class="small" style="margin-top:0">Unduh semua progres sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn ghost" id="bkOut">Unduh cadangan</button><label class="btn ghost" for="bkIn" style="display:inline-block">Pulihkan dari file</label><input id="bkIn" type="file" accept="application/json,.json" hidden></div><p class="small" id="bkMsg" style="margin:8px 0 0"></p></div></div>';
+  return '<h2 class="sec-h">Cadangan</h2><div class="grid g2">'+gdUi
+   +'<div class="panel"><h2>Cadangan manual</h2><p class="small" style="margin-top:0">Unduh semua progres sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn ghost" id="bkOut">Unduh cadangan</button><label class="btn ghost danger" for="bkIn" style="display:inline-flex">Pulihkan dari file</label><input id="bkIn" type="file" accept="application/json,.json" hidden></div><p class="small" id="bkMsg" style="margin:8px 0 0" aria-live="polite"></p></div></div>'
+   +'<details class="panel fold" style="margin-top:16px"><summary>Suara pelafalan <span class="small">(aksen, suara, kecepatan)</span></summary>'+vpUi.replace('<div class="panel vp"><h2>Suara pelafalan</h2>','<div class="vp">')+'</details>';
 }
 function render(){
   var tabs=document.getElementById("tabs");
-  tabs.innerHTML=TABS.map(function(t){return '<button role="tab" aria-selected="'+(state.tab===t[0])+'" data-tab="'+t[0]+'">'+ico(t[0])+t[1]+'</button>'}).join("");
+  tabs.setAttribute("aria-label","Bagian aplikasi");
+  tabs.innerHTML=TABS.map(function(t){return '<button role="tab" aria-selected="'+(state.tab===t[0])+'" tabindex="'+(state.tab===t[0]?0:-1)+'" data-tab="'+t[0]+'">'+ico(t[0])+t[1]+'</button>'}).join("");
+  var cur=tabs.querySelector('[aria-selected="true"]');if(cur&&cur.scrollIntoView)try{cur.scrollIntoView({inline:"center",block:"nearest"})}catch(e){}
   var wk=planWeek();document.getElementById("wkLbl").textContent=wk.lbl;document.getElementById("wkNum").textContent=wk.n?wk.n+" / 12":"--";
   document.getElementById("tgtTop").textContent=S.target;
   var sg="",q;for(q=1;q<=12;q++)sg+='<i class="'+(q<wk.n?"on":q===wk.n?"now":"")+'"></i>';document.getElementById("wkSeg").innerHTML=sg;
@@ -3270,13 +3325,17 @@ function render(){
   v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
   bind();
 }
-function go(t){if(state.tab!==t){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render()}
+function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
 
 function bind(){
   var $=function(id){return document.getElementById(id)};
   if(state.tab==="soal")bindSoal();
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  document.querySelectorAll("[data-quick]").forEach(function(b){b.onclick=function(){quick(b.dataset.quick)}});
+  document.querySelectorAll("[data-tgt]").forEach(function(b){b.onclick=function(){state.tgtEdit=true;render()}});
+  if($("tgtSave"))$("tgtSave").onclick=function(){S.target=+$("tgtSel").value;S.onb=1;state.tgtEdit=false;save();render()};
+  if($("tgtLater"))$("tgtLater").onclick=function(){S.onb=1;state.tgtEdit=false;save();render()};
   if($("doneBtn"))$("doneBtn").onclick=function(){var d=day();d.done=!d.done;save();render()};
   document.querySelectorAll("[data-km]").forEach(function(b){b.onclick=function(){state.km=b.dataset.km;session=null;render()}});
   document.querySelectorAll("[data-r]").forEach(function(b){b.onclick=function(){rate(b.dataset.r)}});
@@ -3314,8 +3373,8 @@ function bind(){
   if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=lastOk&&!GERR?"Selesai. Data sudah tersimpan di Google Drive.":"Gagal sinkron"+(GERR?": "+GERR:".")},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
   if($("gdOut")){$("gdOut").onclick=function(){gLogout();render()}}
   if($("bkOut")){
-    $("bkOut").onclick=function(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="jalur-ielts-cadangan-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)};
-    $("bkIn").onchange=function(){var f=$("bkIn").files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||typeof d!=="object"||!d.cards)throw 0;S=normQ(Object.assign(def(),d));save();$("bkMsg").textContent="Cadangan dipulihkan.";render()}catch(e){$("bkMsg").textContent="File tidak valid."}};r.readAsText(f)};
+    $("bkOut").onclick=function(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="jalur-ielts-cadangan-"+today()+".json";document.body.appendChild(a);a.click();a.remove();bkStamp();setSync(syncOn()?"ok":"off");setTimeout(function(){URL.revokeObjectURL(a.href)},2000)};
+    $("bkIn").onchange=function(){var f=$("bkIn").files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||typeof d!=="object"||!d.cards)throw 0;var nc=Object.keys(d.cards).length,nq=d.q?Object.keys(d.q).length:0,ne=(d.errors||[]).length,m=$("bkMsg");m.innerHTML="File berisi "+nc+" kartu, "+nq+" soal dikerjakan, "+ne+" catatan kesalahan. <b>Progres di perangkat ini akan diganti.</b> ";var y=document.createElement("button");y.className="btn bad";y.type="button";y.textContent="Ya, ganti progres";var no=document.createElement("button");no.className="btn ghost";no.type="button";no.textContent="Batal";m.appendChild(document.createElement("br"));m.appendChild(y);m.appendChild(document.createTextNode(" "));m.appendChild(no);no.onclick=function(){m.textContent="Dibatalkan. Progres tidak diubah.";$("bkIn").value=""};y.onclick=function(){S=normQ(Object.assign(def(),d));save();bkStamp();render();var m2=document.getElementById("bkMsg");if(m2)m2.textContent="Cadangan dipulihkan."}}catch(e){$("bkMsg").textContent="File tidak valid. Pilih file .json hasil Unduh cadangan."}};r.readAsText(f)};
   }
   document.querySelectorAll("[data-part]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.sp={part:+b.dataset.part,i:rnd(10),phase:"idle"};render()}});
   if($("spNext"))$("spNext").onclick=function(){stopTimer();T.left=0;var n=state.sp.part===2?SP2.length:state.sp.part===1?SP1.length:SP3.length;state.sp={part:state.sp.part,i:rnd(n,state.sp.i%n),phase:"idle"};render()};
@@ -3326,6 +3385,7 @@ function bind(){
 }
 
 render();
+document.getElementById("sync").onclick=function(){go("atur")};
 setSync(syncOn()?"busy":"off");
 if(GD.on){if(gHas())pull();else setSync("login")}else setSync("off");
 })();
