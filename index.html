@@ -270,6 +270,7 @@ svg text{font-family:var(--f-mono);font-size:11px}
 @media (max-width:520px){.top .in{align-items:flex-start}.wkbox{width:100%}}
 </style>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <header class="top"><div class="in">
@@ -437,11 +438,57 @@ var S=load();
 function load(){var o=null;try{var r=localStorage.getItem(LS);if(r)o=Object.assign(def(),JSON.parse(r))}catch(e){}if(!o)return def();if(o.vv!==2){o.cards={};o.vv=2}try{return normQ(o)}catch(e){return o}}
 var SYNC={url:"",key:""};
 try{SYNC=Object.assign(SYNC,JSON.parse(localStorage.getItem(LS+"-sync")||"{}"))}catch(e){}
-function syncOn(){return !!(SYNC.url&&SYNC.key)}
+var GCID="924794401753-r1tt2lk2qlr9sa3dj78t05idaqoucrqs.apps.googleusercontent.com",GFILE="jalur-ielts.json";
+var GD={on:false,fid:null};try{GD.on=localStorage.getItem(LS+"-gd")==="1"}catch(e){}
+var gTok=null,gExp=0,gClient=null,gWait=[];
+function gInit(){
+  if(gClient)return true;
+  if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
+  gClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:"https://www.googleapis.com/auth/drive.appdata",
+    callback:function(r){var w=gWait;gWait=[];
+      if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
+      else w.forEach(function(x){x[1](new Error(r&&r.error||"auth"))})},
+    error_callback:function(e){var w=gWait;gWait=[];w.forEach(function(x){x[1](new Error(e&&e.type||"popup"))})}});
+  return true;
+}
+function gReady(){return new Promise(function(res,rej){var n=0;(function t(){if(gInit())return res();if(++n>40)return rej(new Error("gsi"));setTimeout(t,200)})()})}
+function gToken(interactive){
+  if(gTok&&Date.now()<gExp)return Promise.resolve(gTok);
+  return gReady().then(function(){return new Promise(function(res,rej){gWait.push([res,rej]);try{gClient.requestAccessToken({prompt:interactive?"":"none"})}catch(e){gWait=[];rej(e)}})});
+}
+function gf(url,o){
+  return gToken(false).then(function(t){o=o||{};o.headers=Object.assign({Authorization:"Bearer "+t},o.headers||{});return fetch(url,o)})
+    .then(function(r){if(r.status===401){gTok=null}if(!r.ok)throw new Error("http "+r.status);return r});
+}
+function gFind(){
+  if(GD.fid)return Promise.resolve(GD.fid);
+  return gf("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id)&q="+encodeURIComponent("name='"+GFILE+"'")).then(function(r){return r.json()}).then(function(j){GD.fid=j.files&&j.files[0]?j.files[0].id:null;return GD.fid});
+}
+function gCreate(txt){
+  var b="jalurb"+Date.now();
+  var body="--"+b+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify({name:GFILE,parents:["appDataFolder"]})+"\r\n--"+b+"\r\nContent-Type: application/json\r\n\r\n"+txt+"\r\n--"+b+"--";
+  return gf("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":"multipart/related; boundary="+b},body:body}).then(function(r){return r.json()}).then(function(j){GD.fid=j.id});
+}
+function driveCall(body){
+  if(body.action==="get"){
+    return gFind().then(function(id){if(!id)return{ok:true,data:null,updated:0};
+      return gf("https://www.googleapis.com/drive/v3/files/"+id+"?alt=media").then(function(r){return r.json()}).then(function(j){return{ok:true,data:j.data||null,updated:j.updated||0}})});
+  }
+  var txt=JSON.stringify({updated:body.updated,data:body.data});
+  return gFind().then(function(id){
+    if(!id)return gCreate(txt);
+    return gf("https://www.googleapis.com/upload/drive/v3/files/"+id+"?uploadType=media",{method:"PATCH",headers:{"Content-Type":"application/json"},body:txt}).catch(function(e){if(/404/.test(e.message)){GD.fid=null;return gCreate(txt)}throw e});
+  }).then(function(){return{ok:true}});
+}
+function gLogin(){return gToken(true).then(function(){GD.fid=null;return pull()})}
+function gLogout(){try{if(gTok&&window.google)google.accounts.oauth2.revoke(gTok,function(){})}catch(e){}gTok=null;GD.on=false;GD.fid=null;try{localStorage.removeItem(LS+"-gd")}catch(e){}setSync("off")}
+function sheetsOn(){return !!(SYNC.url&&SYNC.key)}
+function syncOn(){return GD.on||sheetsOn()}
 var saveT=null,saving=false,dirty=false;
 function save(){S.updated=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,900)}
-function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":"Sinkron belum diatur"}
+function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Masuk Google untuk sinkron":"Sinkron belum diatur"}
 function call(body){
+  if(GD.on)return driveCall(body);
   return fetch(SYNC.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:SYNC.key},body))})
     .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error||"error");return j});
 }
@@ -457,7 +504,7 @@ function pull(){
     if(j.data&&(j.updated||0)>(S.updated||0)){S=normQ(Object.assign(def(),j.data));try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
     else if((S.updated||0)>(j.updated||0)){dirty=true;flush();return}
     setSync("ok");
-  }).catch(function(){setSync("fail")});
+  }).catch(function(e){setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
 }
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
 function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done))}
@@ -3060,10 +3107,12 @@ function vSalah(){
    +(rows?'<div class="panel" style="margin-top:12px"><h2>Catatan terbaru</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Skill</th><th>Jenis</th><th>Catatan</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':"");
 }
 function vAtur(){
-  return '<div class="grid g2"><div class="panel"><h2>Sinkron ke Google Sheets</h2><p class="small" style="margin-top:0">Isi alamat web app Apps Script dan kunci rahasia (lihat PANDUAN.md). Pengaturan ini hanya disimpan di perangkat ini, jadi isi di setiap perangkat.</p>'
+  var st=document.getElementById("sync")?document.getElementById("sync").textContent:"";
+  var gdUi='<div class="panel"><h2>Sinkron lewat Google Drive</h2><p class="small" style="margin-top:0">Masuk dengan akun Google yang sama di setiap perangkat. Progres disimpan di folder aplikasi pada Drive kamu, tanpa alamat atau kunci. Hanya file milik aplikasi ini yang bisa diakses.</p><p class="small" id="gdSt" style="margin:0 0 10px"><b>'+esc(GD.on?"Terhubung ke Google Drive":"Belum masuk")+'</b></p><div class="row">'+(GD.on?'<button class="btn" id="gdNow">Sinkron sekarang</button><button class="btn ghost" id="gdOut">Keluar</button>':'<button class="btn" id="gdIn">Masuk dengan Google</button>')+'</div><p class="small" id="gdMsg" style="margin:8px 0 0"></p></div>';
+  return '<div class="grid g2">'+gdUi+'<div class="panel" style="grid-column:1/-1;order:3"><details'+(sheetsOn()?' open':'')+'><summary style="cursor:pointer;font-weight:600">Lanjutan: Google Sheets (cara lama)</summary><h2 style="margin-top:12px">Sinkron ke Google Sheets</h2><p class="small" style="margin-top:0">Isi alamat web app Apps Script dan kunci rahasia (lihat PANDUAN.md). Pengaturan ini hanya disimpan di perangkat ini, jadi isi di setiap perangkat.</p>'
    +'<div class="field"><label for="syUrl">Alamat web app</label><input id="syUrl" type="text" value="'+esc(SYNC.url)+'" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px"></div>'
    +'<div class="field" style="margin-top:8px"><label for="syKey">Kunci rahasia</label><input id="syKey" type="password" value="'+esc(SYNC.key)+'" autocomplete="off" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px"></div>'
-   +'<div class="row" style="margin-top:12px"><button class="btn" id="syoSave">Simpan dan tes</button><button class="btn ghost" id="syoNow">Sinkron sekarang</button></div><p class="small" id="syMsg" style="margin:8px 0 0"></p></div>'
+   +'<div class="row" style="margin-top:12px"><button class="btn" id="syoSave">Simpan dan tes</button><button class="btn ghost" id="syoNow">Sinkron sekarang</button></div><p class="small" id="syMsg" style="margin:8px 0 0"></p></details></div>'
    +'<div class="panel"><h2>Cadangan manual</h2><p class="small" style="margin-top:0">Unduh semua progres sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn ghost" id="bkOut">Unduh cadangan</button><label class="btn ghost" for="bkIn" style="display:inline-block">Pulihkan dari file</label><input id="bkIn" type="file" accept="application/json,.json" hidden></div><p class="small" id="bkMsg" style="margin:8px 0 0"></p></div></div>';
 }
 function render(){
@@ -3109,6 +3158,9 @@ function bind(){
     $("errForm").onsubmit=function(e){e.preventDefault();S.errors.push({d:today(),s:$("eS").value,t:$("eT").value,n:$("eN").value.trim()});save();render()};
     document.querySelectorAll("[data-edel]").forEach(function(b){b.onclick=function(){if(b.dataset.armed){S.errors.splice(+b.dataset.edel,1);save();render()}else{b.dataset.armed="1";b.textContent="Yakin?"}}});
   }
+  if($("gdIn")){$("gdIn").onclick=function(){$("gdMsg").textContent="Membuka jendela Google...";gLogin().then(function(){render()},function(e){$("gdMsg").textContent="Gagal masuk: "+(e&&e.message||"dibatalkan")+". Pastikan pop-up tidak diblokir dan email kamu ada di daftar Test users."})}}
+  if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){dirty=true;return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=document.getElementById("sync").textContent==="Tersinkron"?"Selesai.":"Gagal sinkron."},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
+  if($("gdOut")){$("gdOut").onclick=function(){gLogout();render()}}
   if($("syoSave")){
     $("syoSave").onclick=function(){
       SYNC={url:$("syUrl").value.trim(),key:$("syKey").value};
@@ -3130,7 +3182,7 @@ function bind(){
 
 render();
 setSync(syncOn()?"busy":"off");
-pull();
+if(GD.on){gToken(false).then(function(){return pull()}).catch(function(){setSync("login")})}else pull();
 })();
 </script>
 
