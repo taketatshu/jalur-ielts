@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>html{color-scheme:light}body{margin:0}@media (prefers-color-scheme:dark){html:not([data-theme="light"]){color-scheme:dark}}</style>
 <title>Jalur IELTS</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
 /* Tema "kertas kotak-kotak": tinta navy, garis tebal, bayangan keras, label mono. Ada mode terang dan gelap. */
 :root{
@@ -435,6 +435,32 @@ details.more[open]{padding-bottom:14px}
   nav button{padding:8px 11px;gap:5px}
 }
 
+
+/* ===== Kartu makna ===== */
+.mk{--paper:#EEEAE0;--pink:#26221C;--pline:#A8957A;background:var(--paper);color:var(--pink);border:2px solid var(--edge);border-radius:10px;box-shadow:4px 4px 0 var(--sh);padding:22px 18px 16px;margin-top:14px;text-align:center;
+  background-image:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(90,70,40,.07))}
+.mk .ill svg{display:block;width:min(300px,82%);height:auto;margin:0 auto}
+.mk .mq{font-family:"Newsreader",Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(23px,5.4vw,31px);line-height:1.22;margin:14px auto 18px;max-width:26ch;text-wrap:balance;color:var(--pink)}
+.mg{display:grid;grid-template-columns:1fr 1fr;max-width:560px;margin:0 auto}
+.mko{background:none;border:0;color:var(--pink);font:500 clamp(16px,4.2vw,19px)/1.3 var(--f-body);padding:16px 10px;min-height:58px;cursor:pointer;transition:background-color .15s ease-out}
+.mko:nth-child(odd){border-right:1.5px solid var(--pline)}
+.mko:nth-child(n+3){border-top:1.5px solid var(--pline)}
+.mko:hover:not([disabled]){background:rgba(38,34,28,.07)}
+.mko:focus-visible{outline:3px solid #2C58E0;outline-offset:-3px}
+.mko[disabled]{cursor:default}
+.mko[disabled]:not(.right):not(.wrong){color:#5F574A}
+.mko.right{background:#CFE6D4;color:#0F4A2B;font-weight:700}
+.mko.wrong{background:#F1D3CB;color:#7A2414;text-decoration:line-through;text-decoration-thickness:2px}
+.mkfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:#4F473B;text-align:left}
+.mkd{display:flex;gap:7px;flex:none}
+.mkd i{width:8px;height:8px;border-radius:50%;background:#C9BFAE}
+.mkd i.n{background:var(--pink)}.mkd i.c{background:#1C8A5A}.mkd i.x{background:#CF3F3F}
+.mkn{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.mkn li{display:grid;grid-template-columns:26px auto 1fr;gap:4px 12px;align-items:center;padding:10px 12px;border:2px solid var(--edge);border-radius:8px;background:var(--surface)}
+.mkn li.ok{background:var(--good-bg)}.mkn li.pick{background:var(--bad-bg)}
+.mkn .s{display:grid}.mkn .s svg{width:22px;height:22px}
+@media (max-width:520px){.mk{padding:18px 12px 14px}.mkn li{grid-template-columns:26px 1fr}.mkn li>span:last-child{grid-column:2}}
+
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
@@ -817,7 +843,7 @@ function vHari(){
   var when=p.d+', '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+(dn?' &middot; hari ke-'+dn+' dari '+total:' &middot; mulai '+parse(START).getDate()+'/'+(parse(START).getMonth()+1));
   var qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
   var sq=qstat(null,"all");
-  var prog=["vocab","grammar","reading"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+(st.seen?st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n):'belum mulai &middot; '+st.tot+' soal')+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("");
+  var prog=["vocab","grammar","reading","makna"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+(st.seen?st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n):'belum mulai &middot; '+st.tot+' soal')+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("");
   return tgtCard()
    +'<section class="hero"><div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p><p class="when">'+when+' &middot; <button class="lnk tgtbtn" data-tgt type="button">target band '+S.target+'</button></p></div>'
    +'<div class="hero-act"><button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button><p class="hint">'+(resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
@@ -3067,8 +3093,8 @@ r40-4|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak sesuai; T
 r40-5|Soal Pilihan Ganda|Cari kalimat bukti di teks|Sesuai teks|~Tidak sesuai; Tidak didukung oleh bacaan|~Tidak sesuai; Bertentangan atau tidak disebut dalam bacaan|~Tidak sesuai; Tidak sesuai dengan kalimat bukti`;
 GMTXT+="\n"+GM4;GXTXT+="\n"+GX4;VXTXT+="\n"+VX5;RMTXT+="\n"+RM3;
 var TFNG=["True","False","Not Given"];
-var KIND={vocab:"Kosakata",grammar:"Tata bahasa",reading:"Reading mini"};
-var KDESC={vocab:"Pilihan kata, kolokasi, phrasal verb, sinonim, dan bentuk kata. 25 soal per sesi.",grammar:"Tenses, kondisional, pasif, modal, inversi, klausa relatif, dan lainnya. 25 soal per sesi.",reading:"Lima bacaan pendek, masing-masing lima soal (True/False/Not Given dan pilihan ganda). 25 soal per sesi."};
+var KIND={vocab:"Kosakata",grammar:"Tata bahasa",reading:"Reading mini",makna:"Kartu makna"};
+var KDESC={makna:"Arti dalam bahasa Indonesia, pilih kata Inggrisnya. 7 fase bertema, 7 kartu per sesi.",vocab:"Pilihan kata, kolokasi, phrasal verb, sinonim, dan bentuk kata. 25 soal per sesi.",grammar:"Tenses, kondisional, pasif, modal, inversi, klausa relatif, dan lainnya. 25 soal per sesi.",reading:"Lima bacaan pendek, masing-masing lima soal (True/False/Not Given dan pilihan ganda). 25 soal per sesi."};
 var QI=[0,1,3,7,14,30];
 var SESS=25,RSESS=5;
 function D0(){return "2026-01-01"}
@@ -3084,6 +3110,90 @@ GQ2.forEach(function(r,i){BANK.push({id:"g"+(i+31),k:"grammar",lv:r[0],cat:r[1],
 RP.forEach(function(p,pi){p.q.forEach(function(r,i){BANK.push({id:"r"+(pi+1)+"-"+(i+1),k:"reading",lv:p.l,cat:r[0]==="t"?"True/False/Not Given":"Pilihan ganda",q:r[1],o:r[0]==="t"?TFNG:r[2],a:r[3],e:r[4],p:pi,tf:r[0]==="t"})})});
 VQ3.forEach(function(r,i){BANK.push({id:"v"+(i+201),k:"vocab",lv:r[0],cat:r[1],q:r[2],o:r[3],a:r[4],e:r[5]})});
 GQ3.forEach(function(r,i){BANK.push({id:"g"+(i+201),k:"grammar",lv:r[0],cat:r[1],q:r[2],o:r[3],a:r[4],e:r[5]})});
+/* ===== Kartu makna: seri bertema, 7 fase x 7 kartu ===== */
+var MKF=["Ikatan","Retak","Jarak","Perpisahan","Rindu","Merelakan","Bangkit"];
+var MKTXT=`m1-1|0|B2|merasa sayang dan sulit berpisah dari seseorang atau sesuatu|Reluctant~Nostalgic~Attached~Indifferent|2|Attached to berarti terikat secara emosional. Contoh: She is deeply attached to her grandmother.|Enggan melakukan sesuatu~Rindu pada masa lalu~Terikat secara emosional~Tidak peduli sama sekali
+m1-2|0|B2|hubungan erat yang terbentuk karena pengalaman bersama|Barrier~Bond~Burden~Boundary|1|Bond berarti ikatan. Contoh: The trip strengthened the bond between the two brothers.|Penghalang~Ikatan erat~Beban~Batas (wilayah atau sikap)
+m1-3|0|B2|setia dan tidak mudah berpaling|Royal~Lenient~Legal~Loyal|3|Loyal berarti setia. Contoh: He has remained loyal to his old friends.|Berkaitan dengan raja atau ratu~Lunak, tidak tegas menghukum~Sah menurut hukum~Setia
+m1-4|0|C1|saling bergantung satu sama lain|Interdependent~Independent~Dependable~Indispensable|0|Interdependent berarti saling bergantung. Contoh: In a family, members are interdependent.|Saling bergantung~Mandiri, tidak bergantung~Dapat diandalkan~Sangat diperlukan, tak tergantikan
+m1-5|0|B2|rasa sayang yang dalam dan lembut|Affectation~Affection~Infection~Effect|1|Affection berarti kasih sayang. Contoh: She spoke about her teacher with great affection.|Sikap dibuat-buat agar terkesan~Kasih sayang~Infeksi~Akibat, pengaruh
+m1-6|0|C1|cocok sehingga bisa hidup atau bekerja bersama dengan rukun|Comparable~Competent~Compatible~Compulsory|2|Compatible berarti cocok atau serasi. Contoh: They are compatible because they share the same values.|Dapat dibandingkan, setara~Cakap, kompeten~Cocok, serasi~Wajib
+m1-7|0|C1|merawat dan mendukung sesuatu agar tumbuh (hubungan, bakat)|Neglect~Nudge~Nuance~Nurture|3|Nurture berarti memupuk atau merawat. Contoh: Good teachers nurture curiosity in their students.|Mengabaikan~Mendorong pelan~Perbedaan halus~Memupuk, merawat agar tumbuh
+m2-1|1|C1|rasa kesal terpendam karena merasa diperlakukan tidak adil|Refreshment~Resentment~Retirement~Recruitment|1|Resentment berarti rasa kesal yang dipendam. Contoh: Unfair pay can cause resentment among workers.|Makanan atau minuman ringan~Rasa kesal terpendam~Masa pensiun~Perekrutan pegawai
+m2-2|1|B2|gesekan atau ketegangan kecil di antara orang-orang|Fiction~Fraction~Friction~Function|2|Friction berarti gesekan atau perselisihan. Contoh: There is some friction between the two departments.|Cerita rekaan~Pecahan, bagian kecil~Gesekan, perselisihan~Fungsi
+m2-3|1|C1|membuat masalah atau konflik menjadi lebih buruk|Exacerbate~Alleviate~Exaggerate~Exasperate|0|Exacerbate berarti memperburuk. Contoh: Cutting the budget will only exacerbate the problem.|Memperburuk~Meringankan~Melebih-lebihkan~Membuat orang jengkel
+m2-4|1|B2|curiga dan menduga orang lain berniat buruk|Superstitious~Spacious~Suspenseful~Suspicious|3|Suspicious berarti curiga. Contoh: She became suspicious when he refused to answer.|Percaya takhayul~Luas, lapang~Menegangkan (cerita)~Curiga
+m2-5|1|B2|mengabaikan, tidak memberi perhatian yang semestinya|Negotiate~Neglect~Reject~Elect|1|Neglect berarti mengabaikan atau melalaikan. Contoh: He neglected his friends while he was busy at work.|Berunding~Mengabaikan, melalaikan~Menolak~Memilih lewat pemungutan suara
+m2-6|1|C1|tegang dan tidak bersahabat (tentang hubungan)|Trained~Strained~Stained~Restrained|1|Strained berarti tegang atau renggang. Contoh: Relations between the two countries are strained.|Terlatih~Tegang, renggang~Bernoda~Menahan diri
+m2-7|1|B2|cepat membela diri saat dikritik|Offensive~Decisive~Defensive~Deceptive|2|Defensive berarti cepat membela diri. Contoh: He gets defensive whenever someone mentions his grades.|Menyinggung, ofensif~Tegas, cepat memutuskan~Defensif, membela diri~Menipu, menyesatkan
+m3-1|2|C1|tidak lagi akrab dengan keluarga atau orang dekat|Strange~Arranged~Estranged~Exchanged|2|Estranged berarti renggang dan tidak lagi akrab. Contoh: He is estranged from his father.|Aneh~Diatur~Renggang, tidak lagi akrab~Ditukar
+m3-2|2|B2|terpisah atau terasing dari orang lain|Insulated~Isolated~Insulted~Inflated|1|Isolated berarti terasing. Contoh: Elderly people who live alone often feel isolated.|Diberi lapisan pelindung (panas, suara)~Terasing~Dihina~Menggelembung
+m3-3|2|C1|bersikap dingin dan menjaga jarak|Aloud~Alert~Afloat~Aloof|3|Aloof berarti dingin dan menjaga jarak. Contoh: The new manager seemed aloof at first.|Dengan suara keras~Waspada~Mengapung~Dingin, menjaga jarak
+m3-4|2|C1|berkurang sedikit demi sedikit|Dwindle~Swindle~Kindle~Dawdle|0|Dwindle berarti menyusut perlahan. Contoh: Their contact dwindled after she moved abroad.|Menyusut perlahan~Menipu~Menyalakan, membangkitkan~Berlambat-lambat
+m3-5|2|C1|terjadi sesekali dan tidak teratur|Spontaneous~Steady~Sporadic~Static|2|Sporadic berarti sporadis atau sesekali. Contoh: We only have sporadic contact now.|Spontan, tanpa rencana~Stabil, terus-menerus~Sporadis, sesekali~Diam, tidak berubah
+m3-6|2|C1|mengucilkan seseorang dari kelompok|Emphasize~Ostracize~Criticize~Sympathize|1|Ostracize berarti mengucilkan. Contoh: Students who are different are sometimes ostracized.|Menekankan~Mengucilkan~Mengkritik~Bersimpati
+m3-7|2|C1|kesendirian yang dipilih dan bisa dinikmati|Loneliness~Solidarity~Altitude~Solitude|3|Solitude berarti kesendirian yang tenang, berbeda dengan loneliness (kesepian) yang bernada negatif. Contoh: She enjoys the solitude of early mornings.|Kesepian (bernada negatif)~Solidaritas~Ketinggian~Kesendirian yang tenang
+m4-1|3|B2|pasti terjadi dan tidak bisa dihindari|Invaluable~Inevitable~Inedible~Invisible|1|Inevitable berarti tak terelakkan. Contoh: Change is inevitable in any relationship.|Sangat berharga~Tak terelakkan~Tidak bisa dimakan~Tidak terlihat
+m4-2|3|B2|berpisah dan mengambil jalan masing-masing|Give way~Make way~Part ways~Pave the way|2|Part ways berarti berpisah jalan. Contoh: After ten years, the business partners decided to part ways.|Mengalah, roboh~Memberi jalan~Berpisah jalan~Membuka jalan bagi sesuatu
+m4-3|3|B2|rasa menyesal atas sesuatu yang sudah terjadi|Regard~Retreat~Relief~Regret|3|Regret berarti penyesalan. Contoh: She has no regrets about leaving the job.|Hormat, anggapan~Mundur~Rasa lega~Penyesalan
+m4-4|3|C1|mengakhiri perjanjian atau hubungan secara resmi|Terminate~Nominate~Dominate~Contemplate|0|Terminate berarti mengakhiri. Contoh: The company terminated the contract early.|Mengakhiri~Mencalonkan~Menguasai~Merenungkan
+m4-5|3|C1|terasa pahit dan manis sekaligus|Bitter~Bittersweet~Sugarcoated~Lukewarm|1|Bittersweet berarti pahit-manis. Contoh: Graduation is a bittersweet moment.|Pahit, getir~Pahit-manis~Diperhalus agar terdengar baik~Suam-suam kuku, setengah hati
+m4-6|3|B2|meninggalkan dan menelantarkan|Abound~Abolish~Absorb~Abandon|3|Abandon berarti meninggalkan atau menelantarkan. Contoh: They had to abandon the car in the snow.|Berlimpah~Menghapuskan (hukum, sistem)~Menyerap~Meninggalkan, menelantarkan
+m4-7|3|B2|ucapan atau acara perpisahan|Welfare~Farewell~Warfare~Welcome|1|Farewell berarti perpisahan. Contoh: We held a farewell party for our teacher.|Kesejahteraan~Perpisahan~Peperangan~Sambutan
+m5-1|4|C1|keinginan atau kerinduan yang sangat kuat|Earning~Learning~Yearning~Yawning|2|Yearning berarti kerinduan yang dalam. Contoh: She felt a yearning for home.|Penghasilan~Pembelajaran~Kerinduan yang dalam~Menguap karena mengantuk
+m5-2|4|B2|merindukan masa lalu yang terasa indah|Nostalgic~Homesick~Sentimental~Melancholy|0|Nostalgic berarti rindu masa lalu. Contoh: Old songs make me nostalgic.|Rindu masa lalu~Rindu kampung halaman~Mudah terharu, berdasarkan perasaan~Murung, sedih mendalam
+m5-3|4|B2|rindu pada rumah atau kampung halaman|Homeless~Homemade~Homesick~Homebound|2|Homesick berarti rindu kampung halaman. Contoh: Many international students feel homesick in their first month.|Tunawisma~Buatan rumah~Rindu kampung halaman~Terkurung di rumah
+m5-4|4|C1|rasa sedih yang dalam dan tenang|Malicious~Meticulous~Merciful~Melancholy|3|Melancholy berarti kemurungan. Contoh: The rainy evening filled him with melancholy.|Jahat, berniat buruk~Sangat teliti~Penuh belas kasihan~Kemurungan
+m5-5|4|C1|mengenang masa lalu dengan senang|Reminisce~Resemble~Reimburse~Remind|0|Reminisce berarti mengenang masa lalu. Contoh: We spent the evening reminiscing about our school days.|Mengenang~Mirip dengan~Mengganti uang yang sudah dikeluarkan~Mengingatkan orang lain
+m5-6|4|C1|pikirannya terus tersita oleh sesuatu|Unoccupied~Preoccupied~Prejudiced~Presumptuous|1|Preoccupied berarti pikirannya tersita. Contoh: He was too preoccupied with the exam to notice.|Kosong, tidak ditempati~Pikirannya tersita~Berprasangka~Lancang
+m5-7|4|C1|sangat menyentuh perasaan dan mengharukan|Pungent~Pregnant~Poignant~Potent|2|Poignant berarti mengharukan. Contoh: The film ends with a poignant scene.|Menyengat (bau)~Hamil~Mengharukan~Kuat, ampuh
+m6-1|5|C1|akhirnya menerima keadaan yang tidak bisa diubah|Come up with~Come to terms with~Come across~Come down with|1|Come to terms with berarti menerima kenyataan. Contoh: It took her months to come to terms with the loss.|Menemukan ide~Menerima kenyataan~Menemukan secara kebetulan~Jatuh sakit
+m6-2|5|B2|berhenti menggenggam sesuatu, melepaskan|Let down~Let in on~Let go of~Let off|2|Let go of berarti melepaskan. Contoh: You need to let go of the past.|Mengecewakan~Memberi tahu rahasia~Melepaskan~Membebaskan dari hukuman
+m6-3|5|C1|berdamai kembali setelah bertengkar|Reconsider~Recover~Recollect~Reconcile|3|Reconcile berarti berdamai. Contoh: The two friends reconciled after years of silence.|Mempertimbangkan ulang~Pulih~Mengingat kembali~Berdamai
+m6-4|5|C1|tenang dan damai, tidak gelisah|Serene~Severe~Sincere~Sensible|0|Serene berarti tenang dan damai. Contoh: She looked serene despite the bad news.|Tenang, damai~Berat, parah~Tulus~Masuk akal, bijak
+m6-5|5|C1|pelepasan emosi yang membuat lega|Catastrophe~Catharsis~Cathedral~Characteristic|1|Catharsis berarti pelepasan emosi. Contoh: Writing about the experience was a catharsis for him.|Bencana~Pelepasan emosi~Katedral~Ciri khas
+m6-6|5|C1|menyerahkan hak atau kendali secara sukarela|Relish~Replenish~Relinquish~Resist|2|Relinquish berarti melepaskan hak atau kendali. Contoh: He relinquished control of the company to his daughter.|Menikmati~Mengisi kembali~Melepaskan hak atau kendali~Melawan, menolak
+m6-7|5|C1|tabah, menahan rasa sakit tanpa mengeluh|Static~Sceptic~Toxic~Stoic|3|Stoic berarti tabah. Contoh: She remained stoic throughout the difficult year.|Diam, tidak bergerak~Orang yang selalu ragu~Beracun~Tabah
+m7-1|6|C1|cepat pulih setelah mengalami kesulitan|Resident~Resilient~Reluctant~Relevant|1|Resilient berarti tangguh dan cepat pulih. Contoh: Children are often more resilient than adults think.|Penduduk~Tangguh, cepat pulih~Enggan~Relevan
+m7-2|6|B2|tumbuh dan berkembang dengan sangat baik|Strive~Drive~Deprive~Thrive|3|Thrive berarti berkembang pesat. Contoh: Small businesses thrive in this city.|Berusaha keras~Mengemudi, mendorong~Merampas~Berkembang pesat
+m7-3|6|C1|membuat merasa segar dan muda kembali|Renovate~Rejuvenate~Resonate~Reiterate|1|Rejuvenate berarti menyegarkan kembali. Contoh: A week at the beach rejuvenated her.|Merenovasi bangunan~Menyegarkan kembali~Bergema, terasa sesuai~Mengulang ucapan
+m7-4|6|C1|tetap berusaha walaupun sulit|Persevere~Persuade~Preserve~Perceive|0|Persevere berarti tekun dan gigih. Contoh: If you persevere, your English will improve.|Tekun, gigih~Membujuk~Melestarikan~Memahami, menangkap
+m7-5|6|C1|memulai lembaran hidup yang baru|Turn a blind eye~Turn the tables~Turn over a new leaf~Turn up|2|Turn over a new leaf berarti memulai lembaran baru. Contoh: After the holidays, he decided to turn over a new leaf.|Pura-pura tidak melihat~Membalikkan keadaan~Memulai lembaran baru~Muncul, datang
+m7-6|6|B2|yakin bahwa hal baik akan terjadi|Opportunistic~Pessimistic~Realistic~Optimistic|3|Optimistic berarti optimis. Contoh: She is optimistic about her IELTS result.|Memanfaatkan kesempatan demi diri sendiri~Pesimis~Realistis~Optimis
+m7-7|6|B2|berubah total menjadi lebih baik|Transfer~Transform~Transmit~Translate|1|Transform berarti mengubah total. Contoh: The year abroad transformed her confidence.|Memindahkan~Mengubah total~Mengirimkan~Menerjemahkan`;
+MKTXT.split("\n").forEach(function(l){var f=l.split("|");if(f.length<8)return;var o=f[4].split("~"),a=+f[5],ph=/\s/.test(o[a])?"ungkapan":"kata";
+  BANK.push({id:f[0],k:"makna",lv:f[2],cat:"Fase "+(+f[1]+1)+": "+MKF[+f[1]],ph:+f[1],q:"Manakah "+ph+" yang berarti “"+f[3]+"”?",o:o,a:a,e:f[6],nt:f[7].split("~")})});
+function mkIll(p){
+  var I="#26221C",G="#C2902B",W="#A8432E",P="#EEEAE0",s='<svg viewBox="0 0 240 120" aria-hidden="true" fill="none" stroke="'+I+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">';
+  function rope(cx){return '<ellipse cx="'+cx+'" cy="60" rx="50" ry="30" stroke-width="11"/><ellipse cx="'+cx+'" cy="60" rx="50" ry="30" stroke="'+P+'" stroke-width="6"/><ellipse cx="'+cx+'" cy="60" rx="50" ry="30" stroke-width="1.3" stroke-dasharray="3 6"/>'}
+  if(p===0)s+='<defs><clipPath id="mkc0"><rect x="104" y="12" width="32" height="36"/></clipPath></defs>'+rope(100)+rope(140)+'<g clip-path="url(#mkc0)">'+rope(100)+'</g>';
+  else if(p===1)s+='<ellipse cx="120" cy="52" rx="62" ry="11"/><path d="M58 52 C64 96 176 96 182 52"/><path d="M104 88 L100 102 H140 L136 88"/><path d="M132 41 L126 55 L134 66 L125 79 L129 89" stroke="'+G+'" stroke-width="3.2"/><path d="M96 46 L101 52" stroke="'+G+'" stroke-width="2.6"/>';
+  else if(p===2)s+='<path d="M18 92 H222"/><path d="M38 92 V66 L54 52 L70 66 V92"/><path d="M50 92 V80 H58 V92"/><path d="M170 92 V66 L186 52 L202 66 V92"/><rect x="180" y="70" width="12" height="10"/><path d="M62 44 Q120 4 178 44" stroke-dasharray="3 8"/>';
+  else if(p===3)s+='<path d="M120 118 C120 88 112 66 66 26" stroke-width="13"/><path d="M120 118 C120 88 128 66 174 26" stroke-width="13"/><path d="M120 118 C120 88 112 66 66 26" stroke="'+P+'" stroke-width="8"/><path d="M120 118 C120 88 128 66 174 26" stroke="'+P+'" stroke-width="8"/><path d="M120 116 C120 88 112 66 68 28" stroke-width="1.3" stroke-dasharray="4 7"/><path d="M120 116 C120 88 128 66 172 28" stroke-width="1.3" stroke-dasharray="4 7"/><path d="M200 104 V56"/><path d="M200 60 H222 L228 65 L222 70 H200"/><path d="M200 76 H178 L172 81 L178 86 H200"/>';
+  else if(p===4)s+='<rect x="68" y="32" width="104" height="64" rx="3"/><path d="M68 34 L120 70 L172 34"/><path d="M68 94 L106 64"/><path d="M172 94 L134 64"/><circle cx="120" cy="70" r="8.5" fill="'+W+'" stroke="none"/><circle cx="120" cy="70" r="5" stroke="'+P+'" stroke-width="1.2" opacity=".7"/>';
+  else if(p===5)s+='<ellipse cx="152" cy="38" rx="17" ry="21"/><path d="M147 59 L152 64 L157 59"/><path d="M152 64 C140 78 162 88 146 104 C140 110 132 112 124 114"/><path d="M144 26 C146 22 150 20 154 20" stroke-width="1.6"/><path d="M110 30 H124"/><path d="M104 42 H120"/><path d="M112 54 H124"/>';
+  else s+='<path d="M30 100 H210"/><path d="M150 100 A26 26 0 0 1 202 100" stroke="'+G+'"/><path d="M176 66 V56 M152 76 L145 69 M200 76 L207 69 M140 92 L131 90 M212 92 L221 90" stroke="'+G+'"/><path d="M96 100 C96 86 98 74 96 58"/><path d="M96 76 C84 68 76 72 70 60 C84 56 92 62 96 76 Z"/><path d="M97 66 C108 56 118 58 124 46 C110 44 100 52 97 66 Z"/><path d="M82 106 H88 M104 106 H110"/>';
+  return s+'</svg>';
+}
+function mkQ(){
+  var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,L="ABCD";
+  var opts=qs.perm.map(function(orig,i){var cls="";if(done){if(orig===it.a)cls=" right";else if(i===qs.picked)cls=" wrong"}
+    return '<button type="button" class="mko'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">'+L.charAt(i)+'.</span> '+esc(it.o[orig])+'</button>'}).join("");
+  var dots=qs.items.map(function(_,j){return '<i class="'+(j<qs.res.length?(qs.res[j].ok?"c":"x"):j===qs.i?"n":"")+'"></i>'}).join("");
+  var rv="";
+  if(done){
+    var cl=L.charAt(qs.perm.indexOf(it.a));
+    rv='<div class="reveal"><div class="ans '+(qs.ok?"ok":"no")+'">'+(qs.ok?icoOk():icoNo())+'<div>Jawaban: '+cl+'. '+esc(it.o[it.a])+(qs.ok?'<small>Tepat.</small>':'<small>Anda memilih '+L.charAt(qs.picked)+'. '+esc(it.o[qs.perm[qs.picked]])+'.</small>')+'</div></div>'
+      +'<p class="why">'+esc(it.e)+'</p>'
+      +'<div class="nextbar"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Kartu berikutnya")+'</button><span class="kbd">Spasi atau Enter</span></div>'
+      +'<details class="more"><summary>Arti semua pilihan</summary><ul class="mkn">'+qs.perm.map(function(orig,i){var ok=orig===it.a;
+        return '<li class="'+(ok?"ok":qs.picked===i?"pick":"")+'"><span class="s" style="color:var(--'+(ok?"good":"bad")+')">'+(ok?icoOk():icoNo())+'</span><b>'+L.charAt(i)+'. '+esc(it.o[orig])+'</b><span>'+esc(it.nt[orig]||"")+'</span></li>'}).join("")+'</ul></details></div>';
+  }
+  return '<div class="case mkcase"><div class="case-h"><div class="case-t">Kartu makna '+pad(qs.i+1)+'</div><div class="row" style="gap:8px"><span class="chip lvl">'+it.lv+'</span><span class="chip mono">'+(qs.i+1)+'/'+n+'</span><button class="btn ghost" id="qMenu" style="padding:5px 12px;font-size:13px">Keluar</button></div></div>'
+    +'<article class="mk"><div class="ill">'+mkIll(it.ph)+'</div><p class="mq">'+esc(it.q)+'</p><div class="mg" role="group" aria-label="Pilihan jawaban">'+opts+'</div>'
+    +'<div class="mkfoot"><span>'+esc(it.cat)+'</span><span class="mkd" aria-label="Kartu '+(qs.i+1)+' dari '+n+'">'+dots+'</span></div></article>'
+    +(done?"":'<p class="small kbd" style="margin-top:12px">Pintasan: A-D atau 1-4 untuk memilih jawaban.</p>')+rv+'</div>';
+}
 BANK.forEach(function(x){BID[x.id]=x});
 var qs=null,TLIM=1200,tkId=null;
 function fmtT(ms){var s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+":"+("0"+s%60).slice(-2)}
@@ -3108,6 +3218,11 @@ function weakCat(){var m={},w=null;BANK.forEach(function(x){if(x.k!=="grammar")r
 
 function pickItems(kind,lv){
   var t=today(),pool=BANK.filter(function(x){return x.k===kind&&(lv==="all"||x.lv===lv)});
+  if(kind==="makna"){
+    var ph=[],p,its;for(p=0;p<MKF.length;p++){its=pool.filter(function(x){return x.ph===p});if(its.length)ph.push(its)}
+    for(p=0;p<ph.length;p++){if(ph[p].some(function(x){var r=qget(x.id);return !r||r.due<=t}))return ph[p]}
+    return ph.length?ph[Math.floor(Math.random()*ph.length)]:[];
+  }
   if(kind==="reading"){
     var ps={},sc=[];
     pool.forEach(function(x){(ps[x.p]=ps[x.p]||[]).push(x)});
@@ -3249,8 +3364,8 @@ function vSoal(){
 }
 function soalMenu(){
   var lv=state.ql,cards="",b2=qstat(null,"B2"),hint,
-    meta={vocab:["var(--amber)","Kata dan makna"],grammar:["var(--accent)","Struktur kalimat"],reading:["var(--good)","Baca dan jawab"]};
-  ["vocab","grammar","reading"].forEach(function(k){
+    meta={makna:["#A8432E","Seri bertema"],vocab:["var(--amber)","Kata dan makna"],grammar:["var(--accent)","Struktur kalimat"],reading:["var(--good)","Baca dan jawab"]};
+  ["vocab","grammar","reading","makna"].forEach(function(k){
     var st=qstat(k,lv),pc=st.tot?Math.round(st.seen/st.tot*100):0;
     cards+='<div class="panel mode" style="--c:'+meta[k][0]+'"><div class="bandt"></div><div class="bd"><h3>'+KIND[k]+'</h3><p class="small" style="margin:0">'+meta[k][1]+'. '+KDESC[k]+'</p>'
       +(st.seen?'<div class="big"><b>'+pc+'%</b><span>'+st.seen+' dari '+st.tot+' soal sudah dikerjakan<br>sisa '+(st.tot-st.seen)+' soal baru</span></div>':'<div class="big"><b>'+st.tot+'</b><span>soal baru siap<br>belum ada yang dikerjakan</span></div>')+'<div class="meter" aria-hidden="true"><i style="width:'+pc+'%"></i></div>'
@@ -3264,7 +3379,7 @@ function soalMenu(){
   var hist=S.ql.slice().reverse().slice(0,8).map(function(h){return '<tr><td>'+h.d.slice(8)+'/'+h.d.slice(5,7)+'</td><td>'+(KIND[h.k]||h.k)+'</td><td class="n">'+h.c+'/'+h.n+'</td><td class="n">'+pct(h.c,h.n)+'</td></tr>'}).join("");
   var tt=qstat(null,"all"),sums='<div class="sums"><div><b>'+tt.seen+'</b><span>Dikerjakan</span></div><div><b>'+pct(tt.c,tt.n)+'</b><span>Akurasi</span></div><div><b>'+S.ql.length+'</b><span>Sesi</span></div></div>';
   var ss=S.ss&&S.ss.ids?S.ss:null,resume=ss?'<div class="panel resume"><div><h3 style="margin:0 0 4px">Sesi belum selesai: '+KIND[ss.kind]+' &middot; soal '+(ss.i+1)+' dari '+ss.ids.length+'</h3><p class="small" style="margin:0">'+ss.res.length+' soal sudah dijawab'+(ss.timed?' &middot; berwaktu':'')+'. Sesi ini ikut tersinkron, jadi bisa dilanjutkan di perangkat lain.</p></div><div class="row"><button class="btn" id="ssGo">Lanjutkan sesi</button><button class="btn ghost" id="ssDrop">Buang sesi</button></div></div>':'';
-  return resume+'<div class="panel mhead"><div><h2 style="font-size:28px;margin:0 0 4px">Latihan soal</h2><p class="small" style="margin:0 0 12px">1000 soal, 25 per sesi.</p>'
+  return resume+'<div class="panel mhead"><div><h2 style="font-size:28px;margin:0 0 4px">Latihan soal</h2><p class="small" style="margin:0 0 12px">'+BANK.length+' soal. Satu sesi berisi 25 soal, atau 7 kartu untuk Kartu makna.</p>'
     +'<div class="lv" role="group" aria-label="Level">'+[["all","Campur"],["B2","B2"],["C1","C1"]].map(function(o){return '<button data-lv="'+o[0]+'" aria-pressed="'+(o[0]===lv)+'">'+o[1]+'</button>'}).join("")+'</div>'
     +'<p class="small" style="margin:12px 0 0">'+hint+'</p>'+wkTxt
     +'<p class="small" style="margin:8px 0 0">Soal yang salah muncul lagi di sesi berikutnya dan tercatat di tab Kesalahan. Soal ditulis sendiri oleh Claude, bukan soal resmi IELTS atau Cambridge, jadi akurasinya tidak setara dengan skor band.</p></div>'+sums+'</div>'
@@ -3272,6 +3387,7 @@ function soalMenu(){
     +(hist?'<div class="panel" style="margin-top:16px"><h2>Sesi terakhir</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Jenis</th><th class="n">Benar</th><th class="n">Akurasi</th></tr></thead><tbody>'+hist+'</tbody></table></div></div>':"");
 }
 function soalQ(){
+  if(qs.items[qs.i].k==="makna")return mkQ();
   var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,num=pad(qs.i+1),L="ABCD",
     ttl=it.k==="grammar"?"Soal Tata Bahasa":it.k==="vocab"?"Soal Kosakata":"Soal Bacaan",p="";
   var prog='<div class="prog" aria-hidden="true">'+qs.items.map(function(_,j){return '<i class="'+(j<qs.res.length?(qs.res[j].ok?"c":"x"):j===qs.i?"n":"")+'"></i>'}).join("")+'</div>';
