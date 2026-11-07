@@ -7,7 +7,7 @@
 <title>Jalur IELTS</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* Tema "kertas kotak-kotak", palet Oxford ink: tinta navy #0E1A2B, ivory #F5F1E8, aksen marigold #F4B400.
+/* Tema buku catatan (latar motif garis samar, foto Tokyo di header), palet Oxford ink: tinta navy #0E1A2B, ivory #F5F1E8, aksen marigold #F4B400.
    Hijau dan merah hanya untuk benar/salah. Ada mode terang dan gelap. */
 :root{
   --bg:#F5F1E8; --grid:#E6DFCF; --surface:#FBF9F4; --ink:#0E1A2B; --muted:#4B5566; --line:#DCD4C3; --edge:#0E1A2B;
@@ -564,6 +564,19 @@ nav button[aria-selected="true"]{box-shadow:3px 3px 0 var(--accent)}
 .rword .ipa{font-size:13px}
 .rmean{margin:6px 0 0;font-weight:600;font-size:15px}
 .rex{margin:4px 0 0;font-size:13.5px;color:var(--muted);line-height:1.5}
+
+
+/* ===== Latar: foto Tokyo di header, motif garis samar di halaman (menggantikan kotak-kotak) ===== */
+:root{--motif:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%230E1A2B' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' opacity='.08'><g transform='translate(26 30) rotate(-12)'><path d='M0 14 L40 0 L28 30 Z'/><path d='M28 30 L22 18 L40 0'/><path d='M-14 30 q10 -6 18 -4' stroke-dasharray='2 5'/></g><g transform='translate(140 26)'><path d='M0 6 q16 -6 30 2 v34 q-14 -8 -30 -2 Z'/><path d='M30 8 q14 -8 30 -2 v34 q-16 -6 -30 2'/></g><g transform='translate(52 150)'><circle r='20'/><path d='M-20 0 h40 M0 -20 c-9 11 -9 29 0 40 M0 -20 c9 11 9 29 0 40 M-17 -10 h34 M-17 10 h34'/></g><g transform='translate(150 140) rotate(38)'><path d='M0 0 h50 v9 h-50 Z M50 0 l12 4.5 l-12 4.5 M8 0 v9'/></g></svg>")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--motif:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23F5F1E8' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' opacity='.06'><g transform='translate(26 30) rotate(-12)'><path d='M0 14 L40 0 L28 30 Z'/><path d='M28 30 L22 18 L40 0'/><path d='M-14 30 q10 -6 18 -4' stroke-dasharray='2 5'/></g><g transform='translate(140 26)'><path d='M0 6 q16 -6 30 2 v34 q-14 -8 -30 -2 Z'/><path d='M30 8 q14 -8 30 -2 v34 q-16 -6 -30 2'/></g><g transform='translate(52 150)'><circle r='20'/><path d='M-20 0 h40 M0 -20 c-9 11 -9 29 0 40 M0 -20 c9 11 9 29 0 40 M-17 -10 h34 M-17 10 h34'/></g><g transform='translate(150 140) rotate(38)'><path d='M0 0 h50 v9 h-50 Z M50 0 l12 4.5 l-12 4.5 M8 0 v9'/></g></svg>")}}
+:root[data-theme="dark"]{--motif:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23F5F1E8' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' opacity='.06'><g transform='translate(26 30) rotate(-12)'><path d='M0 14 L40 0 L28 30 Z'/><path d='M28 30 L22 18 L40 0'/><path d='M-14 30 q10 -6 18 -4' stroke-dasharray='2 5'/></g><g transform='translate(140 26)'><path d='M0 6 q16 -6 30 2 v34 q-14 -8 -30 -2 Z'/><path d='M30 8 q14 -8 30 -2 v34 q-16 -6 -30 2'/></g><g transform='translate(52 150)'><circle r='20'/><path d='M-20 0 h40 M0 -20 c-9 11 -9 29 0 40 M0 -20 c9 11 9 29 0 40 M-17 -10 h34 M-17 10 h34'/></g><g transform='translate(150 140) rotate(38)'><path d='M0 0 h50 v9 h-50 Z M50 0 l12 4.5 l-12 4.5 M8 0 v9'/></g></svg>")}
+body{background-image:var(--motif);background-size:240px 240px;background-attachment:fixed}
+nav{background-image:none}
+.top{background-color:#09121F;background-image:linear-gradient(90deg,rgba(9,18,31,.78) 0%,rgba(9,18,31,.35) 45%,rgba(9,18,31,.15) 70%,rgba(9,18,31,.45) 100%),url("img/tokyo.jpg");background-size:cover;background-position:center 44%;background-repeat:no-repeat}
+.top h1{text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.top .sub,.top .wkt{color:#D4DCE8}
+@media (min-width:721px){.top{min-height:180px;display:flex;align-items:flex-end}.top .in{width:100%}}
+.hero,.poster,.case,.flash .face{background-image:none}
 
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
