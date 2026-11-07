@@ -1,0 +1,12 @@
+{
+  "name": "jalur-ielts",
+  "private": true,
+  "description": "Alat bantu untuk membuat audio Listening. Situsnya sendiri tidak butuh npm.",
+  "scripts": {
+    "audio:edge": "node tools/buat_audio.mjs --engine edge",
+    "audio:azure": "node tools/buat_audio.mjs --engine azure"
+  },
+  "devDependencies": {
+    "msedge-tts": "^2.1.1"
+  }
+}

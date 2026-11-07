@@ -461,6 +461,50 @@ details.more[open]{padding-bottom:14px}
 .mkn .s{display:grid}.mkn .s svg{width:22px;height:22px}
 @media (max-width:520px){.mk{padding:18px 12px 14px}.mkn li{grid-template-columns:26px 1fr}.mkn li>span:last-child{grid-column:2}}
 
+
+/* ===== Listening ===== */
+.btn[hidden]{display:none}
+.lshead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.lspart{margin-bottom:14px}
+.lspart h3{font-size:20px;margin:0 0 6px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.lsrow{display:grid;grid-template-columns:1fr auto auto;gap:8px 16px;align-items:center;padding:12px 0;border-top:2px dashed var(--line)}
+.lsrow:first-of-type{border-top:0}
+.lsrt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lsrt b{font-family:var(--f-display);font-size:18px}
+.lssc{font-size:14px;color:var(--muted)}
+@media (max-width:520px){.lsrow{grid-template-columns:1fr auto}.lsrow .btn{grid-column:1/-1}}
+.lst{font-size:clamp(24px,5.5vw,32px);margin-top:14px}
+.lsbox{border:2px solid var(--edge);border-radius:10px;background:var(--surface);padding:14px 16px}
+.lsbox .seg{margin-bottom:10px}
+.lsplayer{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+.lsplayer #lsPlay{min-width:170px;min-height:52px}
+.lsbar{height:10px;border:2px solid var(--edge);border-radius:4px;background:var(--soft);overflow:hidden;margin-top:12px}
+.lsbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s ease-out}
+.lsinst{font-weight:700;margin:18px 0 8px}
+.lsq{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.lsq>li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:12px 14px;border:2px solid var(--line);border-radius:8px;background:var(--surface)}
+.lsq>li.ok{border-color:var(--good);background:var(--good-bg)}
+.lsq>li.no{border-color:var(--bad);background:var(--bad-bg)}
+.lsn{width:30px;height:30px;border-radius:50%;background:var(--on-bg);color:var(--on-ink);display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:13px}
+.lsq-t{font-size:16px;line-height:2.1}
+input.lsin{display:inline-block;width:min(15ch,100%);min-height:40px;padding:4px 10px;margin:0 4px;font-family:var(--f-mono);font-size:15px;vertical-align:middle}
+input.lsin.ok{border-color:var(--good)}input.lsin.no{border-color:var(--bad);text-decoration:line-through}
+.lsopts{display:grid;gap:6px;margin-top:4px;line-height:1.4}
+.lsopt{display:flex;gap:10px;align-items:center;min-height:44px;padding:6px 10px;border:2px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.lsopt input{width:20px;height:20px;flex:none;margin:0;accent-color:var(--accent)}
+.lsopt:has(input:checked){border-color:var(--accent)}
+.lsopt.right{border-color:var(--good);background:var(--good-bg)}
+.lsopt.wrong{border-color:var(--bad);background:var(--bad-bg);text-decoration:line-through}
+.lsres{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px;line-height:1.4}
+.lsres svg{width:20px;height:20px;flex:none}
+.lsres.ok{color:var(--good)}.lsres.no{color:var(--ink)}.lsres.no svg{color:var(--bad)}
+.lsscore{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:18px}
+.lstr{margin-top:14px}
+.lstx p{margin:0 0 10px;line-height:1.7}
+.lstx b{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:6px}
+.lstx mark{background:color-mix(in srgb,var(--amber) 45%,transparent);color:inherit;padding:0 3px;border-radius:3px}
+.lstx sup{font-family:var(--f-mono);font-size:10px;margin-right:2px}
+
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
@@ -477,6 +521,7 @@ details.more[open]{padding-bottom:14px}
   <main id="view"></main>
 </div>
 
+<script type="application/json" id="lsdata">[{"id":"L1a","part":1,"title":"Gym membership enquiry","tid":"Menanyakan keanggotaan pusat kebugaran","acc":"gb","sp":{"R":["Receptionist","f",0],"C":["Daniel","m",0]},"inst":"Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.","lines":[["R","Good morning, Brookfield Leisure Centre. How can I help?"],["C","Hi. I'm thinking of joining the gym, and I wanted to ask a few questions first."],["R","Of course. Can I take your name?"],["C","Yes, it's Daniel [[1:Hartley]]. That's H, A, R, T, L, E, Y."],["R","Thank you, Mr Hartley. And your address?"],["C","It's twenty-seven [[2:Marsh]] Road. That's M, A, R, S, H. Not far from the station."],["R","Lovely. And a contact number?"],["C","My mobile is [[3:07700 900418]].","My mobile is oh seven seven oh oh, nine oh oh, four one eight."],["R","Got it. Now, what kind of membership were you interested in?"],["C","Well, I looked at the Gold membership online, but it's quite expensive."],["R","Gold is forty-five pounds a month. If you don't need to come in the evenings, there's our [[4:off-peak]] membership."],["C","Oh, that might suit me. I work from home most days. How much is that?"],["R","It's [[5:£32]] a month, and at the moment we're not charging the twenty-pound joining fee.","It's thirty-two pounds a month, and at the moment we're not charging the twenty-pound joining fee."],["C","Great. And what are the hours?"],["R","Off-peak members can use the gym from six in the morning until [[6:4 pm]] on weekdays, and any time at weekends.","Off-peak members can use the gym from six in the morning until four p.m. on weekdays, and any time at weekends."],["C","That's fine. I'd also like to try a class. Is the spinning class any good?"],["R","It's very popular, but I'm afraid it's full until next year. We do have space in [[7:yoga]], though."],["C","Yoga would be good, actually. My back could use it. When is it?"],["R","There are two groups. Tuesday is fully booked, so it would be the [[8:Thursday]] morning group, at half past ten."],["C","Perfect. What do I need to bring when I come in to sign up?"],["R","Just some photo ID, like a passport or driving licence, and a [[9:utility bill]] to confirm your address. It should be from the last three months."],["R","And finally, may I ask how you heard about us?"],["C","My [[10:colleague]] recommended you. She's been a member for years. I did see your advert on the bus, too, but that was after she told me."],["R","Wonderful. We'll see you soon, Mr Hartley."]],"qs":[{"q":"Name: Daniel ___","a":["Hartley"]},{"q":"Address: 27 ___ Road","a":["Marsh"]},{"q":"Mobile number: ___","a":["07700900418"]},{"q":"Type of membership: ___","a":["off-peak","off peak","offpeak"]},{"q":"Monthly fee: £___","a":["32","thirty-two","thirty two"]},{"q":"Weekday hours: 6 am until ___","a":["4 pm","4pm","4","four","four pm","4.00 pm","16.00","4 o'clock"]},{"q":"Class: ___","a":["yoga"]},{"q":"Class day: ___ morning","a":["Thursday"]},{"q":"Bring photo ID and a ___","a":["utility bill"]},{"q":"Heard about the centre from a ___","a":["colleague"]}]},{"id":"L1b","part":1,"title":"Booking a coastal tour","tid":"Memesan tur pantai","acc":"au","sp":{"A":["Megan","f",0],"S":["Caller","m",0]},"inst":"Questions 1-7 and 10: write NO MORE THAN TWO WORDS AND/OR A NUMBER. Questions 8-9: choose A, B or C.","lines":[["A","Coastal Walks, this is Megan speaking."],["S","Hi, Megan. I'd like to book one of your weekend tours, please."],["A","Sure. Which one were you thinking of?"],["S","We wanted the Rainforest Walk, but your website says it's sold out."],["A","That's right, it's full for the next month. A lot of people choose the [[1:Lighthouse]] Walk instead. It's shorter, but the views are amazing."],["S","OK, let's do that one. Is Saturday the [[2:14th]] of March available?","OK, let's do that one. Is Saturday the fourteenth of March available?"],["A","Let me check. Yes, there's space. How many people?"],["S","It was going to be four of us, but my brother can't come now, so just [[3:three]]."],["A","No problem. The group meets outside the [[4:post office]] in Bay Street. We used to meet at the library, but there's building work there now."],["S","Good to know. And what time do we leave?"],["A","The bus departs at [[5:7.30]], so please be there ten minutes early.","The bus departs at half past seven, so please be there ten minutes early."],["S","That's early! What should we bring?"],["A","You don't need to bring food, because lunch is provided. Just a water bottle and some [[6:sunscreen]]. It can get very hot on the cliffs."],["S","Great. How much is it?"],["A","It's fifty-five dollars per person, so [[7:$165]] altogether. [[8:That covers the bus and a picnic lunch.]] The lighthouse museum is extra, about ten dollars if you want to go in.","It's fifty-five dollars per person, so a hundred and sixty-five dollars altogether. That covers the bus and a picnic lunch. The lighthouse museum is extra, about ten dollars if you want to go in."],["S","And what happens if the weather's bad?"],["A","If it's raining heavily, [[9:we move the tour to the Sunday]]. We only give refunds if Sunday is impossible too."],["S","That sounds fair. Can I have a booking reference?"],["A","Of course. It's [[10:CW2817]].","Of course. It's C, W, two, eight, one, seven."],["S","Thanks, Megan. See you on the fourteenth."]],"qs":[{"q":"Tour: the ___ Walk","a":["Lighthouse"]},{"q":"Date: Saturday ___ March","a":["14","14th","fourteenth","the 14th"]},{"q":"Number of people: ___","a":["3","three"]},{"q":"Meeting point: outside the ___","a":["post office"]},{"q":"Bus departs at: ___","a":["7.30","7:30","730","7.30 am","7:30 am","half past seven"]},{"q":"Bring a water bottle and ___","a":["sunscreen","some sunscreen"]},{"q":"Total cost: $___","a":["165"]},{"q":"What does the price include?","o":["a guide and transport","transport and lunch","lunch and museum entry"],"a":1},{"q":"If it rains heavily, the tour will","o":["be cancelled with a full refund","go ahead as planned","move to the Sunday"],"a":2},{"q":"Booking reference: ___","a":["CW2817"]}]},{"id":"L2a","part":2,"title":"Library orientation","tid":"Pengenalan perpustakaan kampus","acc":"gb","sp":{"G":["Tom (guide)","m",1]},"inst":"Choose A, B or C, or write NO MORE THAN TWO WORDS AND/OR A NUMBER.","lines":[["G","Good morning, everyone, and welcome to the Hartwell Library. I'm Tom, and I'll be showing you around today."],["G","First, a bit of history. The library has been on this site since 1960, and [[1:last year the building was extended]], which gave us a whole new third floor. Some of you may have heard it was going to be renamed, but in the end it kept its original name."],["G","Now, borrowing. Undergraduates can borrow up to [[2:12]] books at a time. Postgraduates can take twenty.","Now, borrowing. Undergraduates can borrow up to twelve books at a time. Postgraduates can take twenty."],["G","Standard books are loaned for [[3:three]] weeks, and you can renew them online. Short-loan books, which are the ones on reading lists, must be returned within [[4:24]] hours.","Standard books are loaned for three weeks, and you can renew them online. Short-loan books, which are the ones on reading lists, must be returned within twenty-four hours."],["G","If you need complete silence, head up to the [[5:third floor]]. The silent area used to be on the second floor, but that's now a computer room."],["G","For group work, we have eight study rooms. You can't reserve them at the front desk any more. [[6:Everything is booked online]], up to a week in advance."],["G","There are printers on every floor. Black and white printing costs [[7:5]] pence a page, and colour is twenty pence.","There are printers on every floor. Black and white printing costs five pence a page, and colour is twenty pence."],["G","If your own laptop breaks, you can borrow one of ours for up to [[8:four]] hours. Just show your student card."],["G","The library itself is open until ten at night, but please note that [[9:the café closes at eight]]."],["G","Finally, if you're worried about referencing in your essays, our librarians run a drop-in session every [[10:Wednesday]] afternoon. You don't need to book. Right, let's start on the ground floor."]],"qs":[{"q":"Last year the library was","o":["extended","moved","renamed"],"a":0},{"q":"Undergraduates may borrow up to ___ books","a":["12","twelve"]},{"q":"Standard loan period: ___ weeks","a":["3","three"]},{"q":"Short-loan books must be returned within ___ hours","a":["24","twenty-four","twenty four"]},{"q":"The silent study area is on the","o":["ground floor","second floor","third floor"],"a":2},{"q":"Group study rooms are booked","o":["at the front desk","online","by email"],"a":1},{"q":"Black and white printing: ___ pence per page","a":["5","five"]},{"q":"Laptops can be borrowed for up to ___ hours","a":["4","four"]},{"q":"The café closes at","o":["6 pm","8 pm","10 pm"],"a":1},{"q":"Referencing help: drop-in session every ___","a":["Wednesday","Wednesday afternoon"]}]},{"id":"L2b","part":2,"title":"Community garden volunteers","tid":"Briefing relawan kebun komunitas","acc":"us","sp":{"M":["Maria","f",1]},"inst":"Choose A, B or C, or write NO MORE THAN TWO WORDS AND/OR A NUMBER.","lines":[["M","Hi everyone, thanks for coming. I'm Maria [[1:Delgado]], that's D, E, L, G, A, D, O, and I coordinate the volunteers here at Riverside Community Garden."],["M","People often assume the city council set this place up, but actually [[2:it was a group of neighbors]] who cleared the empty lot back in 2015. The council only gave us the land lease later."],["M","We started with fifteen plots, and today we have [[3:40]].","We started with fifteen plots, and today we have forty."],["M","So what do volunteers do? On Saturday mornings, [[4:most of the work is watering and weeding]]. On Sundays, a smaller team runs our vegetable stall at the farmers' market."],["M","All the tools are kept in the [[5:green]] shed by the main gate. Please don't use the red one. That belongs to the beekeepers."],["M","For safety, you must wear closed [[6:shoes]]. Sandals are not allowed, even in summer. Gloves are provided, so you don't need to bring your own."],["M","Anything we don't sell at the market [[7:goes to the local food bank]] the same afternoon. Volunteers are welcome to take herbs home, though."],["M","Our busiest month is [[8:June]], when everything needs harvesting at once, so we'd love extra help then."],["M","Before your first shift, [[9:you'll need to attend a short safety talk]]. There's no fee for joining."],["M","The talks are held on the first [[10:Saturday]] of every month, at nine o'clock. Any questions?"]],"qs":[{"q":"Volunteer coordinator: Maria ___","a":["Delgado"]},{"q":"The garden was started by","o":["the city council","a group of neighbours","a local school"],"a":1},{"q":"Number of plots today: ___","a":["40","forty"]},{"q":"On Saturday mornings, volunteers mainly","o":["water and weed","build raised beds","sell vegetables"],"a":0},{"q":"Tools are kept in the ___ shed","a":["green"]},{"q":"Volunteers must wear closed ___","a":["shoes"]},{"q":"Vegetables that are not sold","o":["are thrown away","go to a food bank","are given to volunteers"],"a":1},{"q":"Busiest month: ___","a":["June"]},{"q":"Before their first shift, new volunteers must","o":["attend a safety talk","pay a joining fee","bring their own gloves"],"a":0},{"q":"Safety talks: first ___ of each month","a":["Saturday"]}]},{"id":"L3a","part":3,"title":"Transport survey project","tid":"Proyek survei transportasi","acc":"gb","sp":{"T":["Tutor","f",1],"K":["Kate","f",0],"J":["James","m",0]},"inst":"Choose A, B or C, or write NO MORE THAN TWO WORDS AND/OR A NUMBER.","lines":[["T","So, Kate and James, how's the transport survey going?"],["J","Mostly well. Designing the questions was easy, actually, thanks to the template you gave us."],["K","The hard part was [[1:getting people to stop and answer]]. Most people just walked straight past us."],["T","That's very common. And you're still surveying at the train station?"],["J","No, we moved to the student union. [[2:The station manager wouldn't give us permission]] to stay there, even though it was a great spot."],["T","That's a pity, but the union is fine. Have you thought about [[3:adding an online version]]? You'd reach far more people that way."],["K","That's a good idea. We could share the link on the student forum."],["T","So what have you found so far?"],["K","Well, only [[4:18]] percent of respondents cycle to campus.","Well, only eighteen percent of respondents cycle to campus."],["J","And when we asked why not, the main answer was the lack of safe [[5:lanes]]. Cost and weather came much lower down."],["T","Interesting. And the bus questions?"],["J","Honestly, [[6:I didn't expect the bus results at all]]. Almost half of the students take the bus every day."],["K","I'm not sure it's that surprising, James. It's cheap with a student card."],["T","Well, you can discuss that in your report. Who's doing what next?"],["K","[[7:I'll make the charts]] this week, and James is writing the introduction."],["T","Good. Now, the draft was due on Monday, but I can give you until [[8:Friday]]."],["J","That would really help, thank you."],["T","Remember, the final report should be around [[9:3,000]] words, not including the appendix.","Remember, the final report should be around three thousand words, not including the appendix."],["K","And will you comment on the whole draft?"],["T","There won't be time for that, I'm afraid. [[10:I'll focus on your methodology section]], since that's where most groups lose marks."]],"qs":[{"q":"What did the students find most difficult?","o":["finding people to take part","designing the questions","analysing the data"],"a":0},{"q":"Why did they change the survey location?","o":["the station was too noisy","they needed more cyclists","they were refused permission"],"a":2},{"q":"The tutor suggests that they","o":["reduce the number of questions","add an online version","interview fewer people"],"a":1},{"q":"Respondents who cycle to campus: ___%","a":["18","eighteen"]},{"q":"Main reason for not cycling: lack of safe ___","a":["lanes","cycle lanes","bike lanes"]},{"q":"James thinks the bus results are","o":["unreliable","incomplete","surprising"],"a":2},{"q":"What will Kate do next?","o":["write the introduction","make the charts","contact the council"],"a":1},{"q":"New deadline for the draft: ___","a":["Friday"]},{"q":"Final report length: about ___ words","a":["3000","3,000","three thousand"]},{"q":"The tutor will give feedback on","o":["the methodology only","the whole draft","the presentation slides"],"a":0}]},{"id":"L3b","part":3,"title":"Planning a presentation","tid":"Merencanakan presentasi","acc":"gb","sp":{"P":["Priya","f",0],"L":["Liam","m",0,"au"]},"inst":"Choose A, B or C, or write NO MORE THAN TWO WORDS AND/OR A NUMBER.","lines":[["P","So, Liam, remind me why you wanted to do marine plastic in the first place?"],["L","Our lecturer mentioned it once, but what really got me was [[1:a documentary I watched last summer]] about seabirds. I couldn't stop thinking about it."],["P","Fair enough. I've read our first draft again, and honestly, I don't think it's too long. My problem is that [[2:we make big claims without enough evidence]]."],["L","Yeah, that's fair. Most of it was just our opinion."],["P","We should lean on that report by the [[3:Marlow]] Foundation. That's M, A, R, L, O, W."],["L","Good idea. They say packaging makes up about [[4:40]] percent of all plastic produced.","Good idea. They say packaging makes up about forty percent of all plastic produced."],["P","That's the figure that shocked me. So, solutions. Banning plastic bags has been done to death."],["L","And biodegradable plastic is complicated. It doesn't break down in the ocean as easily as people think."],["P","Then [[5:let's focus on deposit schemes]], where you get money back for returning bottles. There's good data from Germany."],["L","Agreed. My only worry is that [[6:half the class has probably heard all these facts already]]."],["P","And we've only got [[7:15]] minutes, so it needs to be tight. What about opening with a short video?","And we've only got fifteen minutes, so it needs to be tight. What about opening with a short video?"],["L","Videos always take ages to load in that room. [[8:Why don't we open by asking the audience a question]]? Like how many plastic bottles they bought this week."],["P","I like that. It gets them involved straight away. Shall we practise together before the day?"],["L","How about [[9:Tuesday]] afternoon? I've got lectures all day Monday."],["P","Tuesday works. I'll book Room [[10:B12]] in the library.","Tuesday works. I'll book Room B twelve in the library."]],"qs":[{"q":"Why did Liam choose the topic?","o":["he read a news article","his lecturer suggested it","he saw a documentary"],"a":2},{"q":"Priya thinks their first draft","o":["was too long","lacked evidence","was too technical"],"a":1},{"q":"Main source: a report by the ___ Foundation","a":["Marlow"]},{"q":"Packaging is about ___% of all plastic produced","a":["40","forty"]},{"q":"Which solution will they focus on?","o":["deposit schemes","banning plastic bags","biodegradable plastic"],"a":0},{"q":"Liam is worried that the audience will","o":["already know the facts","find the topic depressing","ask difficult questions"],"a":0},{"q":"Presentation length: ___ minutes","a":["15","fifteen"]},{"q":"They will start the presentation with","o":["a short video","a question to the audience","a surprising statistic"],"a":1},{"q":"Practice session: ___ afternoon","a":["Tuesday"]},{"q":"Practice room: Room ___","a":["B12"]}]},{"id":"L4a","part":4,"title":"Sleep and memory","tid":"Kuliah: tidur dan ingatan","acc":"gb","sp":{"L":["Lecturer","m",1]},"inst":"Complete the notes. Write ONE WORD AND/OR A NUMBER for each answer.","lines":[["L","Good afternoon. Today I'd like to look at the relationship between sleep and memory, a topic that matters to every student in this room."],["L","When we experience something new, the memory is first stored in a small area of the brain called the [[1:hippocampus]]. You can think of it as a temporary inbox."],["L","The hippocampus has limited space, however. During deep sleep, memories are gradually transferred to the [[2:cortex]], where they can be stored for the long term."],["L","One well-known type of experiment shows this clearly. Participants learn a list of [[3:words]] in the evening. Half of them then sleep, while the other half stay awake."],["L","In studies like this, the group who slept typically remembered around [[4:20]] percent more the next morning.","In studies like this, the group who slept typically remembered around twenty percent more the next morning."],["L","Dreaming, or REM sleep, seems to play a different role. Researchers believe it is especially important for [[5:creative]] thinking, such as finding new connections between ideas."],["L","This has clear consequences for exam preparation. Students who stay up all night before an exam may lose up to [[6:40]] percent of what they learned that day.","This has clear consequences for exam preparation. Students who stay up all night before an exam may lose up to forty percent of what they learned that day."],["L","What about naps? Short naps can be very effective, but they should be kept under [[7:30]] minutes.","What about naps? Short naps can be very effective, but they should be kept under thirty minutes."],["L","If you sleep longer than that, you may wake up feeling groggy and confused. This is known as sleep [[8:inertia]], and it can last for up to half an hour."],["L","Another common problem is using phones or laptops late at night. The light from screens delays the release of [[9:melatonin]], the hormone that makes us feel sleepy."],["L","So my main advice is simple. Keep a regular [[10:schedule]], going to bed and waking up at the same time, even at weekends. Your memory will thank you."]],"qs":[{"q":"New memories are first stored in the ___","a":["hippocampus"]},{"q":"In deep sleep, memories move to the ___","a":["cortex"]},{"q":"Participants learned a list of ___","a":["words"]},{"q":"The sleep group remembered about ___% more","a":["20","twenty"]},{"q":"REM sleep helps ___ thinking","a":["creative"]},{"q":"Staying up all night: lose up to ___% of new learning","a":["40","forty"]},{"q":"Naps should be under ___ minutes","a":["30","thirty"]},{"q":"Feeling groggy after a long nap: sleep ___","a":["inertia"]},{"q":"Screen light delays the release of ___","a":["melatonin"]},{"q":"Advice: keep a regular ___","a":["schedule"]}]},{"id":"L4b","part":4,"title":"Urban heat islands","tid":"Kuliah: pulau panas perkotaan","acc":"us","sp":{"L":["Lecturer","f",0]},"inst":"Complete the notes. Write ONE WORD AND/OR A NUMBER for each answer.","lines":[["L","Today's topic is the urban heat island effect, which simply means that cities are warmer than the countryside around them."],["L","On a summer evening, a large city can be up to [[1:seven]] degrees Celsius warmer than nearby rural areas."],["L","The main cause is the materials we build with. Dark surfaces, such as roads and [[2:roofs]], absorb sunlight during the day and release that heat slowly at night."],["L","Cities also have fewer [[3:trees]]. Trees provide shade, but they also cool the air through evaporation from their leaves."],["L","On top of that, [[4:traffic]] and air conditioners pump extra heat into the streets."],["L","This isn't just uncomfortable. During heat waves, hospitals see many more visits from [[5:elderly]] people, who are especially vulnerable."],["L","So what can be done? One of the cheapest solutions is painting roofs [[6:white]], so that they reflect sunlight instead of absorbing it."],["L","In some trials, this has lowered temperatures on the top floor by about [[7:three]] degrees."],["L","Another option is green roofs, which are covered with [[8:plants]]. They're more expensive, but they also absorb rainwater."],["L","Some cities are now testing cool [[9:pavements]], which use lighter materials that stay cooler in the sun."],["L","Finally, tree planting matters, but where you plant matters too. Many cities now focus on [[10:poorer]] neighborhoods, which often have the fewest trees and the hottest streets."]],"qs":[{"q":"Cities can be up to ___ degrees warmer","a":["7","seven"]},{"q":"Dark surfaces: roads and ___","a":["roofs"]},{"q":"Fewer ___ means less shade and cooling","a":["trees"]},{"q":"Extra heat from ___ and air conditioners","a":["traffic"]},{"q":"Heat waves: more hospital visits by ___ people","a":["elderly"]},{"q":"Cheap solution: paint roofs ___","a":["white"]},{"q":"Top-floor temperature drop: about ___ degrees","a":["3","three"]},{"q":"Green roofs are covered with ___","a":["plants"]},{"q":"Cool ___ use lighter materials","a":["pavements","pavement"]},{"q":"Tree planting focus: ___ neighbourhoods","a":["poorer"]}]}]</script>
 <script>
 (function(){
 "use strict";
@@ -841,12 +886,12 @@ function vHari(){
   for(i=6;i>=0;i--){k=addDays(t,-i);wk+='<div class="'+(active(k)?"on":"")+(i===0?" now":"")+'">'+PLAN[parse(k).getDay()].d.slice(0,3)+'</div>'}
   var kind=nextKind(),resume=S.ss&&S.ss.ids?S.ss:null,total=diff(START,END)+1,dn=t<START?0:Math.min(total,diff(START,t)+1);
   var when=p.d+', '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+(dn?' &middot; hari ke-'+dn+' dari '+total:' &middot; mulai '+parse(START).getDate()+'/'+(parse(START).getMonth()+1));
-  var qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
+  var lsd=p.f==="Listening"&&!(S.ss&&S.ss.ids)?lsNext():null,qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
   var sq=qstat(null,"all");
   var prog=["vocab","grammar","reading","makna"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+(st.seen?st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n):'belum mulai &middot; '+st.tot+' soal')+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("");
   return tgtCard()
    +'<section class="hero"><div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p><p class="when">'+when+' &middot; <button class="lnk tgtbtn" data-tgt type="button">target band '+S.target+'</button></p></div>'
-   +'<div class="hero-act"><button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button><p class="hint">'+(resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
+   +'<div class="hero-act">'+(lsd?'<button class="btn amber cta-main" data-lsgo="'+lsd.id+'">Mulai Listening: '+esc(lsd.title)+'</button>':'<button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button>')+'<p class="hint">'+(lsd?'10 soal, audio langsung bisa diputar.':resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
    +'<dl class="strip panel"><div><dt>Streak</dt><dd>'+streak()+'<small> hari</small></dd></div><div><dt>Kartu menunggu</dt><dd>'+n+'</dd></div><div><dt>Kata dikuasai</dt><dd>'+mastered()+'<small>/'+VOCAB.length+'</small></dd></div><div><dt>Soal dikerjakan</dt><dd>'+sq.seen+'<small>/'+BANK.length+'</small></dd></div></dl>'
    +'<div class="grid g2" style="margin-top:16px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:12px 0 0">Hari aktif: kartu atau soal dikerjakan, atau ditandai selesai.</p></div>'
    +'<div class="panel"><h2>Progres soal</h2>'+prog+'</div></div>';
@@ -3358,6 +3403,7 @@ function formOf(G,it,orig){return G.l[orig]||(it.k==="grammar"?autoForm(it.o[ori
 function blankify(s,fill){return esc(s).replace(/_{3,}/g,fill?'<span class="fill">'+esc(fill)+'</span>':'<span class="blank"></span>')}
 
 function vSoal(){
+  if(state.lsv)return lsView();
   state.ql=state.ql||"all";
   if(!qs)return soalMenu();
   return qs.done?soalDone():soalQ();
@@ -3372,6 +3418,7 @@ function soalMenu(){
       +'<div class="acc"><span>Akurasi</span><b>'+pct(st.c,st.n)+'</b></div>'+(k==="reading"?'<label class="tmr"><input type="checkbox" id="tmChk"'+(state.timed?" checked":"")+'> Berwaktu 20 menit</label>':"")
       +'<button class="btn'+(k===nextKind()?'':' ghost')+'" data-start="'+k+'"'+(st.tot?"":" disabled")+'>'+(k===nextKind()?'Mulai sesi (disarankan hari ini)':'Mulai sesi')+'</button></div></div>';
   });
+  cards+=lsCard();
   if(b2.n<15)hint="Mulai dari level B2 atau Campur. Setelah akurasi B2 stabil di atas 80%, pindah ke C1.";
   else if(b2.c/b2.n>=0.8)hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Sudah siap mencoba level C1.";
   else hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Perkuat B2 dulu, lalu naik ke C1.";
@@ -3428,6 +3475,7 @@ function soalDone(){
     +(wrong?'<h2 style="margin:22px 0 4px;font-size:20px">Yang perlu diulang ('+(n-c)+')</h2>'+wrong:'<p class="small" style="margin:14px 0 0">Semua benar.</p>')+'</div>';
 }
 function bindSoal(){
+  lsBind();
   var $=function(id){return document.getElementById(id)};
   document.querySelectorAll("[data-start]").forEach(function(b){b.onclick=function(){startQuiz(b.dataset.start);render()}});
   document.querySelectorAll("[data-opt]").forEach(function(b){b.onclick=function(){answer(+b.dataset.opt)}});
@@ -3441,6 +3489,176 @@ function bindSoal(){
 }
 
 window.JI={bid:function(i){return BID[i]},all:function(){return BANK},gm:gm,gx:gx,vx:vxm,set:function(ids){qs.items=ids.map(function(i){return BID[i]}).concat(qs.items.slice(ids.length));qs.perm=makePerm(qs.items[0]);render()}};
+/* ===== Listening: 8 set bergaya IELTS, audio MP3 neural dengan cadangan suara perangkat ===== */
+var LSETS=[];try{LSETS=JSON.parse(document.getElementById("lsdata").textContent)}catch(e){}
+var LSID={};LSETS.forEach(function(x){LSID[x.id]=x});
+var LPART=["","Percakapan sehari-hari","Monolog situasi umum","Diskusi akademik","Kuliah akademik"];
+var LACC={gb:"Inggris Britania",au:"Inggris Australia",us:"Inggris Amerika"};
+function lsStrip(t){return String(t).replace(/\[\[\d+:([^\]]+)\]\]/g,"$1")}
+function lsSpoken(l){return l[2]||lsStrip(l[1])}
+function lsRec(id){return (S.lq||{})[id]||null}
+function lsNext(){var i,w=null;for(i=0;i<LSETS.length;i++)if(!lsRec(LSETS[i].id))return LSETS[i];
+  LSETS.forEach(function(x){var r=lsRec(x.id),rw=w&&lsRec(w.id);if(!w||r.best/r.n<rw.best/rw.n)w=x});return w}
+function lsUrl(set,i){return "audio/"+set.id+"/"+pad(i+1)+".mp3"}
+function lsAccOf(set,code){var sp=set.sp[code]||[];return sp[3]||set.acc}
+
+/* pemutar */
+var LP={set:null,i:0,playing:false,started:false,played:false,src:null,el:null,pre:[],rate:1,token:0};
+function lsOpen(id){lsStop();var set=LSID[id];if(!set)return;
+  LP={set:set,i:0,playing:false,started:false,played:false,src:null,el:null,pre:[],rate:1,token:0};
+  state.lsv=id;state.lsChk=false;state.lsAns=state.lsAns||{};state.lsAns[id]=state.lsAns[id]||{};state.lsMode=state.lsMode||"latihan";
+  var a=new Audio(),done=false;
+  function fin(ok){if(done||LP.set!==set)return;done=true;LP.src=ok?"mp3":"tts";
+    if(ok)LP.pre=set.lines.map(function(_,i){var p=new Audio();p.preload="auto";p.src=lsUrl(set,i);return p});lsPaint()}
+  a.preload="auto";a.oncanplaythrough=function(){fin(true)};a.onloadeddata=function(){fin(true)};a.onerror=function(){fin(false)};
+  try{a.src=lsUrl(set,0);a.load()}catch(e){fin(false)}
+  setTimeout(function(){fin(false)},5000);
+}
+function lsStop(){LP.token++;LP.playing=false;if(LP.el){try{LP.el.pause()}catch(e){}}try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function lsPlay(from){
+  var set=LP.set;if(!set)return;
+  if(!LP.el){LP.el=new Audio()}
+  var tok=++LP.token;LP.playing=true;LP.started=true;LP.i=from||0;
+  try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+  (function step(){
+    if(tok!==LP.token)return;
+    if(LP.i>=set.lines.length){LP.playing=false;LP.played=true;lsPaint();return}
+    lsPaint();
+    var l=set.lines[LP.i],next=function(){if(tok!==LP.token)return;LP.i++;setTimeout(step,420)};
+    if(LP.src==="mp3"){
+      var a=LP.el,fell=false,fb=function(){if(fell||tok!==LP.token)return;fell=true;ttsLine(l,next)};
+      a.onended=next;a.onerror=fb;a.src=lsUrl(set,LP.i);a.defaultPlaybackRate=LP.rate;a.playbackRate=LP.rate;
+      var p=a.play();if(p&&p.catch)p.catch(fb);
+    }else ttsLine(l,next);
+  })();
+}
+var LFEM=/sonia|libby|maisie|aria|jenny|ava|emma|michelle|natasha|annette|samantha|karen|serena|kate|female|zira|hazel|susan|catherine|tessa|moira|fiona|victoria|allison|google us english/i,
+    LMAL=/ryan|thomas|guy|davis|christopher|andrew|brian|william|daniel|\bmale\b|david|george|mark|james|alex|fred|oliver|arthur|rishi|lee/i;
+function lsVoice(acc,g,n){
+  var vs=voices(),want=acc==="gb"?/^en[-_]GB/i:acc==="au"?/^en[-_]AU/i:/^en[-_]US/i,re=g==="m"?LMAL:LFEM,
+    by=function(a,b){return vScore(b)-vScore(a)},
+    c=vs.filter(function(v){return want.test(v.lang)&&re.test(v.name)}).sort(by);
+  if(!c.length)c=vs.filter(function(v){return re.test(v.name)}).sort(by);
+  var v=c.length?c[Math.min(n||0,c.length-1)]:null,pitch=1;
+  if(!v){v=pickVoice();pitch=g==="m"?0.85:1.12}
+  return{v:v,lang:v?v.lang:(acc==="gb"?"en-GB":acc==="au"?"en-AU":"en-US"),pitch:pitch};
+}
+function ttsLine(l,cb){
+  var set=LP.set,tok=LP.token,sp=set.sp[l[0]]||["","f",0],t=lsSpoken(l),parts=t.match(/[^.!?]+[.!?]*/g)||[t],k=0;
+  if(!window.speechSynthesis){setTimeout(cb,1500);return}
+  var vo=lsVoice(lsAccOf(set,l[0]),sp[1],sp[2]);
+  (function nx(){
+    if(tok!==LP.token)return;
+    if(k>=parts.length){cb();return}
+    var txt=parts[k++].trim(),u=new SpeechSynthesisUtterance(txt),fired=false,go=function(){if(fired)return;fired=true;clearTimeout(LP.wd);nx()};
+    if(vo.v)u.voice=vo.v;u.lang=vo.lang;u.pitch=vo.pitch;u.rate=LP.rate*0.96;
+    u.onend=go;u.onerror=go;LP.utt=u;
+    clearTimeout(LP.wd);LP.wd=setTimeout(go,(txt.split(/s+/).length/2.2/(LP.rate*0.96))*1000+2500);
+    speechSynthesis.speak(u);
+  })();
+}
+function lsPaint(){
+  var set=LP.set,b=document.getElementById("lsPlay");if(!set||!b||state.lsv!==set.id)return;
+  var ex=state.lsMode==="ujian",n=set.lines.length,st=document.getElementById("lsStat"),bar=document.getElementById("lsBar"),src=document.getElementById("lsSrc"),rs=document.getElementById("lsRestart");
+  if(ex){b.disabled=LP.started;b.textContent=LP.played?"Audio sudah diputar sekali":LP.playing?"Sedang diputar...":"Putar audio (sekali)"}
+  else{b.disabled=false;b.textContent=LP.playing?"Jeda":LP.played?"Putar ulang":LP.started?"Lanjutkan":"Putar audio"}
+  if(rs)rs.hidden=ex||!LP.started;
+  if(st)st.textContent=LP.played?"Selesai":LP.started?"Bagian "+Math.min(LP.i+1,n)+" dari "+n:"Belum diputar";
+  if(bar)bar.style.width=(LP.played?100:Math.round(Math.min(LP.i,n)/n*100))+"%";
+  if(src)src.textContent=LP.src==="mp3"?"Sumber suara: rekaman neural (MP3).":LP.src==="tts"?"Sumber suara: suara perangkat, karena file audio belum tersedia. Paling natural di Microsoft Edge.":"Memeriksa file audio...";
+  document.querySelectorAll(".lsmode button").forEach(function(x){x.disabled=LP.started});
+}
+
+/* jawaban */
+function lsNorm(s){return String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:"£$%]/g," ").replace(/\s+/g," ").trim().replace(/^(a|an|the|his|her|my|some) /,"")}
+function lsOk(q,v){if(q.o)return v!==undefined&&v!==""&&+v===q.a;var n=lsNorm(v);if(!n)return false;
+  return q.a.some(function(a){var x=lsNorm(a);return n===x||n.replace(/[\s-]/g,"")===x.replace(/[\s-]/g,"")})}
+function lev(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++){d[i]=[i]}for(j=1;j<=n;j++)d[0][j]=j;
+  for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+function lsCheck(){
+  var set=LP.set,ans=state.lsAns[set.id],ok=0,dd=day();
+  set.qs.forEach(function(q,i){var v=ans[i],r=lsOk(q,v);if(r){ok++;return}
+    var t=q.o?"Terkecoh distraktor":(lsNorm(v)&&q.a.some(function(a){return lev(lsNorm(v),lsNorm(a))<=2})?"Salah ejaan":/\d/.test(q.a[0])?"Angka atau nama tidak tertangkap":"Hilang fokus");
+    S.errors.push({d:today(),s:"Listening",t:t,n:set.title+" Q"+(i+1)+": "+q.q.replace("___","...")})});
+  if(S.errors.length>100)S.errors.splice(0,S.errors.length-100);
+  S.lq=S.lq||{};var r=S.lq[set.id]||{best:0,n:set.qs.length,tries:0};
+  r.best=Math.max(r.best,ok);r.n=set.qs.length;r.tries++;r.last=today();r.lastScore=ok;S.lq[set.id]=r;
+  dd.quiz=(dd.quiz||0)+set.qs.length;
+  state.lsChk=true;save();
+}
+
+/* tampilan */
+function lsCard(){
+  var done=LSETS.filter(function(x){return lsRec(x.id)}).length,tot=LSETS.length,ok=0,n=0,nx=lsNext();
+  LSETS.forEach(function(x){var r=lsRec(x.id);if(r){ok+=r.best;n+=r.n}});
+  var rec=PLAN[new Date().getDay()].f==="Listening";
+  return '<div class="panel mode" style="--c:#2E7D8C"><div class="bandt"></div><div class="bd"><h3>Listening</h3><p class="small" style="margin:0">Dengar dan jawab. Empat bagian seperti tes IELTS: percakapan, monolog, diskusi, dan kuliah. '+tot+' set, 10 soal per set.</p>'
+   +(done?'<div class="big"><b>'+done+'/'+tot+'</b><span>set sudah dikerjakan<br>skor terbaik '+pct(ok,n)+'</span></div>':'<div class="big"><b>'+tot+'</b><span>set siap didengar<br>belum ada yang dikerjakan</span></div>')
+   +'<div class="meter" aria-hidden="true"><i style="width:'+Math.round(done/tot*100)+'%"></i></div>'
+   +'<div class="row" style="margin-top:auto"><button class="btn'+(rec?'':' ghost')+'" data-lsopen="'+(nx?nx.id:"")+'">'+(rec?'Mulai (disarankan hari ini)':'Mulai set berikutnya')+'</button><button class="btn ghost" data-lsv="list">Semua set</button></div></div></div>';
+}
+function lsList(){
+  var h='<div class="panel lshead"><div><h2 style="margin:0 0 4px">Listening</h2><p class="small" style="margin:0">Naskah ditulis sendiri dengan gaya IELTS, bukan soal resmi. Audio memakai suara neural; jika file audio belum ada, suara perangkat dipakai.</p></div><button class="btn ghost" id="lsBack">Kembali ke menu soal</button></div>';
+  for(var p=1;p<=4;p++){
+    var rows=LSETS.filter(function(x){return x.part===p}).map(function(x){var r=lsRec(x.id);
+      return '<div class="lsrow"><div class="lsrt"><b>'+esc(x.title)+'</b><span class="small">'+esc(x.tid)+' &middot; '+LACC[x.acc]+'</span></div><span class="mono lssc">'+(r?r.best+'/'+r.n:'Belum')+'</span><button class="btn'+(r?' ghost':'')+'" data-lsopen="'+x.id+'">'+(r?'Ulangi':'Mulai')+'</button></div>'}).join("");
+    h+='<section class="panel lspart"><h3>Part '+p+' <span class="small">'+LPART[p]+'</span></h3>'+rows+'</section>';
+  }
+  return h;
+}
+function lsGap(q,i,val,dis,cls){
+  var inp='<input type="text" class="lsin'+(cls||"")+'" id="lsA'+i+'" data-lsi="'+i+'" value="'+esc(val||"")+'" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Jawaban nomor '+(i+1)+'"'+(dis?" disabled":"")+'>';
+  var parts=esc(q.q).split("___");
+  return parts.length>1?parts[0]+inp+parts.slice(1).join("___"):esc(q.q)+' '+inp;
+}
+function lsView(){
+  if(state.lsv==="list")return lsList();
+  var set=LSID[state.lsv];if(!set){state.lsv="list";return lsList()}
+  var ans=state.lsAns[set.id]||{},chk=state.lsChk,ex=state.lsMode==="ujian",score=0;
+  var qh=set.qs.map(function(q,i){
+    var v=ans[i],ok=chk&&lsOk(q,v),body;
+    if(q.o)body='<div class="lsq-t">'+esc(q.q)+'</div><div class="lsopts" role="radiogroup" aria-label="Pilihan nomor '+(i+1)+'">'+q.o.map(function(o,k){var on=v!==undefined&&v!==""&&+v===k;
+      return '<label class="lsopt'+(chk&&k===q.a?" right":"")+(chk&&on&&k!==q.a?" wrong":"")+'"><input type="radio" name="lsq'+i+'" value="'+k+'" data-lsr="'+i+'"'+(on?" checked":"")+(chk?" disabled":"")+'><span><b>'+"ABC".charAt(k)+'</b> '+esc(o)+'</span></label>'}).join("")+'</div>';
+    else body='<div class="lsq-t">'+lsGap(q,i,v,chk,chk?(ok?" ok":" no"):"")+'</div>';
+    if(chk){if(ok)score++;body+='<div class="lsres '+(ok?"ok":"no")+'">'+(ok?icoOk():icoNo())+'<span>'+(ok?'Benar.':'Jawaban: <b>'+esc(q.o?"ABC".charAt(q.a)+" "+q.o[q.a]:q.a[0])+'</b>'+(q.o||!q.a[1]?'':' <span class="small">(diterima juga: '+esc(q.a.slice(1,4).join(", "))+')</span>'))+'</span></div>'}
+    return '<li class="'+(chk?(ok?"ok":"no"):"")+'"><span class="lsn">'+(i+1)+'</span><div>'+body+'</div></li>';
+  }).join("");
+  var tr="";
+  if(chk)tr='<details class="more lstr" open><summary>Transkrip</summary><div class="lstx">'+set.lines.map(function(l){var sp=set.sp[l[0]]||[l[0]];
+    return '<p><b>'+esc(sp[0])+'</b> '+esc(l[1]).replace(/\[\[(\d+):([^\]]+)\]\]/g,function(_,n,t){return '<mark><sup>'+n+'</sup>'+t+'</mark>'})+'</p>'}).join("")+'</div></details>';
+  return '<div class="case lscase"><div class="case-h"><div class="case-t">Listening Part '+set.part+'</div><div class="row" style="gap:8px"><span class="chip">'+LACC[set.acc]+'</span><span class="chip mono">'+set.qs.length+' soal</span><button class="btn ghost" id="lsExit" style="padding:5px 12px;font-size:13px">Keluar</button></div></div>'
+    +'<h2 class="lst">'+esc(set.title)+'</h2><p class="small" style="margin:2px 0 14px">'+esc(set.tid)+' &middot; '+LPART[set.part]+'</p>'
+    +'<div class="lsbox"><div class="seg lsmode" role="group" aria-label="Mode"><button data-lsmode="latihan" aria-pressed="'+!ex+'">Latihan</button><button data-lsmode="ujian" aria-pressed="'+ex+'">Ujian</button></div>'
+    +'<p class="small" style="margin:0 0 12px">'+(ex?'Audio diputar sekali tanpa jeda, seperti tes asli. Baca soal dulu sebelum menekan putar.':'Audio bisa dijeda, diulang, dan diperlambat.')+'</p>'
+    +'<div class="lsplayer"><button class="btn" id="lsPlay" type="button">Putar audio</button>'+(ex?'':'<button class="btn ghost" id="lsRestart" type="button" hidden>Dari awal</button><button class="btn ghost" id="lsSlow" type="button" aria-pressed="'+(LP.rate<1)+'">Pelan 0,85&times;</button>')
+    +'<span class="small" id="lsStat" aria-live="polite"></span></div><div class="lsbar" aria-hidden="true"><i id="lsBar"></i></div><p class="small" id="lsSrc" style="margin:8px 0 0"></p></div>'
+    +'<p class="lsinst">'+esc(set.inst)+'</p><ol class="lsq">'+qh+'</ol>'
+    +(chk?'<div class="panel lsscore"><div class="ring" style="--p:'+Math.round(score/set.qs.length*100)+'"><b>'+score+'/'+set.qs.length+'</b></div><div><p style="margin:0 0 6px;font-weight:700">'+(score>=9?'Sangat baik. Setara band tinggi untuk bagian ini.':score>=6?'Cukup baik. Lihat transkrip di bagian yang salah.':'Masih perlu latihan. Putar ulang sambil membaca transkrip.')+'</p><p class="small" style="margin:0">Jawaban yang salah tercatat di tab Kesalahan. Skor ini bukan konversi band resmi.</p><div class="row" style="margin-top:12px"><button class="btn" id="lsAgain">Kerjakan ulang</button><button class="btn ghost" data-lsv="list">Set lain</button></div></div></div>'+tr
+      :'<div class="nextbar"><button class="btn" id="lsCheckBtn">Periksa jawaban</button><span class="small">Ejaan harus tepat; huruf besar/kecil tidak dihitung.</span></div>')
+    +'</div>';
+}
+function lsBind(){
+  var $=function(id){return document.getElementById(id)};
+  document.querySelectorAll("[data-lsopen]").forEach(function(b){b.onclick=function(){if(!b.dataset.lsopen)return;lsOpen(b.dataset.lsopen);render();window.scrollTo(0,0)}});
+  document.querySelectorAll("[data-lsv]").forEach(function(b){b.onclick=function(){lsStop();state.lsv=b.dataset.lsv;render();window.scrollTo(0,0)}});
+  if($("lsBack"))$("lsBack").onclick=function(){state.lsv=null;render()};
+  if($("lsExit"))$("lsExit").onclick=function(){lsStop();state.lsv="list";render();window.scrollTo(0,0)};
+  document.querySelectorAll("[data-lsmode]").forEach(function(b){b.onclick=function(){if(LP.started)return;state.lsMode=b.dataset.lsmode;render()}});
+  if($("lsPlay"))$("lsPlay").onclick=function(){
+    if(state.lsMode==="ujian"){if(!LP.started)lsPlay(0);return}
+    if(LP.playing){lsStop();lsPaint();return}
+    lsPlay(LP.played?0:LP.i);if(LP.played){LP.played=false}
+  };
+  if($("lsRestart"))$("lsRestart").onclick=function(){lsStop();LP.played=false;lsPlay(0)};
+  if($("lsSlow"))$("lsSlow").onclick=function(){LP.rate=LP.rate<1?1:0.85;this.setAttribute("aria-pressed",LP.rate<1);if(LP.el){LP.el.playbackRate=LP.rate}};
+  document.querySelectorAll("[data-lsi]").forEach(function(x){x.oninput=function(){state.lsAns[state.lsv][+x.dataset.lsi]=x.value}});
+  document.querySelectorAll("[data-lsr]").forEach(function(x){x.onchange=function(){state.lsAns[state.lsv][+x.dataset.lsr]=x.value}});
+  if($("lsCheckBtn"))$("lsCheckBtn").onclick=function(){var b=$("lsCheckBtn"),set=LP.set,ans=state.lsAns[set.id],empty=set.qs.filter(function(_,i){return ans[i]===undefined||ans[i]===""}).length;
+    if(empty&&!b.dataset.armed){b.dataset.armed="1";b.textContent="Masih "+empty+" kosong. Periksa saja?";return}
+    lsStop();lsCheck();render();var s=document.querySelector(".lsscore");if(s&&s.scrollIntoView)s.scrollIntoView({block:"start"})};
+  if($("lsAgain"))$("lsAgain").onclick=function(){state.lsAns[state.lsv]={};lsOpen(state.lsv);render();window.scrollTo(0,0)};
+  lsPaint();
+}
 function vSalah(){
   var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
   var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
@@ -3476,16 +3694,17 @@ function render(){
   var sg="",q;for(q=1;q<=12;q++)sg+='<i class="'+(q<wk.n?"on":q===wk.n?"now":"")+'"></i>';document.getElementById("wkSeg").innerHTML=sg;
   var v=document.getElementById("view");
   v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
-  document.body.classList.toggle("insess",state.tab==="soal"&&!!qs&&!qs.done);
+  document.body.classList.toggle("insess",state.tab==="soal"&&(state.lsv&&state.lsv!=="list"?true:!state.lsv&&!!qs&&!qs.done));
   bind();
 }
-function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
+function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0;lsStop()}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
 
 function bind(){
   var $=function(id){return document.getElementById(id)};
   if(state.tab==="soal")bindSoal();
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  document.querySelectorAll("[data-lsgo]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.tab="soal";lsOpen(b.dataset.lsgo);render();window.scrollTo(0,0)}});
   document.querySelectorAll("[data-quick]").forEach(function(b){b.onclick=function(){quick(b.dataset.quick)}});
   document.querySelectorAll("[data-tgt]").forEach(function(b){b.onclick=function(){state.tgtEdit=true;render()}});
   if($("tgtSave"))$("tgtSave").onclick=function(){S.target=+$("tgtSel").value;S.onb=1;state.tgtEdit=false;save();render()};
@@ -3542,7 +3761,7 @@ document.addEventListener("keydown",function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   var el=document.activeElement,tg=el&&el.tagName;if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(el&&el.isContentEditable))return;
   var k=e.key,onBtn=tg==="BUTTON"||tg==="SUMMARY"||tg==="A";
-  if(state.tab==="soal"&&qs&&!qs.done){
+  if(state.tab==="soal"&&!state.lsv&&qs&&!qs.done){
     if(qs.picked===null){var i="abcd".indexOf(k.toLowerCase());if(i<0&&/^[1-4]$/.test(k))i=+k-1;if(i>=0&&i<qs.perm.length){e.preventDefault();answer(i)}}
     else if(!onBtn&&(k===" "||k==="Enter"||k==="ArrowRight"||k.toLowerCase()==="n")){e.preventDefault();nextQ()}
   }else if(state.tab==="kata"&&state.km==="cards"&&session&&session.i<session.q.length){
