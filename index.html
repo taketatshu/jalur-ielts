@@ -268,6 +268,102 @@ svg text{font-family:var(--f-mono);font-size:11px}
 .wr{border:2px solid var(--edge);border-left:8px solid var(--bad);border-radius:8px;background:var(--surface);padding:12px 14px;margin-top:10px}
 @media (prefers-reduced-motion:reduce){.btn,.opt{transition:none}}
 @media (max-width:520px){.top .in{align-items:flex-start}.wkbox{width:100%}}
+
+/* ===== Penyempurnaan tampilan (hanya CSS: tanpa perubahan isi, struktur, atau perilaku) ===== */
+:root{--grid-soft:color-mix(in srgb,var(--grid) 55%,transparent)}
+html{scrollbar-color:var(--edge) var(--bg);accent-color:var(--accent)}
+::selection{background:var(--amber);color:#0F2040}
+input,textarea{caret-color:var(--accent)}
+
+/* hierarki Hari ini: hero lebih tenang, kartu aksi lebih menonjol, ubin statistik lebih ringan */
+.hero{padding:18px 20px;box-shadow:4px 4px 0 var(--amber);background-size:26px 26px;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)}
+.hero h2{font-size:clamp(24px,5vw,30px);margin:4px 0}
+.hero p{max-width:60ch;line-height:1.5}
+.cta:not(.alt){border-color:var(--accent);box-shadow:5px 5px 0 var(--accent)}
+.cta h2{font-size:clamp(20px,4.5vw,24px)}
+.cta .btn{min-height:48px;padding-inline:22px}
+.stat{box-shadow:2px 2px 0 var(--sh);padding:14px 16px}
+.stat .big{font-size:30px}
+.stat .ic{width:30px;height:30px;top:12px;right:12px}
+
+/* tekstur kotak-kotak lebih halus di belakang konten baca */
+.poster,.case,.flash .face{background-image:linear-gradient(var(--grid-soft) 1px,transparent 1px),linear-gradient(90deg,var(--grid-soft) 1px,transparent 1px)}
+
+/* tipografi: label tidak lebih kecil dari 12px */
+.lbl,th,.field label,.chip,.week div,.vf span,.mx-th,.flash .stub,.vl .fm b,.sums span{font-size:12px}
+.small{font-size:13.5px}
+.lbl{letter-spacing:.08em}
+
+/* target sentuh nyaman (min. 44px) tanpa mengubah tata letak */
+nav button{min-height:44px}
+.lv button,.seg button{min-height:44px}
+.btn{min-height:44px}
+.spk{position:relative}
+.spk::after{content:"";position:absolute;inset:-7px}
+
+/* isyarat gulir pada navigasi di ponsel */
+@media (max-width:720px){
+  nav{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .top{padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:18px}
+  .top h1{font-size:clamp(30px,9vw,40px)}
+}
+
+/* opsi jawaban: tidak hanya bergantung pada warna */
+.opt.right{box-shadow:inset 0 0 0 3px #fff}
+.opt.wrong{text-decoration:line-through;text-decoration-thickness:2px}
+
+/* Kosakata: daftar lebih mudah dipindai (kata, arti, bentuk kata kerja, lafal, contoh) */
+.poster .lead{font-size:14px;margin-bottom:6px}
+.vl li{grid-template-columns:40px 1fr;gap:7px 10px;padding:20px 0}
+.vl .n{font-size:13px;opacity:.8;padding-top:6px}
+.vl .w{font-size:clamp(26px,6vw,34px);line-height:1.1}
+.vl .p{font-size:12px;margin:0 8px;padding:1px 8px;border:1.5px solid var(--line);border-radius:999px;vertical-align:middle}
+.vl .m{font-size:17px;font-weight:600;vertical-align:middle}
+.vl .fm:not(.prn){font-size:13px;line-height:1.7;background:var(--soft);border-radius:6px;padding:6px 10px;justify-self:start;max-width:100%;overflow-wrap:anywhere}
+.vl .fm b{font-size:12px}
+.vl .prn{font-size:13px;gap:8px 18px;margin-top:2px}
+.vl .x{font-size:14.5px;line-height:1.5;font-style:normal;color:var(--ink)}
+.vl .x.tr{font-size:14px;color:var(--muted);margin-top:-4px}
+@media (max-width:520px){.vl li{grid-template-columns:28px 1fr;gap:7px 8px}.vl .n{font-size:12px}}
+
+/* Flashcard: kata jadi fokus, sisi belakang berurutan jelas, tombol nilai lebih mantap */
+.flash{min-height:300px;grid-template-columns:112px 1fr}
+.flash .stub{border-right-color:var(--edge)}
+.flash .stub b{font-size:28px}
+.flash .face{padding:28px 28px;gap:12px}
+.flash .word{font-size:clamp(40px,10vw,64px);line-height:1.02}
+.flash .pos{align-self:flex-start;font-size:12px;padding:1px 10px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface)}
+.flash .mean{font-size:clamp(22px,4.5vw,28px);line-height:1.25;margin-top:4px}
+.flash .fm:not(.prn){align-self:flex-start;font-size:13px;line-height:1.7;background:var(--soft);border-radius:6px;padding:6px 10px;max-width:100%;overflow-wrap:anywhere}
+.flash .fm b{font-size:12px}
+.flash .prn{font-size:13px;gap:8px 18px}
+.flash .ex{font-size:17px;line-height:1.5;color:var(--ink);margin-top:2px}
+.flash .face>.small{font-size:15px;line-height:1.5}
+.rate{gap:12px}
+.rate .btn{min-height:54px;font-size:16px}
+@media (max-width:520px){.flash{grid-template-columns:1fr;min-height:0}.flash .stub{flex-direction:row;border-right:0;border-bottom:3px dashed var(--edge);align-items:center}.flash .stub b{display:inline;font-size:22px;margin-left:6px}.flash .face{padding:22px 18px}}
+
+/* Writing, Speaking, Kesalahan, Sinkron: formulir yang nyaman disentuh dan dibaca */
+textarea,input[type=number],input[type=text],input[type=password],select{min-height:44px;font-size:15px}
+textarea{min-height:260px;font-size:16px}
+::placeholder{color:var(--muted);opacity:.85}
+input[type=checkbox]{width:22px;height:22px;flex:none;margin:0}
+label:has(>input[type=checkbox]){min-height:44px;display:flex;align-items:center;gap:10px;cursor:pointer}
+#prompt{font-size:clamp(20px,4.5vw,24px);line-height:1.3}
+.field label{margin-top:2px}
+select{cursor:pointer}
+
+/* mode gelap: teks gelap di atas hijau/merah muda terang (sebelumnya putih, kontras 1,9-2,4:1) */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.btn.good,.btn.bad,.opt.right,.opt.wrong,.week div.on){color:#0B1524}}
+:root[data-theme="dark"] :is(.btn.good,.btn.bad,.opt.right,.opt.wrong,.week div.on){color:#0B1524}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .opt.right{box-shadow:inset 0 0 0 3px #0B1524}}
+:root[data-theme="dark"] .opt.right{box-shadow:inset 0 0 0 3px #0B1524}
+.kicker,.kicker *,.sync{font-size:12px}
+:root{--good:#177A50}
+
+/* gerak dikurangi: hormati preferensi sistem sepenuhnya */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
