@@ -441,25 +441,28 @@ function load(){var o=null;try{var r=localStorage.getItem(LS);if(r)o=Object.assi
 var GCID="924794401753-r1tt2lk2qlr9sa3dj78t05idaqoucrqs.apps.googleusercontent.com",GFILE="jalur-ielts.json";
 var GD={on:false,fid:null};try{GD.on=localStorage.getItem(LS+"-gd")==="1"}catch(e){}
 var gTok=null,gExp=0,gClient=null,gWait=[],GERR="";
+try{var _gt=JSON.parse(localStorage.getItem(LS+"-gt")||"null");if(_gt&&_gt.e>Date.now()){gTok=_gt.t;gExp=_gt.e}}catch(e){}
+function gHas(){return !!(gTok&&Date.now()<gExp)}
 function gInit(){
   if(gClient)return true;
   if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
   gClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:"https://www.googleapis.com/auth/drive.appdata",
     callback:function(r){var w=gWait;gWait=[];
       if(r&&r.access_token&&google.accounts.oauth2.hasGrantedAllScopes&&!google.accounts.oauth2.hasGrantedAllScopes(r,"https://www.googleapis.com/auth/drive.appdata")){w.forEach(function(x){x[1](new Error("izin Drive tidak diberikan"))})}
-      else if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
+      else if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gt",JSON.stringify({t:gTok,e:gExp}))}catch(e){}try{localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
       else w.forEach(function(x){x[1](new Error(r&&r.error||"auth"))})},
     error_callback:function(e){var w=gWait;gWait=[];w.forEach(function(x){x[1](new Error(e&&e.type||"popup"))})}});
   return true;
 }
 function gReady(){return new Promise(function(res,rej){var n=0;(function t(){if(gInit())return res();if(++n>40)return rej(new Error("gsi"));setTimeout(t,200)})()})}
 function gToken(interactive){
-  if(gTok&&Date.now()<gExp)return Promise.resolve(gTok);
-  return gReady().then(function(){return new Promise(function(res,rej){gWait.push([res,rej]);try{gClient.requestAccessToken({prompt:interactive?"":"none"})}catch(e){gWait=[];rej(e)}})});
+  if(gHas())return Promise.resolve(gTok);
+  if(!interactive)return Promise.reject(new Error("login"));
+  return gReady().then(function(){return new Promise(function(res,rej){gWait.push([res,rej]);try{gClient.requestAccessToken({prompt:""})}catch(e){gWait=[];rej(e)}})});
 }
 function gf(url,o){
   return gToken(false).then(function(t){o=o||{};o.headers=Object.assign({Authorization:"Bearer "+t},o.headers||{});return fetch(url,o)})
-    .then(function(r){if(r.status===401){gTok=null}if(!r.ok)return r.text().then(function(t){var m="";try{m=JSON.parse(t).error.message||""}catch(e){}throw new Error("http "+r.status+(m?" - "+m:""))});return r});
+    .then(function(r){if(r.status===401){gTok=null;gExp=0;try{localStorage.removeItem(LS+"-gt")}catch(e){}}if(!r.ok)return r.text().then(function(t){var m="";try{m=JSON.parse(t).error.message||""}catch(e){}throw new Error("http "+r.status+(m?" - "+m:""))});return r});
 }
 function gFind(){
   if(GD.fid)return Promise.resolve(GD.fid);
@@ -482,23 +485,23 @@ function driveCall(body){
   }).then(function(){return{ok:true}});
 }
 function gLogin(){return gToken(true).then(function(){GD.fid=null;return pull()})}
-function gLogout(){try{if(gTok&&window.google)google.accounts.oauth2.revoke(gTok,function(){})}catch(e){}gTok=null;GD.on=false;GD.fid=null;try{localStorage.removeItem(LS+"-gd")}catch(e){}setSync("off")}
+function gLogout(){try{if(gTok&&window.google)google.accounts.oauth2.revoke(gTok,function(){})}catch(e){}gTok=null;gExp=0;GD.on=false;GD.fid=null;try{localStorage.removeItem(LS+"-gd");localStorage.removeItem(LS+"-gt")}catch(e){}setSync("off")}
 try{localStorage.removeItem(LS+"-sync")}catch(e){}
 function syncOn(){return GD.on}
 var saveT=null,saving=false,dirty=false;
 function save(){S.updated=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,900)}
-function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Masuk Google untuk sinkron":"Sinkron belum diatur"}
+function setSync(m){var e=document.getElementById("sync");if(!e)return;e.textContent=m==="ok"?"Tersinkron":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Belum sinkron, tekan Sinkron sekarang":"Sinkron belum diatur"}
 function call(body){return driveCall(body)}
 var flushP=null,lastOk=false;
 function flush(){
   if(saving&&flushP)return flushP;
   if(!syncOn()||!dirty)return Promise.resolve();
   saving=true;dirty=false;setSync("busy");
-  flushP=call({action:"set",updated:S.updated,data:S}).then(function(){lastOk=true;GERR="";setSync("ok")},function(e){lastOk=false;GERR=e&&e.message||"";dirty=true;setSync("fail")}).then(function(){saving=false;flushP=null});
+  flushP=call({action:"set",updated:S.updated,data:S}).then(function(){lastOk=true;GERR="";setSync("ok")},function(e){lastOk=false;GERR=e&&e.message||"";dirty=true;setSync(GERR==="login"?"login":"fail")}).then(function(){saving=false;flushP=null});
   return flushP;
 }
 var lastPull=0;
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&GD.on&&Date.now()-lastPull>15000&&!saving)pull()});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&GD.on&&gHas()&&Date.now()-lastPull>15000&&!saving)pull()});
 function pull(){
   if(!syncOn()){setSync("off");return Promise.resolve()}
   lastPull=Date.now();
@@ -3121,7 +3124,7 @@ function vSalah(){
 }
 function vAtur(){
   var st=document.getElementById("sync")?document.getElementById("sync").textContent:"";
-  var gdUi='<div class="panel"><h2>Sinkron lewat Google Drive</h2><p class="small" style="margin-top:0">Masuk dengan akun Google yang sama di setiap perangkat. Progres disimpan di folder aplikasi pada Drive kamu, tanpa alamat atau kunci. Hanya file milik aplikasi ini yang bisa diakses.</p><p class="small" id="gdSt" style="margin:0 0 10px"><b>'+esc(GD.on?"Terhubung ke Google Drive":"Belum masuk")+'</b></p><div class="row">'+(GD.on?'<button class="btn" id="gdNow">Sinkron sekarang</button><button class="btn ghost" id="gdOut">Keluar</button>':'<button class="btn" id="gdIn">Masuk dengan Google</button>')+'</div><p class="small" id="gdMsg" style="margin:8px 0 0"></p></div>';
+  var gdUi='<div class="panel"><h2>Sinkron lewat Google Drive</h2><p class="small" style="margin-top:0">Masuk dengan akun Google yang sama di setiap perangkat. Progres disimpan di folder aplikasi pada Drive kamu, tanpa alamat atau kunci. Hanya file milik aplikasi ini yang bisa diakses.</p><p class="small" style="margin:0 0 10px">Saat pindah perangkat, tekan <b>Sinkron sekarang</b> dulu sebelum mengerjakan soal, supaya data terbaru tertarik dari Drive.</p><p class="small" id="gdSt" style="margin:0 0 10px"><b>'+esc(GD.on?"Terhubung ke Google Drive":"Belum masuk")+'</b></p><div class="row">'+(GD.on?'<button class="btn" id="gdNow">Sinkron sekarang</button><button class="btn ghost" id="gdOut">Keluar</button>':'<button class="btn" id="gdIn">Masuk dengan Google</button>')+'</div><p class="small" id="gdMsg" style="margin:8px 0 0"></p></div>';
   return '<div class="grid g2">'+gdUi+''
    +'<div class="panel"><h2>Cadangan manual</h2><p class="small" style="margin-top:0">Unduh semua progres sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn ghost" id="bkOut">Unduh cadangan</button><label class="btn ghost" for="bkIn" style="display:inline-block">Pulihkan dari file</label><input id="bkIn" type="file" accept="application/json,.json" hidden></div><p class="small" id="bkMsg" style="margin:8px 0 0"></p></div></div>';
 }
@@ -3185,7 +3188,7 @@ function bind(){
 
 render();
 setSync(syncOn()?"busy":"off");
-if(GD.on){gToken(false).then(function(){return pull()}).catch(function(){setSync("login")})}else pull();
+if(GD.on){if(gHas())pull();else setSync("login")}else setSync("off");
 })();
 </script>
 
