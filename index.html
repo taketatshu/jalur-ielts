@@ -446,7 +446,8 @@ function gInit(){
   if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
   gClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:"https://www.googleapis.com/auth/drive.appdata",
     callback:function(r){var w=gWait;gWait=[];
-      if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
+      if(r&&r.access_token&&google.accounts.oauth2.hasGrantedAllScopes&&!google.accounts.oauth2.hasGrantedAllScopes(r,"https://www.googleapis.com/auth/drive.appdata")){w.forEach(function(x){x[1](new Error("izin Drive tidak diberikan"))})}
+      else if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
       else w.forEach(function(x){x[1](new Error(r&&r.error||"auth"))})},
     error_callback:function(e){var w=gWait;gWait=[];w.forEach(function(x){x[1](new Error(e&&e.type||"popup"))})}});
   return true;
@@ -492,19 +493,22 @@ function call(body){
   return fetch(SYNC.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:SYNC.key},body))})
     .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error||"error");return j});
 }
+var flushP=null,lastOk=false;
 function flush(){
-  if(!syncOn()||saving||!dirty)return;
+  if(saving&&flushP)return flushP;
+  if(!syncOn()||!dirty)return Promise.resolve();
   saving=true;dirty=false;setSync("busy");
-  call({action:"set",updated:S.updated,data:S}).then(function(){setSync("ok")},function(e){GERR=e&&e.message||"";dirty=true;setSync("fail")}).then(function(){saving=false});
+  flushP=call({action:"set",updated:S.updated,data:S}).then(function(){lastOk=true;GERR="";setSync("ok")},function(e){lastOk=false;GERR=e&&e.message||"";dirty=true;setSync("fail")}).then(function(){saving=false;flushP=null});
+  return flushP;
 }
 function pull(){
   if(!syncOn()){setSync("off");return Promise.resolve()}
-  setSync("busy");
+  setSync("busy");lastOk=false;
   return call({action:"get"}).then(function(j){
     if(j.data&&(j.updated||0)>(S.updated||0)){S=normQ(Object.assign(def(),j.data));try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
-    else if((S.updated||0)>(j.updated||0)){dirty=true;flush();return}
-    setSync("ok");
-  }).catch(function(e){GERR=e&&e.message||"";setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
+    else if((S.updated||0)>(j.updated||0)){dirty=true;return flush()}
+    lastOk=true;GERR="";setSync("ok");
+  }).catch(function(e){lastOk=false;GERR=e&&e.message||"";setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
 }
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
 function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done))}
@@ -3159,7 +3163,7 @@ function bind(){
     document.querySelectorAll("[data-edel]").forEach(function(b){b.onclick=function(){if(b.dataset.armed){S.errors.splice(+b.dataset.edel,1);save();render()}else{b.dataset.armed="1";b.textContent="Yakin?"}}});
   }
   if($("gdIn")){$("gdIn").onclick=function(){$("gdMsg").textContent="Membuka jendela Google...";gLogin().then(function(){render()},function(e){$("gdMsg").textContent="Gagal masuk: "+(e&&e.message||"dibatalkan")+". Pastikan pop-up tidak diblokir dan email kamu ada di daftar Test users."})}}
-  if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){dirty=true;return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=document.getElementById("sync").textContent==="Tersinkron"?"Selesai.":"Gagal sinkron"+(GERR?": "+GERR:".")},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
+  if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=lastOk&&!GERR?"Selesai. Data sudah tersimpan di Google Drive.":"Gagal sinkron"+(GERR?": "+GERR:".")},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
   if($("gdOut")){$("gdOut").onclick=function(){gLogout();render()}}
   if($("syoSave")){
     $("syoSave").onclick=function(){
