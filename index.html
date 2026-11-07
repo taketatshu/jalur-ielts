@@ -462,6 +462,9 @@ details.more[open]{padding-bottom:14px}
 @media (max-width:520px){.mk{padding:18px 12px 14px}.mkn li{grid-template-columns:26px 1fr}.mkn li>span:last-child{grid-column:2}}
 
 
+/* ===== Writing/Speaking di menu Soal ===== */
+.svhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:14px}
+.svhead h2{font-size:clamp(24px,5.5vw,30px);order:-1;margin-right:auto}
 /* ===== Listening ===== */
 .btn[hidden]{display:none}
 .lshead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -656,7 +659,7 @@ var PLAN=[ // index = getDay(): 0 Minggu
  {d:"Jumat",f:"Writing Task 1",t:"20 menit deskripsi grafik atau diagram, 20 menit cek dan perbaiki.",m:40},
  {d:"Sabtu",f:"Campuran",t:"Satu bagian IELTS sesuai kelemahan, plus 20 menit podcast. Minggu 9-12: tes penuh.",m:60}];
 var START="2026-11-05",END="2027-01-27",NEW_PER_DAY=25,INTERVALS=[0,1,2,4,8,16,32],LS="jalur-ielts-v1";
-var TABS=[["hari","Hari ini"],["kata","Kosakata"],["soal","Soal"],["tulis","Writing"],["bicara","Speaking"],["salah","Kesalahan"],["atur","Sinkron"]];
+var TABS=[["hari","Hari ini"],["kata","Kosakata"],["soal","Soal"],["salah","Kesalahan"],["atur","Sinkron"]];
 var ERR={Reading:["True/False/Not Given","Matching headings","Kosakata tidak paham","Kehabisan waktu","Salah baca soal"],Listening:["Angka atau nama tidak tertangkap","Aksen","Hilang fokus","Salah ejaan","Terkecoh distraktor"],Writing:["Tata bahasa","Kosakata kurang variatif","Struktur paragraf","Tidak menjawab soal","Kurang dari 250 kata","Ejaan dan tanda baca"],Speaking:["Jeda terlalu lama","Pengucapan","Tata bahasa","Jawaban terlalu pendek","Kosakata terbatas"]};
 
 function pad(n){return String(n).padStart(2,"0")}
@@ -819,7 +822,7 @@ var T={id:null,left:0,run:false,onEnd:null,el:null};
 function stopTimer(){clearInterval(T.id);T.id=null;T.run=false}
 function fmt(s){return pad(Math.floor(s/60))+":"+pad(s%60)}
 function startTimer(sec,onEnd){stopTimer();T.left=sec;T.run=true;T.onEnd=onEnd;tickPaint();T.id=setInterval(function(){T.left--;tickPaint();if(T.left<=0){stopTimer();if(T.onEnd)T.onEnd()}},1000)}
-function tickPaint(){var e=document.getElementById("timer");if(e){e.textContent=fmt(Math.max(0,T.left));e.classList.toggle("low",T.left<=60&&T.left>0&&state.tab==="tulis")}}
+function tickPaint(){var e=document.getElementById("timer");if(e){e.textContent=fmt(Math.max(0,T.left));e.classList.toggle("low",T.left<=60&&T.left>0&&state.sv==="tulis")}}
 
 /* ui state */
 var state={tab:"hari",wp:0,sp:{part:1,i:0,phase:"idle"},draft:""};
@@ -886,12 +889,12 @@ function vHari(){
   for(i=6;i>=0;i--){k=addDays(t,-i);wk+='<div class="'+(active(k)?"on":"")+(i===0?" now":"")+'">'+PLAN[parse(k).getDay()].d.slice(0,3)+'</div>'}
   var kind=nextKind(),resume=S.ss&&S.ss.ids?S.ss:null,total=diff(START,END)+1,dn=t<START?0:Math.min(total,diff(START,t)+1);
   var when=p.d+', '+parse(t).getDate()+'/'+(parse(t).getMonth()+1)+(dn?' &middot; hari ke-'+dn+' dari '+total:' &middot; mulai '+parse(START).getDate()+'/'+(parse(START).getMonth()+1));
-  var lsd=p.f==="Listening"&&!(S.ss&&S.ss.ids)?lsNext():null,qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
+  var svd=/^Writing/.test(p.f)?"tulis":p.f==="Speaking"?"bicara":null,lsd=p.f==="Listening"&&!(S.ss&&S.ss.ids)?lsNext():null,qn=dd.quiz||0,main=resume?'Lanjutkan sesi '+KIND[resume.kind]:'Mulai 25 soal: '+KIND[kind];
   var sq=qstat(null,"all");
   var prog=["vocab","grammar","reading","makna"].map(function(k){var st=qstat(k,"all"),pc=st.tot?Math.round(st.seen/st.tot*100):0;return '<div style="margin:10px 0 0"><div class="acc" style="display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px"><span>'+KIND[k]+'</span><b>'+(st.seen?st.seen+'/'+st.tot+' &middot; akurasi '+pct(st.c,st.n):'belum mulai &middot; '+st.tot+' soal')+'</b></div><div class="meter" style="--c:var(--accent);margin-top:4px"><i style="width:'+pc+'%"></i></div></div>'}).join("");
   return tgtCard()
    +'<section class="hero"><div><h2>'+p.f+'</h2><p>'+p.t+' Sekitar '+p.m+' menit, ditambah 10-15 menit kosakata.</p><p class="when">'+when+' &middot; <button class="lnk tgtbtn" data-tgt type="button">target band '+S.target+'</button></p></div>'
-   +'<div class="hero-act">'+(lsd?'<button class="btn amber cta-main" data-lsgo="'+lsd.id+'">Mulai Listening: '+esc(lsd.title)+'</button>':'<button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button>')+'<p class="hint">'+(lsd?'10 soal, audio langsung bisa diputar.':resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
+   +'<div class="hero-act">'+(svd?'<button class="btn amber cta-main" data-svgo="'+svd+'">'+(svd==="tulis"?'Mulai Writing':'Mulai Speaking')+'</button>':lsd?'<button class="btn amber cta-main" data-lsgo="'+lsd.id+'">Mulai Listening: '+esc(lsd.title)+'</button>':'<button class="btn amber cta-main" data-quick="'+kind+'">'+main+'</button>')+'<p class="hint">'+(svd==="tulis"?'Timer 40 menit dan kerangka esai siap.':svd?'Part 1 sampai 3 dengan timer.':lsd?'10 soal, audio langsung bisa diputar.':resume?'Dilanjutkan dari soal '+(resume.i+1)+' dari '+resume.ids.length+'.':qn?qn+' soal sudah dijawab hari ini.':'Soal pertama langsung terbuka.')+'</p><div class="row sub-act"><button class="lnk" data-go="kata" type="button">Kosakata'+(n?' ('+n+' kartu)':'')+'</button><button class="lnk'+(dd.done?" done":"")+'" id="doneBtn" type="button" aria-pressed="'+(!!dd.done)+'">'+(dd.done?"Selesai hari ini":"Tandai selesai")+'</button></div></div></section>'
    +'<dl class="strip panel"><div><dt>Streak</dt><dd>'+streak()+'<small> hari</small></dd></div><div><dt>Kartu menunggu</dt><dd>'+n+'</dd></div><div><dt>Kata dikuasai</dt><dd>'+mastered()+'<small>/'+VOCAB.length+'</small></dd></div><div><dt>Soal dikerjakan</dt><dd>'+sq.seen+'<small>/'+BANK.length+'</small></dd></div></dl>'
    +'<div class="grid g2" style="margin-top:16px"><div class="panel"><h2>7 hari terakhir</h2><div class="week">'+wk+'</div><p class="small" style="margin:12px 0 0">Hari aktif: kartu atau soal dikerjakan, atau ditandai selesai.</p></div>'
    +'<div class="panel"><h2>Progres soal</h2>'+prog+'</div></div>';
@@ -3403,6 +3406,7 @@ function formOf(G,it,orig){return G.l[orig]||(it.k==="grammar"?autoForm(it.o[ori
 function blankify(s,fill){return esc(s).replace(/_{3,}/g,fill?'<span class="fill">'+esc(fill)+'</span>':'<span class="blank"></span>')}
 
 function vSoal(){
+  if(state.sv)return svView();
   if(state.lsv)return lsView();
   state.ql=state.ql||"all";
   if(!qs)return soalMenu();
@@ -3418,7 +3422,7 @@ function soalMenu(){
       +'<div class="acc"><span>Akurasi</span><b>'+pct(st.c,st.n)+'</b></div>'+(k==="reading"?'<label class="tmr"><input type="checkbox" id="tmChk"'+(state.timed?" checked":"")+'> Berwaktu 20 menit</label>':"")
       +'<button class="btn'+(k===nextKind()?'':' ghost')+'" data-start="'+k+'"'+(st.tot?"":" disabled")+'>'+(k===nextKind()?'Mulai sesi (disarankan hari ini)':'Mulai sesi')+'</button></div></div>';
   });
-  cards+=lsCard();
+  cards+=lsCard()+svCards();
   if(b2.n<15)hint="Mulai dari level B2 atau Campur. Setelah akurasi B2 stabil di atas 80%, pindah ke C1.";
   else if(b2.c/b2.n>=0.8)hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Sudah siap mencoba level C1.";
   else hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Perkuat B2 dulu, lalu naik ke C1.";
@@ -3476,6 +3480,8 @@ function soalDone(){
 }
 function bindSoal(){
   lsBind();
+  document.querySelectorAll("[data-sv]").forEach(function(b){b.onclick=function(){svOpen(b.dataset.sv)}});
+  if(document.getElementById("svBack"))document.getElementById("svBack").onclick=function(){stopTimer();T.left=0;state.sv=null;render();window.scrollTo(0,0)};
   var $=function(id){return document.getElementById(id)};
   document.querySelectorAll("[data-start]").forEach(function(b){b.onclick=function(){startQuiz(b.dataset.start);render()}});
   document.querySelectorAll("[data-opt]").forEach(function(b){b.onclick=function(){answer(+b.dataset.opt)}});
@@ -3659,6 +3665,21 @@ function lsBind(){
   if($("lsAgain"))$("lsAgain").onclick=function(){state.lsAns[state.lsv]={};lsOpen(state.lsv);render();window.scrollTo(0,0)};
   lsPaint();
 }
+/* ===== Writing dan Speaking sebagai bagian menu Soal ===== */
+function svOpen(k){stopTimer();T.left=0;lsStop();state.lsv=null;state.sv=k;state.tab="soal";render();window.scrollTo(0,0)}
+function svView(){
+  var w=state.sv==="tulis";
+  return '<div class="svhead"><button class="btn ghost" id="svBack" type="button">Kembali ke menu soal</button><h2>'+(w?'Writing':'Speaking')+'</h2></div>'+(w?vTulis():vBicara());
+}
+function svCards(){
+  var p=PLAN[new Date().getDay()].f,wr=/^Writing/.test(p),sk=p==="Speaking",wc=state.draft.trim()?state.draft.trim().split(/\s+/).length:0;
+  return '<div class="panel mode" style="--c:#7A5AC8"><div class="bandt"></div><div class="bd"><h3>Writing</h3><p class="small" style="margin:0">Esai Task 2 dengan timer 40 menit, kerangka, dan hitung kata. Salin esai ke Claude untuk dinilai dengan band descriptor.</p>'
+   +'<div class="big"><b>'+(wc?wc:'40')+'</b><span>'+(wc?'kata di draf terakhir<br>tersimpan otomatis':'menit per esai<br>minimal 250 kata')+'</span></div>'
+   +'<button class="btn'+(wr?'':' ghost')+'" data-sv="tulis">'+(wr?'Mulai (disarankan hari ini)':wc?'Lanjutkan draf':'Mulai menulis')+'</button></div></div>'
+   +'<div class="panel mode" style="--c:#C8641E"><div class="bandt"></div><div class="bd"><h3>Speaking</h3><p class="small" style="margin:0">Pertanyaan Part 1, kartu Part 2 dengan 1 menit persiapan dan 2 menit bicara, serta diskusi Part 3.</p>'
+   +'<div class="big"><b>3</b><span>part seperti tes asli<br>dengan timer</span></div>'
+   +'<button class="btn'+(sk?'':' ghost')+'" data-sv="bicara">'+(sk?'Mulai (disarankan hari ini)':'Mulai berbicara')+'</button></div></div>';
+}
 function vSalah(){
   var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
   var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
@@ -3693,17 +3714,18 @@ function render(){
   document.getElementById("tgtTop").textContent=S.target;
   var sg="",q;for(q=1;q<=12;q++)sg+='<i class="'+(q<wk.n?"on":q===wk.n?"now":"")+'"></i>';document.getElementById("wkSeg").innerHTML=sg;
   var v=document.getElementById("view");
-  v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
+  v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vHari();
   document.body.classList.toggle("insess",state.tab==="soal"&&(state.lsv&&state.lsv!=="list"?true:!state.lsv&&!!qs&&!qs.done));
   bind();
 }
-function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0;lsStop()}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
+function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0;lsStop();if(t!=="soal")state.sv=null}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
 
 function bind(){
   var $=function(id){return document.getElementById(id)};
   if(state.tab==="soal")bindSoal();
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  document.querySelectorAll("[data-svgo]").forEach(function(b){b.onclick=function(){svOpen(b.dataset.svgo)}});
   document.querySelectorAll("[data-lsgo]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.tab="soal";lsOpen(b.dataset.lsgo);render();window.scrollTo(0,0)}});
   document.querySelectorAll("[data-quick]").forEach(function(b){b.onclick=function(){quick(b.dataset.quick)}});
   document.querySelectorAll("[data-tgt]").forEach(function(b){b.onclick=function(){state.tgtEdit=true;render()}});
