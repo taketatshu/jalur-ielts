@@ -440,7 +440,7 @@ var SYNC={url:"",key:""};
 try{SYNC=Object.assign(SYNC,JSON.parse(localStorage.getItem(LS+"-sync")||"{}"))}catch(e){}
 var GCID="924794401753-r1tt2lk2qlr9sa3dj78t05idaqoucrqs.apps.googleusercontent.com",GFILE="jalur-ielts.json";
 var GD={on:false,fid:null};try{GD.on=localStorage.getItem(LS+"-gd")==="1"}catch(e){}
-var gTok=null,gExp=0,gClient=null,gWait=[];
+var gTok=null,gExp=0,gClient=null,gWait=[],GERR="";
 function gInit(){
   if(gClient)return true;
   if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
@@ -458,7 +458,7 @@ function gToken(interactive){
 }
 function gf(url,o){
   return gToken(false).then(function(t){o=o||{};o.headers=Object.assign({Authorization:"Bearer "+t},o.headers||{});return fetch(url,o)})
-    .then(function(r){if(r.status===401){gTok=null}if(!r.ok)throw new Error("http "+r.status);return r});
+    .then(function(r){if(r.status===401){gTok=null}if(!r.ok)return r.text().then(function(t){var m="";try{m=JSON.parse(t).error.message||""}catch(e){}throw new Error("http "+r.status+(m?" - "+m:""))});return r});
 }
 function gFind(){
   if(GD.fid)return Promise.resolve(GD.fid);
@@ -495,7 +495,7 @@ function call(body){
 function flush(){
   if(!syncOn()||saving||!dirty)return;
   saving=true;dirty=false;setSync("busy");
-  call({action:"set",updated:S.updated,data:S}).then(function(){setSync("ok")},function(){dirty=true;setSync("fail")}).then(function(){saving=false});
+  call({action:"set",updated:S.updated,data:S}).then(function(){setSync("ok")},function(e){GERR=e&&e.message||"";dirty=true;setSync("fail")}).then(function(){saving=false});
 }
 function pull(){
   if(!syncOn()){setSync("off");return Promise.resolve()}
@@ -504,7 +504,7 @@ function pull(){
     if(j.data&&(j.updated||0)>(S.updated||0)){S=normQ(Object.assign(def(),j.data));try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}
     else if((S.updated||0)>(j.updated||0)){dirty=true;flush();return}
     setSync("ok");
-  }).catch(function(e){setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
+  }).catch(function(e){GERR=e&&e.message||"";setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
 }
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
 function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done))}
@@ -3159,7 +3159,7 @@ function bind(){
     document.querySelectorAll("[data-edel]").forEach(function(b){b.onclick=function(){if(b.dataset.armed){S.errors.splice(+b.dataset.edel,1);save();render()}else{b.dataset.armed="1";b.textContent="Yakin?"}}});
   }
   if($("gdIn")){$("gdIn").onclick=function(){$("gdMsg").textContent="Membuka jendela Google...";gLogin().then(function(){render()},function(e){$("gdMsg").textContent="Gagal masuk: "+(e&&e.message||"dibatalkan")+". Pastikan pop-up tidak diblokir dan email kamu ada di daftar Test users."})}}
-  if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){dirty=true;return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=document.getElementById("sync").textContent==="Tersinkron"?"Selesai.":"Gagal sinkron."},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
+  if($("gdNow")){$("gdNow").onclick=function(){$("gdMsg").textContent="Menyinkronkan...";gToken(true).then(function(){dirty=true;return pull()}).then(function(){return flush()}).then(function(){$("gdMsg").textContent=document.getElementById("sync").textContent==="Tersinkron"?"Selesai.":"Gagal sinkron"+(GERR?": "+GERR:".")},function(e){$("gdMsg").textContent="Gagal: "+(e&&e.message||"")})}}
   if($("gdOut")){$("gdOut").onclick=function(){gLogout();render()}}
   if($("syoSave")){
     $("syoSave").onclick=function(){
