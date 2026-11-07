@@ -399,6 +399,42 @@ button.sync.warn{color:var(--amber)}
 /* tab: fokus keyboard jelas */
 nav button:focus-visible{outline-offset:-3px}
 
+
+/* ===== Putaran 2: umpan balik ringkas, header ponsel, pintasan ===== */
+.nextbar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 0;margin-top:4px;background:var(--surface);border-top:2px solid var(--edge)}
+.nextbar .btn{min-height:52px;padding-inline:26px}
+.kbd{font-size:12.5px;color:var(--muted)}
+@media (hover:none){.kbd{display:none}}
+details.more{border:2px dashed var(--edge);border-radius:8px;padding:0 14px;background:var(--surface)}
+details.more>summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:700;font-family:var(--f-display);font-size:17px}
+details.more[open]{padding-bottom:14px}
+.fold>summary::after,details.more>summary::after{content:"Buka";margin-left:auto;font:600 13px var(--f-mono);color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.fold[open]>summary::after,details.more[open]>summary::after{content:"Tutup"}
+.fold>summary{list-style:none}.fold>summary::-webkit-details-marker{display:none}
+.tgtstrip{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 14px;padding:8px 12px;border:2px solid var(--accent);border-radius:10px;background:var(--surface)}
+.tgtstrip label{font-weight:700}
+.tgtstrip select{width:auto;min-width:84px}
+.tgtstrip .btn{min-height:44px;padding:8px 16px}
+.lnk.dark{color:var(--ink)}
+.opt[disabled]:not(.right):not(.wrong){opacity:1;background:var(--soft);color:var(--muted)}
+.mx-r{grid-template-columns:1.15fr 84px .95fr 2.2fr}
+.mx-th span{letter-spacing:.03em}
+.flash{min-height:340px}
+@media (max-width:520px){.flash{min-height:0}}
+@media (max-width:720px){
+  .top{padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-left,0px)) 8px}
+  .top .in{flex-wrap:wrap;align-items:center;gap:0 12px}
+  .top h1{font-size:26px;margin:0}
+  .top .sub,.seg12{display:none}
+  .wkbox{width:auto;min-width:0;display:flex;align-items:baseline;gap:8px;margin-left:auto}
+  .wkt{gap:8px}.wkt b{font-size:18px}
+  button.sync{flex-basis:100%;order:3;min-height:36px;padding:2px 0}
+  .top .in>.wkbox{display:contents}
+  .top .in>.wkbox .wkt{margin-left:auto}
+  body.insess .top{display:none}
+  nav button{padding:8px 11px;gap:5px}
+}
+
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
@@ -772,7 +808,7 @@ function tgtCard(){
   var first=!S.onb&&!S.ql.length&&!Object.keys(S.cards).length&&!Object.keys(S.daily).some(function(k){return active(k)});
   if(!first&&!state.tgtEdit)return "";
   var o=[5.5,6,6.5,7,7.5,8,8.5].map(function(b){return '<option value="'+b+'"'+(+S.target===b?" selected":"")+'>'+b+'</option>'}).join("");
-  return '<section class="panel tgtcard"><h2>'+(first?'Atur target band, lalu mulai hari 1':'Ubah target band')+'</h2><p class="small" style="margin:0 0 12px">'+(first?'Target ini tampil di bagian atas dan membantu menjaga fokus. Bisa diubah kapan saja lewat tombol target di kartu hari ini.':'Pilih band yang disyaratkan beasiswa atau kampus tujuan.')+'</p><div class="row"><div class="field" style="min-width:140px"><label for="tgtSel">Target band</label><select id="tgtSel">'+o+'</select></div><button class="btn" id="tgtSave">Simpan target</button><button class="btn ghost" id="tgtLater">'+(first?'Nanti saja':'Tutup')+'</button></div></section>';
+  return '<section class="tgtstrip" aria-label="Target band"><label for="tgtSel">'+(first?'Target band Anda':'Ubah target band')+'</label><select id="tgtSel">'+o+'</select><button class="btn" id="tgtSave" type="button">Simpan</button><button class="lnk dark" id="tgtLater" type="button">'+(first?'Nanti saja':'Tutup')+'</button></section>';
 }
 function vHari(){
   var p=PLAN[new Date().getDay()],dd=day(),t=today(),n=dueCount(),wk="",i,k;
@@ -824,7 +860,7 @@ function vTulis(){
    +'<div class="row" style="margin:10px 0"><button class="btn" id="tStart">'+(T.run?"Jeda":"Mulai 40 menit")+'</button><button class="btn ghost" id="tReset">Reset</button></div>'
    +'<div class="small" style="margin-bottom:8px">Kerangka 5 menit: pendapat, alasan 1, alasan 2, contoh, kesimpulan. Sisakan 5 menit akhir untuk memeriksa.</div>'
    +'<textarea id="essay" placeholder="Tulis esai di sini..." spellcheck="true">'+esc(state.draft)+'</textarea>'
-   +'<div class="row" style="margin-top:8px"><span class="mono" id="wc">'+wc+' kata</span><button class="btn ghost" id="copyEssay" style="margin-left:auto">Salin esai + soal</button><button class="btn ghost" id="clearEssay">Kosongkan</button></div>'
+   +'<div class="row" style="margin-top:8px"><span class="mono" id="wc">'+wc+' / 250 kata</span><button class="btn ghost" id="copyEssay" style="margin-left:auto">Salin esai + soal</button><button class="btn ghost" id="clearEssay">Kosongkan</button></div>'
    +'<p class="small" id="copyMsg" style="margin:8px 0 0">Tempel hasil salinan ke obrolan dengan Claude untuk dinilai berdasarkan band descriptor.</p></div></div>';
 }
 function vBicara(){
@@ -3104,7 +3140,7 @@ function answer(idx){
   qset(it.id,r);
   qs.res.push({id:it.id,ok:ok});
   var dd=day();dd.quiz=(dd.quiz||0)+1;
-  if(!ok){S.errors.push({d:today(),s:KIND[it.k],t:it.cat,n:it.q.slice(0,50)});if(S.errors.length>100)S.errors.splice(0,S.errors.length-100)}
+  if(!ok){S.errors.push({d:today(),s:KIND[it.k],t:it.cat,n:it.q.slice(0,140)});if(S.errors.length>100)S.errors.splice(0,S.errors.length-100)}
   ssSave();save();render();
 }
 function nextQ(){
@@ -3219,7 +3255,7 @@ function soalMenu(){
     cards+='<div class="panel mode" style="--c:'+meta[k][0]+'"><div class="bandt"></div><div class="bd"><h3>'+KIND[k]+'</h3><p class="small" style="margin:0">'+meta[k][1]+'. '+KDESC[k]+'</p>'
       +(st.seen?'<div class="big"><b>'+pc+'%</b><span>'+st.seen+' dari '+st.tot+' soal sudah dikerjakan<br>sisa '+(st.tot-st.seen)+' soal baru</span></div>':'<div class="big"><b>'+st.tot+'</b><span>soal baru siap<br>belum ada yang dikerjakan</span></div>')+'<div class="meter" aria-hidden="true"><i style="width:'+pc+'%"></i></div>'
       +'<div class="acc"><span>Akurasi</span><b>'+pct(st.c,st.n)+'</b></div>'+(k==="reading"?'<label class="tmr"><input type="checkbox" id="tmChk"'+(state.timed?" checked":"")+'> Berwaktu 20 menit</label>':"")
-      +'<button class="btn" data-start="'+k+'"'+(st.tot?"":" disabled")+'>Mulai sesi</button></div></div>';
+      +'<button class="btn'+(k===nextKind()?'':' ghost')+'" data-start="'+k+'"'+(st.tot?"":" disabled")+'>'+(k===nextKind()?'Mulai sesi (disarankan hari ini)':'Mulai sesi')+'</button></div></div>';
   });
   if(b2.n<15)hint="Mulai dari level B2 atau Campur. Setelah akurasi B2 stabil di atas 80%, pindah ke C1.";
   else if(b2.c/b2.n>=0.8)hint="Akurasi level B2 Anda "+pct(b2.c,b2.n)+". Sudah siap mencoba level C1.";
@@ -3237,33 +3273,33 @@ function soalMenu(){
 }
 function soalQ(){
   var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,num=pad(qs.i+1),L="ABCD",
-    ttl=it.k==="grammar"?"Kasus Diagnostik":it.k==="vocab"?"Kasus Kosakata":"Kasus Bacaan",p="";
+    ttl=it.k==="grammar"?"Soal Tata Bahasa":it.k==="vocab"?"Soal Kosakata":"Soal Bacaan",p="";
   var prog='<div class="prog" aria-hidden="true">'+qs.items.map(function(_,j){return '<i class="'+(j<qs.res.length?(qs.res[j].ok?"c":"x"):j===qs.i?"n":"")+'"></i>'}).join("")+'</div>';
   if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">Teks &middot; '+P.l+'</div><h3>'+esc(P.t)+'</h3><div>'+esc(P.x)+'</div></div>'}
   var opts=qs.perm.map(function(orig,i){
     var cls="opt";if(done){if(orig===it.a)cls+=" right";else if(i===qs.picked)cls+=" wrong"}
     return '<button class="'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">['+L.charAt(i)+']</span><span class="ot">'+esc(it.o[orig])+'</span></button>';
   }).join("");
-  var rv="";
+  var rv="",more="";
   if(done){
     var cl=L.charAt(qs.perm.indexOf(it.a)),G=gm(it.id)||(it.tf?gmAuto(it):null);
     var ans='<div class="ans '+(qs.ok?"ok":"no")+'">'+(qs.ok?icoOk():icoNo())+'<div>Jawaban: ['+cl+'] '+esc(it.o[it.a])+(qs.ok?'<small>Tepat.</small>':'<small>Anda memilih ['+L.charAt(qs.picked)+'] '+esc(it.o[qs.perm[qs.picked]])+'.</small>')+'</div></div>';
     var rule=G?'<div class="rule"><div class="rule-t">'+esc(G.t)+'</div><div class="rule-p">Pola: '+esc(G.p)+'</div></div>':"";
     rv='<div class="reveal"><div class="rv-top" style="'+(G?"":"grid-template-columns:1fr")+'">'+ans+rule+'</div><p class="why">'+esc(it.e)+'</p>';
-    if(it.k==="grammar"){var aw=it.o[it.a];if(pr(aw)&&!/tanpa|^-/.test(aw)){var full=it.q.replace(/_{3,}/,aw);rv+='<div><h3 class="sec-t">Pelafalan</h3><div class="prn">'+spkRow([aw])+'<span class="pi"><b>Kalimat lengkap</b> <span class="pw"><button class="spk" type="button" data-say="'+esc(full)+'" aria-label="Dengarkan kalimat lengkap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></span></span></div></div>'}}
-    var X=it.k==="grammar"?gx(it.id):null;if(X)rv+=gxHtml(X);
-    var V=it.k==="vocab"?vxm(it.id):null,vf=!!V;if(V)rv+=vxHtml(V,it.o[0]);
-    if(G&&G.ev)rv+='<div><h3 class="sec-t">Garis Waktu</h3><div class="tl">'+tlSvg(G.ev)+'</div></div>';
+    if(it.k==="grammar"){var aw=it.o[it.a];if(pr(aw)&&!/tanpa|^-/.test(aw)){var full=it.q.replace(/_{3,}/,aw);more+='<div><h3 class="sec-t">Pelafalan</h3><div class="prn">'+spkRow([aw])+'<span class="pi"><b>Kalimat lengkap</b> <span class="pw"><button class="spk" type="button" data-say="'+esc(full)+'" aria-label="Dengarkan kalimat lengkap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></span></span></div></div>'}}
+    var X=it.k==="grammar"?gx(it.id):null;if(X)more+=gxHtml(X);
+    var V=it.k==="vocab"?vxm(it.id):null,vf=!!V;if(V)more+=vxHtml(V,it.o[0]);
+    if(G&&G.ev)more+='<div><h3 class="sec-t">Garis Waktu</h3><div class="tl">'+tlSvg(G.ev)+'</div></div>';
     if(G){
-      rv+='<div><h3 class="sec-t">Matriks Eliminasi '+num+'</h3><div class="mx"><div class="mx-r mx-th"><span>Opsi</span><span>Status</span><span>'+(it.k==="vocab"?"Arti":it.k==="reading"?"Dasar":"Bentuk")+'</span><span>Alasan logis</span></div>'
+      more+='<div><h3 class="sec-t">Matriks Eliminasi '+num+'</h3><div class="mx"><div class="mx-r mx-th"><span>Opsi</span><span>Status</span><span>'+(it.k==="vocab"?"Arti":it.k==="reading"?"Dasar":"Bentuk")+'</span><span>Alasan logis</span></div>'
         +qs.perm.map(function(orig,i){var ok=orig===it.a;return '<div class="mx-r'+(ok?" ok":"")+(qs.picked===i?" pick":"")+'"><span class="o">['+L.charAt(i)+'] '+esc(it.o[orig])+'</span><span class="s" style="color:var(--'+(ok?"good":"bad")+')">'+(ok?icoOk():icoNo())+'</span><span class="f">'+esc(vf?(ok?(G.l[0]||"Jawaban benar"):V.d[orig-1].l):formOf(G,it,orig))+'</span><span class="a">'+esc(vf?(ok?V.us:V.d[orig-1].r):(ok?it.e:G.r[orig]))+'</span></div>'}).join("")+'</div></div>';
     }
-    rv+='<div class="row"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Kasus berikutnya")+'</button></div></div>';
+    rv+='<div class="nextbar"><button class="btn" id="qNext">'+(qs.i+1>=n?"Lihat hasil":"Soal berikutnya")+'</button><span class="kbd">Spasi atau Enter</span></div>'+(more?'<details class="more"><summary>Lihat penjelasan lengkap</summary><div class="reveal" style="margin-top:14px">'+more+'</div></details>':"")+'</div>';
   }
   return '<div class="case"><div class="case-h"><div class="case-t">'+ttl+' '+num+'</div><div class="row" style="gap:8px"><span class="chip lvl">'+it.lv+'</span><span class="chip">'+esc(it.cat)+'</span><span class="chip mono">'+(qs.i+1)+'/'+n+'</span>'+(qs.timed?'<span class="chip tm" id="qTimer">'+fmtT(qs.end-Date.now())+'</span>':'')+'<button class="btn ghost" id="qMenu" style="padding:5px 12px;font-size:13px">Keluar</button></div></div>'
     +prog+p
     +(it.tf?'<p class="small" style="margin:0 0 6px">Sesuai teks: True = sesuai, False = bertentangan, Not Given = tidak disebut.</p>':"")
-    +'<div class="qh">'+blankify(it.q,done?it.o[it.a]:"")+'</div><div class="ogrid">'+opts+'</div>'+rv+'</div>';
+    +'<div class="qh">'+blankify(it.q,done?it.o[it.a]:"")+'</div><div class="ogrid">'+opts+'</div>'+(done?"":'<p class="small kbd">Pintasan: A-D atau 1-4 untuk memilih jawaban.</p>')+rv+'</div>';
 }
 function soalDone(){
   var n=qs.res.length,c=qs.res.filter(function(r){return r.ok}).length,pc=n?Math.round(c/n*100):0;
@@ -3296,8 +3332,9 @@ function vSalah(){
   var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}).slice(0,5),max=top.length?cnt[top[0]]:1;
   var bars=top.map(function(k){return '<div class="bar" style="grid-template-columns:150px 1fr 28px"><span>'+esc(k)+'</span><i><span style="width:'+(cnt[k]/max*100)+'%"></span></i><b class="mono">'+cnt[k]+'</b></div>'}).join("");
   var rows=S.errors.slice().reverse().slice(0,15).map(function(e,j){var idx=S.errors.length-1-j;return '<tr><td>'+e.d.slice(8)+'/'+e.d.slice(5,7)+'</td><td>'+esc(e.s)+'</td><td>'+esc(e.t)+'</td><td>'+esc(e.n||"")+'</td><td><button class="btn ghost" data-edel="'+idx+'">Hapus</button></td></tr>'}).join("");
-  return '<div class="grid g2"><div class="panel"><h2>Catat kesalahan</h2><form id="errForm" class="grid"><div class="field"><label for="eS">Skill</label><select id="eS">'+opts+'</select></div><div class="field"><label for="eT">Jenis kesalahan</label><select id="eT">'+types+'</select></div><div class="field"><label for="eN">Catatan (opsional)</label><input id="eN" type="text" maxlength="160" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px" placeholder="Contoh: Cambridge 17 Test 2, Passage 3"></div><div><button class="btn" type="submit">Tambah</button></div></form></div>'
-   +'<div class="panel"><h2>Kesalahan terbanyak</h2>'+(top.length?'<div class="bars">'+bars+'</div><p class="small" style="margin:12px 0 0">Fokus minggu ini: <b>'+esc(top[0])+'</b>. Latih jenis ini lebih dulu.</p>':'<div class="empty">Belum ada catatan. Setiap selesai latihan, catat 1-3 kesalahan utama.</div>')+'</div></div>'
+  var formP='<div class="panel"><h2>Catat kesalahan</h2><form id="errForm" class="grid"><div class="field"><label for="eS">Skill</label><select id="eS">'+opts+'</select></div><div class="field"><label for="eT">Jenis kesalahan</label><select id="eT">'+types+'</select></div><div class="field"><label for="eN">Catatan (opsional)</label><input id="eN" type="text" maxlength="160" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px" placeholder="Contoh: Cambridge 17 Test 2, Passage 3"></div><div><button class="btn" type="submit">Tambah</button></div></form></div>';
+  var topP='<div class="panel"><h2>Kesalahan terbanyak</h2>'+(top.length?'<div class="bars">'+bars+'</div><p class="small" style="margin:12px 0 0">Fokus minggu ini: <b>'+esc(top[0])+'</b>. Latih jenis ini lebih dulu.</p>':'<div class="empty">Belum ada catatan. Setiap selesai latihan, catat 1-3 kesalahan utama.</div>')+'</div>';
+  return '<div class="grid g2">'+topP+formP+'</div>'
    +(rows?'<div class="panel" style="margin-top:12px"><h2>Catatan terbaru</h2><div class="scroll"><table><thead><tr><th>Tgl</th><th>Skill</th><th>Jenis</th><th>Catatan</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':"");
 }
 function vAtur(){
@@ -3323,6 +3360,7 @@ function render(){
   var sg="",q;for(q=1;q<=12;q++)sg+='<i class="'+(q<wk.n?"on":q===wk.n?"now":"")+'"></i>';document.getElementById("wkSeg").innerHTML=sg;
   var v=document.getElementById("view");
   v.innerHTML=state.tab==="hari"?vHari():state.tab==="kata"?vKata():state.tab==="soal"?vSoal():state.tab==="tulis"?vTulis():state.tab==="salah"?vSalah():state.tab==="atur"?vAtur():vBicara();
+  document.body.classList.toggle("insess",state.tab==="soal"&&!!qs&&!qs.done);
   bind();
 }
 function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0}state.tab=t;if(t==="kata")session=null;render();if(ch)window.scrollTo(0,0)}
@@ -3343,14 +3381,14 @@ function bind(){
   if($("resetSess"))$("resetSess").onclick=function(){session=null;render()};
   if($("essay")){
     var ta=$("essay");
-    ta.oninput=function(){state.draft=ta.value;try{localStorage.setItem(LS+"-draft",state.draft)}catch(e){}var n=state.draft.trim()?state.draft.trim().split(/\s+/).length:0;$("wc").textContent=n+" kata"};
+    ta.oninput=function(){state.draft=ta.value;try{localStorage.setItem(LS+"-draft",state.draft)}catch(e){}var n=state.draft.trim()?state.draft.trim().split(/\s+/).length:0;$("wc").textContent=n+" / 250 kata"};
     $("newPrompt").onclick=function(){state.wp=rnd(WRITING.length,state.wp);$("prompt").textContent=WRITING[state.wp]};
     $("tStart").onclick=function(){
       if(T.run){stopTimer();render();return}
       startTimer(T.left>0?T.left:2400,function(){render()});render();
     };
     $("tReset").onclick=function(){stopTimer();T.left=0;render()};
-    $("clearEssay").onclick=function(){state.draft="";try{localStorage.removeItem(LS+"-draft")}catch(e){}render()};
+    $("clearEssay").onclick=function(){var b=$("clearEssay");if(!b.dataset.armed){b.dataset.armed="1";b.textContent="Yakin kosongkan?";setTimeout(function(){if(b&&b.dataset)delete b.dataset.armed,b.textContent="Kosongkan"},4000);return}state.draft="";try{localStorage.removeItem(LS+"-draft")}catch(e){}render()};
     $("copyEssay").onclick=function(){
       var txt="Soal: "+WRITING[state.wp]+"\n\nEsai saya ("+(state.draft.trim()?state.draft.trim().split(/\s+/).length:0)+" kata):\n"+state.draft+"\n\nTolong nilai berdasarkan band descriptor IELTS Writing Task 2 (Task Response, Coherence, Lexical Resource, Grammar) dan beri 3 perbaikan terpenting.";
       var done=function(ok){$("copyMsg").textContent=ok?"Tersalin. Tempel ke obrolan dengan Claude.":"Gagal menyalin otomatis. Blok teks esai lalu salin manual."};
@@ -3384,6 +3422,18 @@ function bind(){
   };
 }
 
+document.addEventListener("keydown",function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  var el=document.activeElement,tg=el&&el.tagName;if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(el&&el.isContentEditable))return;
+  var k=e.key,onBtn=tg==="BUTTON"||tg==="SUMMARY"||tg==="A";
+  if(state.tab==="soal"&&qs&&!qs.done){
+    if(qs.picked===null){var i="abcd".indexOf(k.toLowerCase());if(i<0&&/^[1-4]$/.test(k))i=+k-1;if(i>=0&&i<qs.perm.length){e.preventDefault();answer(i)}}
+    else if(!onBtn&&(k===" "||k==="Enter"||k==="ArrowRight"||k.toLowerCase()==="n")){e.preventDefault();nextQ()}
+  }else if(state.tab==="kata"&&state.km==="cards"&&session&&session.i<session.q.length){
+    if(!session.flip){if(!onBtn&&(k===" "||k==="Enter")){e.preventDefault();session.flip=true;render()}}
+    else{var m={"1":"again","2":"hard","3":"good"}[k];if(m){e.preventDefault();rate(m)}}
+  }
+});
 render();
 document.getElementById("sync").onclick=function(){go("atur")};
 setSync(syncOn()?"busy":"off");
