@@ -702,6 +702,11 @@ select.rtsel{width:auto;max-width:100%;display:inline-block;min-height:40px;marg
 .vc-r{color:var(--muted);font-size:13.5px}
 .vc-s{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);line-height:1.5}
 .vc-s .fno{background:var(--bad-bg);color:var(--bad);text-decoration:line-through;padding:0 3px;border-radius:3px}
+.wsdone{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:14px;padding:14px 16px;border:2px solid var(--edge);border-radius:10px;background:var(--surface);box-shadow:3px 3px 0 var(--accent)}
+.wsdone>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 260px}
+.wsdone b{font-family:var(--f-display);font-size:17px}
+.wsdone.ok{border-color:var(--good);box-shadow:3px 3px 0 var(--good)}
+.wsdone.ok b{color:var(--good)}
 /* gerak dikurangi: hormati preferensi sistem sepenuhnya */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
@@ -994,7 +999,7 @@ function pull(){
   }).catch(function(e){lastOk=false;GERR=e&&e.message||"";setSync(GD.on&&!gTok&&/auth|popup|gsi|interaction|immediate|login|consent/i.test(e&&e.message||"")?"login":"fail")});
 }
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={reviewed:0,newSeen:0,done:false})}
-function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done))}
+function active(k){var d=S.daily[k];return !!(d&&(d.reviewed>0||d.quiz>0||d.done||d.writing>0||d.speaking>0))}
 function streak(){var k=today(),n=0;if(!active(k))k=addDays(k,-1);while(active(k)){n++;k=addDays(k,-1)}return n}
 function planWeek(){var t=today();if(t<START)return{n:0,lbl:"Mulai"};if(t>END)return{n:12,lbl:"Selesai"};return{n:Math.min(12,Math.floor(diff(START,t)/7)+1),lbl:"Minggu ke"}}
 function avg(s){return Math.round((s.L+s.R+s.W+s.S)/4*2)/2}
@@ -3686,6 +3691,7 @@ function soalDone(){
 }
 function bindSoal(){
   lsBind();
+  wsBind();
   rtBind();
   w1Bind();
   document.querySelectorAll("[data-sv]").forEach(function(b){b.onclick=function(){svOpen(b.dataset.sv)}});
@@ -3876,10 +3882,10 @@ function lsBind(){
   lsPaint();
 }
 /* ===== Writing dan Speaking sebagai bagian menu Soal ===== */
-function svOpen(k){stopTimer();T.left=0;lsStop();rtStop();state.lsv=null;state.rtv=null;if(k==="tulis"&&!state.wt)state.wt=PLAN[new Date().getDay()].f==="Writing Task 1"?"1":"2";state.sv=k;state.tab="soal";render();window.scrollTo(0,0)}
+function svOpen(k){state.wMsg=null;state.spMsg=null;stopTimer();T.left=0;lsStop();rtStop();state.lsv=null;state.rtv=null;if(k==="tulis"&&!state.wt)state.wt=PLAN[new Date().getDay()].f==="Writing Task 1"?"1":"2";state.sv=k;state.tab="soal";render();window.scrollTo(0,0)}
 function svView(){
   var w=state.sv==="tulis";
-  return '<div class="svhead"><button class="btn ghost" id="svBack" type="button">Kembali ke menu soal</button><h2>'+(w?'Writing':'Speaking')+'</h2></div>'+(w?wtSeg()+(state.wt==="1"?vTulis1():vTulis()):vBicara());
+  return '<div class="svhead"><button class="btn ghost" id="svBack" type="button">Kembali ke menu soal</button><h2>'+(w?'Writing':'Speaking')+'</h2></div>'+(w?wtSeg()+(state.wt==="1"?vTulis1():vTulis())+wDoneBar():vBicara()+spDoneBar());
 }
 function svCards(){
   var p=PLAN[new Date().getDay()].f,wr=/^Writing/.test(p),sk=p==="Speaking",wc=state.draft.trim()?state.draft.trim().split(/\s+/).length:0;
@@ -3897,8 +3903,8 @@ function railChecks(){
   it.push({ok:due===0,txt:due?due+' kartu kosakata menunggu':'Kartu kosakata selesai',a:'data-gokm="cards"'});
   it.push({ok:qdone,txt:qdone?'Sesi soal sudah dikerjakan':'Satu sesi soal ('+KIND[nextKind()]+')',a:'data-quick="'+nextKind()+'"'});
   if(p.f==="Listening"){var n=lsNext();it.push({ok:lsToday,txt:'Listening'+(n?': '+n.title:''),a:n?'data-lsgo="'+n.id+'"':''})}
-  else if(/^Writing/.test(p.f))it.push({ok:!!dd.done,txt:p.f+' (40 menit)',a:'data-svgo="tulis"'});
-  else if(p.f==="Speaking")it.push({ok:!!dd.done,txt:'Speaking Part 1 sampai 3',a:'data-svgo="bicara"'});
+  else if(/^Writing/.test(p.f))it.push({ok:!!(dd.writing||dd.done),txt:p.f+(p.f==="Writing Task 1"?' (20 menit)':' (40 menit)'),a:'data-svgo="tulis"'});
+  else if(p.f==="Speaking")it.push({ok:!!(dd.speaking||dd.done),txt:'Speaking Part 1 sampai 3',a:'data-svgo="bicara"'});
   else if(p.f==="Reading")it.push({ok:S.ql.some(function(h){return h.d===t&&h.k==="reading"}),txt:'Reading mini',a:'data-quick="reading"'});
   return it;
 }
@@ -4057,13 +4063,13 @@ function w1Data(t){
 function wtSeg(){var w=state.wt||"2";return '<div class="seg" role="group" aria-label="Jenis tugas"><button data-wt="1" aria-pressed="'+(w==="1")+'">Task 1 (grafik)</button><button data-wt="2" aria-pressed="'+(w==="2")+'">Task 2 (esai)</button></div>'}
 function w1Bind(){
   var $=function(id){return document.getElementById(id)};
-  document.querySelectorAll("[data-wt]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.wt=b.dataset.wt;render()}});
+  document.querySelectorAll("[data-wt]").forEach(function(b){b.onclick=function(){stopTimer();T.left=0;state.wMsg=null;state.wt=b.dataset.wt;render()}});
   if(!$("essay1"))return;
   var t=W1[state.w1],ta=$("essay1");
   ta.oninput=function(){D1[t.id]=ta.value;d1Save();var n=ta.value.trim()?ta.value.trim().split(/\s+/).length:0;$("wc1").textContent=n+" / 150 kata"};
   $("w1Next").onclick=function(){stopTimer();T.left=0;state.w1=(state.w1+1)%W1.length;render()};
   $("w1Prev").onclick=function(){stopTimer();T.left=0;state.w1=(state.w1-1+W1.length)%W1.length;render()};
-  $("tStart").onclick=function(){if(T.run){stopTimer();render();return}startTimer(T.left>0?T.left:1200,function(){render()});render()};
+  $("tStart").onclick=function(){if(T.run){stopTimer();render();return}startTimer(T.left>0?T.left:1200,function(){wDone(1,true);render()});render()};
   $("tReset").onclick=function(){stopTimer();T.left=0;render()};
   $("clearEssay1").onclick=function(){var b=$("clearEssay1");if(!b.dataset.armed){b.dataset.armed="1";b.textContent="Yakin kosongkan?";return}delete D1[t.id];d1Save();render()};
   $("copyEssay1").onclick=function(){var tx=D1[t.id]||"",n=tx.trim()?tx.trim().split(/\s+/).length:0,
@@ -4150,6 +4156,34 @@ function vcReveal(it,L){
       +(blank?'<p class="vc-s">'+fillSent(it.q,it.o[o.orig],false)+'</p>':'')+(qs.picked===o.i?'<em>pilihan Anda</em>':'')+'</div>'}).join("")+'</div></section>';
   return h;
 }
+/* ===== Pencatatan latihan Writing dan Speaking ke konsistensi harian ===== */
+function wsLog(kind,info){var dd=day();dd[kind]=(dd[kind]||0)+1;S.wl=S.wl||[];S.wl.push(Object.assign({d:today(),k:kind},info));if(S.wl.length>80)S.wl.splice(0,S.wl.length-80);save()}
+function wsToday(kind){var t=today();return (S.wl||[]).filter(function(x){return x.d===t&&x.k===kind})}
+function wCount(txt){txt=(txt||"").trim();return txt?txt.split(/\s+/).length:0}
+function wDone(task,auto){
+  var txt=task===1?(D1[W1[state.w1].id]||""):state.draft,n=wCount(txt),min=task===1?150:250,sig=task+":"+txt.trim().slice(0,60);
+  if(!n){if(!auto)state.wMsg="Tulis jawaban dulu sebelum menandai selesai.";return false}
+  if(wsToday("writing").some(function(x){return x.sig===sig&&x.words===n})){if(!auto)state.wMsg="Jawaban ini sudah tercatat hari ini.";return false}
+  wsLog("writing",{task:task,words:n,sig:sig});stopTimer();T.left=0;
+  state.wMsg=(auto?"Waktu habis. ":"")+"Tercatat di konsistensi hari ini: Task "+task+", "+n+" kata"+(n<min?" (di bawah "+min+" kata, di tes asli ini menurunkan nilai)":"")+". Salin jawaban untuk dinilai Claude.";
+  return true;
+}
+function wsSummary(kind){var a=wsToday(kind);if(!a.length)return kind==="writing"?"Belum ada tulisan yang selesai hari ini.":"Belum ada latihan Speaking yang tercatat hari ini.";
+  return kind==="writing"?"Hari ini: "+a.length+" tulisan selesai ("+a.map(function(x){return "Task "+x.task+", "+x.words+" kata"}).join("; ")+").":"Hari ini: "+a.length+" latihan Speaking tercatat."}
+function wDoneBar(){var task=state.wt==="1"?1:2,done=wsToday("writing").length>0;
+  return '<div class="wsdone'+(done?" ok":"")+'"><div><b>'+(done?"Writing hari ini sudah tercatat":"Selesai menulis?")+'</b><span class="small" id="wMsg" aria-live="polite">'+esc(state.wMsg||wsSummary("writing"))+'</span></div><button class="btn" id="wDone" type="button" data-task="'+task+'">Tandai selesai</button></div>'}
+function spDoneBar(){var done=wsToday("speaking").length>0;
+  return '<div class="wsdone'+(done?" ok":"")+'"><div><b>'+(done?"Speaking hari ini sudah tercatat":"Sudah berlatih?")+'</b><span class="small" id="spMsg" aria-live="polite">'+esc(state.spMsg||wsSummary("speaking"))+'</span></div><button class="btn" id="spDone" type="button">Tandai selesai</button></div>'}
+function spDone(auto){var sp=state.sp,sig=sp.part+":"+sp.i;
+  if(wsToday("speaking").some(function(x){return x.sig===sig})){if(!auto)state.spMsg="Pertanyaan ini sudah tercatat hari ini. Pilih pertanyaan lain untuk latihan berikutnya.";return false}
+  wsLog("speaking",{part:sp.part,sig:sig});state.spMsg=(auto?"Waktu bicara habis. ":"")+"Tercatat di konsistensi hari ini: Speaking Part "+sp.part+".";return true}
+function wsBind(){
+  var $=function(id){return document.getElementById(id)};
+  if($("wDone"))$("wDone").onclick=function(){var b=$("wDone"),task=+b.dataset.task,txt=task===1?(D1[W1[state.w1].id]||""):state.draft,n=wCount(txt),min=task===1?150:250;
+    if(n&&n<min&&!b.dataset.armed){b.dataset.armed="1";b.textContent="Baru "+n+" kata. Tetap tandai?";return}
+    wDone(task,false);render()};
+  if($("spDone"))$("spDone").onclick=function(){spDone(false);render()};
+}
 function vSalah(){
   var sk=state.errSkill||"Reading",opts=Object.keys(ERR).map(function(k){return '<option'+(k===sk?" selected":"")+'>'+k+'</option>'}).join("");
   var types=ERR[sk].map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
@@ -4217,7 +4251,7 @@ function bind(){
     $("newPrompt").onclick=function(){state.wp=rnd(WRITING.length,state.wp);$("prompt").textContent=WRITING[state.wp]};
     $("tStart").onclick=function(){
       if(T.run){stopTimer();render();return}
-      startTimer(T.left>0?T.left:2400,function(){render()});render();
+      startTimer(T.left>0?T.left:2400,function(){wDone(2,true);render()});render();
     };
     $("tReset").onclick=function(){stopTimer();T.left=0;render()};
     $("clearEssay").onclick=function(){var b=$("clearEssay");if(!b.dataset.armed){b.dataset.armed="1";b.textContent="Yakin kosongkan?";setTimeout(function(){if(b&&b.dataset)delete b.dataset.armed,b.textContent="Kosongkan"},4000);return}state.draft="";try{localStorage.removeItem(LS+"-draft")}catch(e){}render()};
@@ -4250,7 +4284,7 @@ function bind(){
   if($("spNext"))$("spNext").onclick=function(){stopTimer();T.left=0;var n=state.sp.part===2?SP2.length:state.sp.part===1?SP1.length:SP3.length;state.sp={part:state.sp.part,i:rnd(n,state.sp.i%n),phase:"idle"};render()};
   if($("spTime"))$("spTime").onclick=function(){startTimer(state.sp.part===1?30:60,function(){render()});};
   if($("spStart"))$("spStart").onclick=function(){
-    state.sp.phase="prep";startTimer(60,function(){state.sp.phase="speak";render();startTimer(120,function(){state.sp.phase="done";render()})});render();
+    state.sp.phase="prep";startTimer(60,function(){state.sp.phase="speak";render();startTimer(120,function(){state.sp.phase="done";spDone(true);render()})});render();
   };
 }
 
