@@ -474,9 +474,7 @@ function vAtur(){
   return '<section class="card"><h3>Tampilan</h3><div class="srow"><span>Furigana (cara baca di atas kanji)</span><div class="seg"><button type="button" data-act="furi:1" aria-pressed="'+S.furi+'">Tampilkan</button><button type="button" data-act="furi:0" aria-pressed="'+!S.furi+'">Sembunyikan</button></div></div>'
    +'<div class="srow"><span>Tema</span><div class="seg">'+[["auto","Otomatis"],["light","Terang"],["dark","Gelap"]].map(function(t){return '<button type="button" data-act="theme:'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>'}).join("")+'</div></div>'
    +'<div class="srow"><span>Kata baru per hari</span><div class="seg">'+[5,10,15,20].map(function(n){return '<button type="button" data-act="newPer:'+n+'" aria-pressed="'+(S.newPer===n)+'">'+n+'</button>'}).join("")+'</div></div></section>'
-   +syncCard()+voiceCard()
-   +'<section class="card"><h3>Cadangan manual</h3><p>Unduh kemajuan sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn alt" type="button" data-act="export">Ekspor cadangan</button><label class="btn alt" for="impFile">Impor cadangan</label><input id="impFile" type="file" accept="application/json,.json" class="sr"></div><p class="small" id="impMsg" aria-live="polite"></p></section>'
-   +'<section class="card"><h3>Rencana</h3><p>Rencana 12 minggu dimulai '+tgl(S.start)+'. Minggu 1 hiragana, minggu 2 katakana, minggu 3 sampai 12 kosakata, kanji, dan tata bahasa N5.</p><div class="row"><button class="lnk" type="button" data-act="restart">Mulai rencana dari hari ini</button><button class="lnk danger" type="button" data-act="reset">Hapus semua kemajuan</button></div></section>';
+   +syncCard()+voiceCard();
 }
 
 /* ---------- render & aksi ---------- */
