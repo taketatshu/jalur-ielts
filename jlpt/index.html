@@ -61,6 +61,12 @@ kbd{font:600 12.5px var(--f-body);border:1.5px solid currentColor;border-radius:
 .top h1{font-size:36px;display:flex;align-items:baseline;gap:12px}
 .top h1 .jp{font-family:var(--f-glyph);font-weight:600;font-size:.8em;color:var(--accent)}
 .top .sub{color:#C9D1DD;font-size:14.5px;margin-top:4px}
+.hdr-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.sync{font:600 13.5px var(--f-body);color:#C9D1DD;background:none;border:0;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;min-height:32px}
+.sync.warn{color:#F4B400}
+.field{margin-top:10px}
+.field label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.card select{width:100%;max-width:440px;min-height:44px;border:2px solid var(--edge);border-radius:8px;padding:8px 10px;background:var(--surface)}
 .top .wk{font-weight:600;font-size:14px;color:#F5F1E8;background:rgba(14,26,43,.6);border:1.5px solid rgba(245,241,232,.35);border-radius:999px;padding:4px 12px}
 
 .wrap{max-width:1080px;margin:0 auto;padding-top:14px}
@@ -345,12 +351,13 @@ main>*+*{margin-top:16px}
 </style>
 </head>
 <body>
-<header class="top"><div class="in"><div class="appsw" role="navigation" aria-label="Pindah aplikasi"><a href="../">Beranda</a><a href="../ielts.html">IELTS</a></div><div><h1>Nihongo <span class="jp" lang="ja">日本語</span></h1><p class="sub">Bahasa Jepang dari nol sampai JLPT N5 dalam 12 minggu</p></div><span class="wk" id="wk"></span></div></header>
+<header class="top"><div class="in"><div class="appsw" role="navigation" aria-label="Pindah aplikasi"><a href="../">Beranda</a><a href="../ielts.html">IELTS</a></div><div><h1>Nihongo <span class="jp" lang="ja">日本語</span></h1><p class="sub">Bahasa Jepang dari nol sampai JLPT N5 dalam 12 minggu</p></div><div class="hdr-r"><button type="button" class="sync" id="sync" data-act="go:atur"></button><span class="wk" id="wk"></span></div></div></header>
 <div class="wrap">
   <nav id="nav" role="tablist" aria-label="Menu"></nav>
   <main id="view" aria-live="polite"></main>
   <aside id="rail" aria-label="Ringkasan hari ini"></aside>
 </div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

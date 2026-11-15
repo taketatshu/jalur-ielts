@@ -16,11 +16,84 @@ var BULAN=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","De
 function tgl(k){var d=parse(k);return HARI[d.getDay()]+", "+d.getDate()+" "+BULAN[d.getMonth()]}
 
 /* ---------- state ---------- */
-function fresh(){return {v:1,start:today(),cards:{},daily:{},err:[],kana:{},qr:{},ks:{},furi:true,newPer:10,theme:"auto"}}
+function fresh(){return {v:1,updated:0,start:today(),cards:{},daily:{},err:[],kana:{},qr:{},ks:{},furi:true,newPer:10,theme:"auto"}}
 var S;try{S=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){S=null}
 if(!S||S.v!==1)S=fresh();
 (function(){var f=fresh();for(var k in f)if(S[k]===undefined)S[k]=f[k]})();
-function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+function save(){S.updated=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,900)}
+
+/* ---------- Sinkron Google Drive: akun dan izin sama dengan IELTS, file terpisah (jalur-nihongo.json) ---------- */
+var GCID="924794401753-r1tt2lk2qlr9sa3dj78t05idaqoucrqs.apps.googleusercontent.com",GFILE="jalur-nihongo.json",GSC="https://www.googleapis.com/auth/drive.appdata",OTHER="jalur-ielts-v1";
+var GD={on:false,fid:null},gTok=null,gExp=0,gClient=null,gWait=[],GERR="",saveT=null,saving=false,dirty=false,flushP=null,lastPull=0,LASTSYNC="off";
+try{GD.on=localStorage.getItem(LS+"-gd")==="1"}catch(e){}
+[LS+"-gt",OTHER+"-gt"].forEach(function(k){if(gTok)return;try{var t=JSON.parse(localStorage.getItem(k)||"null");if(t&&t.e>Date.now()){gTok=t.t;gExp=t.e}}catch(e){}});
+function gHas(){return !!(gTok&&Date.now()<gExp)}
+function gInit(){
+  if(gClient)return true;
+  if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
+  gClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:GSC,
+    callback:function(r){var w=gWait;gWait=[];
+      if(r&&r.access_token&&google.accounts.oauth2.hasGrantedAllScopes&&!google.accounts.oauth2.hasGrantedAllScopes(r,GSC)){w.forEach(function(x){x[1](new Error("izin Drive tidak diberikan"))})}
+      else if(r&&r.access_token){gTok=r.access_token;gExp=Date.now()+(r.expires_in||3600)*1000-60000;GD.on=true;try{localStorage.setItem(LS+"-gt",JSON.stringify({t:gTok,e:gExp}));localStorage.setItem(LS+"-gd","1")}catch(e){}w.forEach(function(x){x[0](gTok)})}
+      else w.forEach(function(x){x[1](new Error(r&&r.error||"auth"))})},
+    error_callback:function(e){var w=gWait;gWait=[];w.forEach(function(x){x[1](new Error(e&&e.type||"popup"))})}});
+  return true;
+}
+function gReady(){return new Promise(function(res,rej){var n=0;(function t(){if(gInit())return res();if(++n>40)return rej(new Error("gsi"));setTimeout(t,200)})()})}
+function gToken(interactive){
+  if(gHas()){if(!GD.on){GD.on=true;try{localStorage.setItem(LS+"-gd","1")}catch(e){}}return Promise.resolve(gTok)}
+  if(!interactive)return Promise.reject(new Error("login"));
+  return gReady().then(function(){return new Promise(function(res,rej){gWait.push([res,rej]);try{gClient.requestAccessToken({prompt:""})}catch(e){gWait=[];rej(e)}})});
+}
+function gf(url,o){
+  return gToken(false).then(function(t){o=o||{};o.headers=Object.assign({Authorization:"Bearer "+t},o.headers||{});return fetch(url,o)})
+    .then(function(r){if(r.status===401){gTok=null;gExp=0;try{localStorage.removeItem(LS+"-gt")}catch(e){}}if(!r.ok)return r.text().then(function(t){var m="";try{m=JSON.parse(t).error.message||""}catch(e){}throw new Error("http "+r.status+(m?" - "+m:""))});return r});
+}
+function gFind(){
+  if(GD.fid)return Promise.resolve(GD.fid);
+  return gf("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id)&q="+encodeURIComponent("name='"+GFILE+"'")).then(function(r){return r.json()}).then(function(j){GD.fid=j.files&&j.files[0]?j.files[0].id:null;return GD.fid});
+}
+function gCreate(txt){
+  var b="nihongob"+Date.now();
+  var body="--"+b+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify({name:GFILE,parents:["appDataFolder"]})+"\r\n--"+b+"\r\nContent-Type: application/json\r\n\r\n"+txt+"\r\n--"+b+"--";
+  return gf("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":"multipart/related; boundary="+b},body:body}).then(function(r){return r.json()}).then(function(j){GD.fid=j.id});
+}
+function driveCall(body){
+  if(body.action==="get"){
+    return gFind().then(function(id){if(!id)return{data:null,updated:0};
+      return gf("https://www.googleapis.com/drive/v3/files/"+id+"?alt=media").then(function(r){return r.json()}).then(function(j){return{data:j.data||null,updated:j.updated||0}})});
+  }
+  var txt=JSON.stringify({updated:body.updated,data:body.data});
+  return gFind().then(function(id){
+    if(!id)return gCreate(txt);
+    return gf("https://www.googleapis.com/upload/drive/v3/files/"+id+"?uploadType=media",{method:"PATCH",headers:{"Content-Type":"application/json"},body:txt}).catch(function(e){if(/404/.test(e.message)){GD.fid=null;return gCreate(txt)}throw e});
+  });
+}
+function gLogin(){return gToken(true).then(function(){GD.fid=null;return pull()})}
+function gLogout(){try{if(gTok&&window.google)google.accounts.oauth2.revoke(gTok,function(){})}catch(e){}gTok=null;gExp=0;GD.on=false;GD.fid=null;try{localStorage.removeItem(LS+"-gd");localStorage.removeItem(LS+"-gt")}catch(e){}setSync("off")}
+function setSync(m){LASTSYNC=m;var e=document.getElementById("sync");if(!e)return;
+  e.className="sync"+(m==="fail"||m==="login"?" warn":"");
+  e.textContent=m==="ok"?"Tersinkron ke Drive":m==="busy"?"Menyinkronkan...":m==="fail"?"Gagal sinkron, data aman di perangkat":m==="login"?"Belum sinkron. Buka Pengaturan":"Sinkron Drive belum aktif"}
+function flush(){
+  if(saving&&flushP)return flushP;
+  if(!GD.on||!dirty)return Promise.resolve();
+  saving=true;dirty=false;setSync("busy");
+  flushP=driveCall({action:"set",updated:S.updated,data:S}).then(function(){GERR="";setSync("ok")},function(e){GERR=e&&e.message||"";dirty=true;setSync(GERR==="login"?"login":"fail")}).then(function(){saving=false;flushP=null});
+  return flushP;
+}
+function pull(){
+  if(!GD.on){setSync("off");return Promise.resolve()}
+  lastPull=Date.now();setSync("busy");
+  return driveCall({action:"get"}).then(function(j){
+    if(j.data&&(j.updated||0)>(S.updated||0)){
+      var o=Object.assign(fresh(),j.data);
+      if(o.v===1){S=o;try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}applyTheme();state.fc=null;state.kq=null;if(state.qs&&state.qs.i>=state.qs.items.length)state.qs=null;render()}
+    }else if((S.updated||0)>(j.updated||0)){dirty=true;return flush()}
+    GERR="";setSync("ok");
+  }).catch(function(e){GERR=e&&e.message||"";setSync(/auth|popup|gsi|interaction|immediate|login|consent/i.test(GERR)?"login":"fail")});
+}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&GD.on&&gHas()&&Date.now()-lastPull>15000&&!saving)pull()});
+
 function day(k){k=k||today();return S.daily[k]||(S.daily[k]={rev:0,quiz:0,kana:0,newc:0,done:0})}
 function active(k){var d=S.daily[k];return !!(d&&(d.rev||d.quiz||d.kana||d.done))}
 function streak(){var t=today(),n=0,k=active(t)?t:addDays(t,-1);while(active(k)){n++;k=addDays(k,-1)}return n}
@@ -74,11 +147,14 @@ function roma(m){
   }).join(" ").replace(/\s+([.,?!])/g,"$1").replace(/_+/g,"___").replace(/\s+/g," ").trim()}
 
 /* ---------- suara ---------- */
-var VOICE=null;
-function pickVoice(){if(!("speechSynthesis" in window))return;var v=speechSynthesis.getVoices().filter(function(x){return /^ja([-_]|$)/i.test(x.lang)});
-  VOICE=v.filter(function(x){return /Nanami|Online|Natural|Google/i.test(x.name)})[0]||v[0]||null}
-if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-function say(t){if(!("speechSynthesis" in window)||!t)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";if(VOICE)u.voice=VOICE;u.rate=.9;speechSynthesis.speak(u)}
+var VOICE=null,VP={voice:"",slow:false};
+try{var _vp=JSON.parse(localStorage.getItem(LS+"-vp")||"null");if(_vp)VP=Object.assign(VP,_vp)}catch(e){}
+function vpSave(){try{localStorage.setItem(LS+"-vp",JSON.stringify(VP))}catch(e){}}
+function jaVoices(){return "speechSynthesis" in window?speechSynthesis.getVoices().filter(function(x){return /^ja([-_]|$)/i.test(x.lang)}):[]}
+function vScore(v){var n=v.name,s=0;if(/natural|neural|online/i.test(n))s+=6;if(/nanami|keita|ayumi|haruka|sayaka|kyoko|o-ren|hattori|ichiro/i.test(n))s+=3;if(/microsoft|apple/i.test(n))s+=2;if(/google/i.test(n))s-=1;return s}
+function pickVoice(){var v=jaVoices();VOICE=null;if(VP.voice)VOICE=v.filter(function(x){return x.name===VP.voice})[0]||null;if(!VOICE)VOICE=v.slice().sort(function(a,b){return vScore(b)-vScore(a)})[0]||null}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=function(){pickVoice();var ae=document.activeElement;if(state.tab==="atur"&&!(ae&&ae.tagName==="SELECT"))render()}}
+function say(t){if(!("speechSynthesis" in window)||!t)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";if(VOICE)u.voice=VOICE;u.rate=VP.slow?.65:.9;speechSynthesis.speak(u)}
 var ICO={
  spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
  ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
@@ -388,13 +464,18 @@ function vSalah(){
 }
 
 /* Pengaturan */
+function syncCard(){return '<section class="card"><h3>Sinkron lewat Google Drive</h3><p>Masuk dengan akun Google yang sama di setiap perangkat. Kemajuan disimpan di folder aplikasi pada Drive Anda, dan hanya file milik aplikasi ini yang bisa diakses. Akun dan izinnya sama dengan aplikasi IELTS, tetapi datanya terpisah.</p><p class="small">Saat pindah perangkat, tekan <b>Sinkron sekarang</b> dulu sebelum belajar, supaya data terbaru tertarik dari Drive.</p><p><b>'+(GD.on?"Terhubung ke Google Drive":"Belum masuk")+'</b></p><div class="row">'+(GD.on?'<button class="btn" type="button" data-act="gdnow">Sinkron sekarang</button><button class="btn alt" type="button" data-act="gdout">Keluar</button>':'<button class="btn" type="button" data-act="gdin">Masuk dengan Google</button>')+'</div><p class="small" id="gdMsg" aria-live="polite"></p></section>'}
+function voiceCard(){pickVoice();var v=jaVoices();
+  return '<section class="card"><h3>Suara pelafalan</h3><p>Berlaku hanya di perangkat ini. '+(v.length?'Terdeteksi '+v.length+' suara Jepang. Saat ini dipakai: <b>'+(VOICE?esc(VOICE.name):"suara bawaan perangkat")+'</b>.':'Belum ada suara bahasa Jepang di perangkat ini. Di Windows: Pengaturan, Waktu & bahasa, Ucapan, Tambahkan suara, Jepang.')+'</p>'
+   +'<div class="field"><label for="vpVoice">Suara</label><select id="vpVoice"><option value="">Otomatis (pilih yang paling natural)</option>'+v.map(function(x){return '<option value="'+esc(x.name)+'"'+(VP.voice===x.name?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>'
+   +'<div class="srow"><span>Kecepatan</span><div class="seg"><button type="button" data-act="vslow:0" aria-pressed="'+!VP.slow+'">Normal</button><button type="button" data-act="vslow:1" aria-pressed="'+VP.slow+'">Pelan</button></div></div>'
+   +'<p class="small">Suara paling natural biasanya ada di Microsoft Edge (Nanami, Keita). Di Chrome, suara bawaannya adalah Google.</p><div class="row"><button class="btn alt" type="button" data-say="こんにちは。きょうは いい てんき ですね。">Tes suara</button></div></section>'}
 function vAtur(){
-  var hasJa=!!VOICE;
   return '<section class="card"><h3>Tampilan</h3><div class="srow"><span>Furigana (cara baca di atas kanji)</span><div class="seg"><button type="button" data-act="furi:1" aria-pressed="'+S.furi+'">Tampilkan</button><button type="button" data-act="furi:0" aria-pressed="'+!S.furi+'">Sembunyikan</button></div></div>'
    +'<div class="srow"><span>Tema</span><div class="seg">'+[["auto","Otomatis"],["light","Terang"],["dark","Gelap"]].map(function(t){return '<button type="button" data-act="theme:'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>'}).join("")+'</div></div>'
    +'<div class="srow"><span>Kata baru per hari</span><div class="seg">'+[5,10,15,20].map(function(n){return '<button type="button" data-act="newPer:'+n+'" aria-pressed="'+(S.newPer===n)+'">'+n+'</button>'}).join("")+'</div></div></section>'
-   +'<section class="card"><h3>Suara</h3><p>'+(hasJa?'Suara Jepang ditemukan: <b>'+esc(VOICE.name)+'</b>.':'Belum ada suara bahasa Jepang di perangkat ini. Di Windows: Pengaturan → Waktu & bahasa → Ucapan → Tambahkan suara → Jepang. Browser Microsoft Edge biasanya sudah punya suara Jepang yang natural (Nanami).')+'</p><button class="btn alt" type="button" data-say="こんにちは、にほんごを べんきょうしましょう。">Tes suara</button></section>'
-   +'<section class="card"><h3>Cadangan</h3><p>Kemajuan disimpan di browser ini saja. Ekspor ke file secara berkala, lalu impor di perangkat lain.</p><div class="row"><button class="btn" type="button" data-act="export">Ekspor cadangan</button><label class="btn alt" for="impFile">Impor cadangan</label><input id="impFile" type="file" accept="application/json,.json" class="sr"></div><p class="small" id="impMsg" aria-live="polite"></p></section>'
+   +syncCard()+voiceCard()
+   +'<section class="card"><h3>Cadangan manual</h3><p>Unduh kemajuan sebagai file, atau pulihkan dari file cadangan.</p><div class="row"><button class="btn alt" type="button" data-act="export">Ekspor cadangan</button><label class="btn alt" for="impFile">Impor cadangan</label><input id="impFile" type="file" accept="application/json,.json" class="sr"></div><p class="small" id="impMsg" aria-live="polite"></p></section>'
    +'<section class="card"><h3>Rencana</h3><p>Rencana 12 minggu dimulai '+tgl(S.start)+'. Minggu 1 hiragana, minggu 2 katakana, minggu 3 sampai 12 kosakata, kanji, dan tata bahasa N5.</p><div class="row"><button class="lnk" type="button" data-act="restart">Mulai rencana dari hari ini</button><button class="lnk danger" type="button" data-act="reset">Hapus semua kemajuan</button></div></section>';
 }
 
@@ -409,6 +490,8 @@ function render(){
   var n=$("nextBtn")||$("flipBtn");if(n)n.focus({preventScroll:true});
   var vq=$("vq");if(vq)vq.oninput=function(){state.vq=vq.value;$("vlist").innerHTML=vRows()};
   var imp=$("impFile");if(imp)imp.onchange=importFile;
+  var vs=$("vpVoice");if(vs)vs.onchange=function(){VP.voice=vs.value;vpSave();pickVoice();render()};
+  setSync(LASTSYNC);
 }
 function go(tab){state.tab=tab;if(tab!=="soal"&&state.qs&&state.qs.i>=state.qs.items.length)state.qs=null;render();window.scrollTo(0,0)}
 function act(a,el){
@@ -440,10 +523,14 @@ function act(a,el){
     case "qmenu":state.qs=null;break;
     case "furi":S.furi=v==="1";save();break;
     case "theme":S.theme=v;save();applyTheme();break;
+    case "vslow":VP.slow=v==="1";vpSave();break;
+    case "gdin":var gm=$("gdMsg");if(gm)gm.textContent="Membuka jendela Google...";gLogin().then(function(){render()},function(e){var g2=$("gdMsg");if(g2)g2.textContent="Gagal masuk: "+(e&&e.message||"dibatalkan")+". Pastikan pop-up tidak diblokir dan situs dibuka dari alamat taketatshu.github.io."});return;
+    case "gdnow":var gn=$("gdMsg");if(gn)gn.textContent="Menyinkronkan...";(gHas()?Promise.resolve():gToken(true)).then(function(){return pull()}).then(function(){render()},function(e){var g3=$("gdMsg");if(g3)g3.textContent="Gagal: "+(e&&e.message||"dibatalkan")});return;
+    case "gdout":gLogout();break;
     case "newPer":S.newPer=+v;state.fc=null;save();break;
     case "export":exportFile();return;
     case "restart":if(confirm("Mulai rencana 12 minggu dari hari ini? Kemajuan belajar tetap disimpan.")){S.start=today();save()}break;
-    case "reset":if(confirm("Hapus semua kemajuan di browser ini? Ini tidak bisa dibatalkan, kecuali Anda punya file cadangan.")){S=fresh();save();state.fc=null;state.qs=null;state.kq=null}break;
+    case "reset":if(confirm("Hapus semua kemajuan di browser ini"+(GD.on?" dan di Google Drive":"")+"? Ini tidak bisa dibatalkan, kecuali Anda punya file cadangan.")){S=fresh();save();state.fc=null;state.qs=null;state.kq=null}break;
   }
   render();
 }
@@ -468,6 +555,6 @@ function importFile(e){var f=e.target.files[0];if(!f)return;var r=new FileReader
     if(confirm("Ganti kemajuan di browser ini dengan isi file "+f.name+"?")){S=o;var fr=fresh();for(var k in fr)if(S[k]===undefined)S[k]=fr[k];save();applyTheme();state.fc=null;state.qs=null;render();$("impMsg").textContent="Cadangan berhasil diimpor."}}
   catch(err){if(m)m.textContent="File ini bukan cadangan Nihongo yang valid."}};r.readAsText(f)}
 
-applyTheme();render();
+applyTheme();render();if(GD.on)pull();
 window.NJ={S:function(){return S},state:state,romaji:romaji,roma:roma,mkItem:mkItem,poolKeys:poolKeys};
 })();
