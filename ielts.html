@@ -316,6 +316,12 @@ nav button{min-height:44px}
 .gu-ex{margin:6px 0 0;font-weight:600}
 .gu-ex .spk{vertical-align:middle;margin-left:4px}
 .gu-tr{margin:2px 0 0;color:var(--muted);font-style:italic}
+.rdbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:8px 0 12px}
+.rdbtn{min-height:40px;padding:6px 14px;font-size:14px}
+.rdbtn.on{background:var(--accent);color:#0E1A2B;border-color:var(--accent)}
+.rdprog{flex:1 1 120px;min-width:80px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.rdprog i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s linear}
+@media (prefers-reduced-motion:reduce){.rdprog i{transition:none}}
 .optspk{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:10px}
 .qh .spk{vertical-align:middle;margin-left:4px}
 .vpbox{margin-top:4px}
@@ -604,7 +610,8 @@ nav{background-image:none}
 .rttabs{display:flex;flex-wrap:wrap;margin:12px 0 14px}
 .rttabs button{display:flex;flex-direction:column;align-items:flex-start;gap:0;line-height:1.25}
 .rttabs .small{font-size:12.5px}
-.rtgrid{display:grid;gap:18px}
+.rtgrid{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+.rtgrid>*{min-width:0}
 @media (min-width:1100px){.rtgrid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}.rtpass{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}}
 .rtpass{background:var(--surface);border:2px solid var(--edge);border-radius:10px;padding:16px 18px;line-height:1.75;font-size:15.5px}
 .rtpass h2{font-size:clamp(22px,4.5vw,26px);margin:0 0 10px}
@@ -962,6 +969,7 @@ function humanUrl(w){
     AU[w]=u?u.replace(/^http:/,"https:"):"";auSave();return AU[w]}).catch(function(e){clearTimeout(t);if(e===0){AU[w]="";auSave()}return ""});
 }
 function say(w,btn){
+  if(typeof rdA!=="undefined"&&rdA&&!rdA.paused){try{rdA.pause()}catch(e){}}
   w=String(w);var k=w.toLowerCase().trim(),id=spkStart(btn,w);
   if(VP.human&&/^[a-z']{2,}$/.test(k)&&navigator.onLine!==false){
     humanUrl(k).then(function(u){
@@ -3793,12 +3801,34 @@ function fullSent(q,fill){return String(q).replace(/_{3,}/,fill)}
 function speakable(o){o=String(o||"").trim();return !!o&&!/^[(\-—–]/.test(o)&&!/tanpa|no article/i.test(o)}
 function ansSpk(it){var w=it.o[it.a];if(it.tf||!speakable(w))return "";var h=spkBtn(w,w);if(/_{3,}/.test(it.q))h+='<span class="spkl">Kalimat lengkap</span>'+spkBtn(fullSent(it.q,w),"kalimat lengkap");return '<span class="ansspk">'+h+'</span>'}
 function optSpkRow(it,L){return '<div class="optspk"><span class="spkl">Dengarkan pilihan:</span>'+qs.perm.map(function(orig,i){return '<span class="pi"><b>'+L.charAt(i)+'</b> '+(speakable(it.o[orig])?spkBtn(it.o[orig],L.charAt(i)+". "+it.o[orig]):"")+'</span>'}).join("")+'</div>'}
+/* ===== Audio teks Bacaan: MP3 neural (audio/rd/<kunci>.mp3), cadangan suara perangkat ===== */
+var rdA=null,rdKey="",rdTts=false;
+function rdText(key){var m=/^P(\d+)$/.exec(key);if(m){var P=RP[+m[1]-1];return P?P.t+". "+P.x:""}
+  var r=/^(.+)-(\d+)$/.exec(key),t=r&&RTS.filter(function(x){return x.id===r[1]})[0],p=t&&t.passages[+r[2]-1];if(!p)return "";
+  return p.t+". "+p.paras.map(function(x){return Array.isArray(x)?x[x.length-1]:x}).join(" ").replace(/\[\[\d+:([^\]]+)\]\]/g,"$1")}
+function rdBar(key){var on=rdKey===key&&((rdA&&!rdA.paused)||rdTts);
+  return '<div class="rdbar"><button class="btn ghost rdbtn'+(on?" on":"")+'" type="button" data-rd="'+esc(key)+'" aria-pressed="'+on+'">'+(on?"Jeda":"Dengarkan teks")+'</button>'+slowBtn()+'<div class="rdprog" aria-hidden="true"><i id="rdProg"></i></div><span class="small" id="rdSt" aria-live="polite"></span></div>'}
+function rdUi(){document.querySelectorAll("[data-rd]").forEach(function(b){var on=b.getAttribute("data-rd")===rdKey&&((rdA&&!rdA.paused)||rdTts);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);b.textContent=on?"Jeda":(rdKey===b.getAttribute("data-rd")&&rdA&&rdA.currentTime>0?"Lanjutkan":"Dengarkan teks")})}
+function rdStop(){if(rdA){try{rdA.pause()}catch(e){}}rdA=null;if(rdTts){try{speechSynthesis.cancel()}catch(e){}}rdTts=false;rdKey="";var g=document.getElementById("rdProg");if(g)g.style.width="0";rdUi()}
+function rdPlay(key,btn){
+  if(rdKey===key&&rdTts){rdStop();return}
+  if(rdKey===key&&rdA){if(rdA.paused){rdA.playbackRate=VP.slow?.85:1;rdA.play()}else rdA.pause();rdUi();return}
+  rdStop();spkStop();try{speechSynthesis.cancel()}catch(e){}if(curAudio){try{curAudio.pause()}catch(e){}}
+  rdKey=key;var a=new Audio("audio/rd/"+key+".mp3"),st=document.getElementById("rdSt");rdA=a;a.playbackRate=VP.slow?.85:1;
+  var fb=function(){if(rdA!==a)return;rdA=null;rdTts=true;var t=rdText(key);if(st)st.textContent="Memakai suara perangkat.";
+    try{var u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=VP.slow?.7:.95;var v=pickVoice();if(v){u.voice=v;u.lang=v.lang}u.onend=u.onerror=function(){if(rdKey===key&&rdTts){rdTts=false;rdKey="";rdUi()}};speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){rdTts=false;rdKey=""}rdUi()};
+  a.onerror=fb;a.onplay=a.onpause=rdUi;
+  a.onended=function(){if(rdA===a){rdA=null;rdKey="";var g=document.getElementById("rdProg");if(g)g.style.width="100%";rdUi()}};
+  a.ontimeupdate=function(){var g=document.getElementById("rdProg");if(g&&a.duration)g.style.width=(a.currentTime/a.duration*100)+"%"};
+  var pp=a.play();if(pp&&pp.catch)pp.catch(function(e){if(e&&e.name==="NotAllowedError"){rdKey="";rdA=null;rdUi()}else fb()});rdUi();
+}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-rd]");if(b){e.preventDefault();rdPlay(b.getAttribute("data-rd"),b)}});
 function soalQ(){
   if(qs.items[qs.i].k==="makna")return mkQ();
   var it=qs.items[qs.i],n=qs.items.length,done=qs.picked!==null,num=pad(qs.i+1),L="ABCD",
     ttl=it.k==="grammar"?"Soal Tata Bahasa":it.k==="vocab"?"Soal Kosakata":"Soal Bacaan",p="";
   var prog='<div class="prog" aria-hidden="true">'+qs.items.map(function(_,j){return '<i class="'+(j<qs.res.length?(qs.res[j].ok?"c":"x"):j===qs.i?"n":"")+'"></i>'}).join("")+'</div>';
-  if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">Teks &middot; '+P.l+'</div><h3>'+esc(P.t)+'</h3><div>'+esc(P.x)+'</div></div>'}
+  if(it.k==="reading"){var P=RP[it.p];p='<div class="passage"><div class="lbl" style="margin-bottom:6px">Teks &middot; '+P.l+'</div><h3>'+esc(P.t)+'</h3>'+rdBar("P"+String(it.p+1).padStart(2,"0"))+'<div>'+esc(P.x)+'</div></div>'}
   var opts=qs.perm.map(function(orig,i){
     var cls="opt";if(done){if(orig===it.a)cls+=" right";else if(i===qs.picked)cls+=" wrong"}
     return '<button class="'+cls+'" data-opt="'+i+'"'+(done?" disabled":"")+'><span class="ol">['+L.charAt(i)+']</span><span class="ot">'+esc(it.o[orig])+'</span></button>';
@@ -4126,7 +4156,7 @@ function rtView(){
   var start=(!chk&&!state.rtEnd)?'<div class="lsbox" style="margin:12px 0"><div class="seg lsmode" role="group" aria-label="Mode"><button data-rtmode="latihan" aria-pressed="'+!ex+'">Latihan</button><button data-rtmode="ujian" aria-pressed="'+ex+'">Ujian 60 menit</button></div><p class="small" style="margin:0">'+(ex?'Timer 60 menit dimulai saat Anda menekan tombol di bawah. Jawaban diperiksa otomatis saat waktu habis. Tes asli tidak memberi waktu tambahan untuk menyalin jawaban.':'Tanpa batas waktu. Cocok untuk belajar strategi tiap jenis soal.')+'</p>'+(ex?'<button class="btn" id="rtStart" style="margin-top:10px">Mulai 60 menit</button>':'')+'</div>':'';
   var res=chk?'<div class="panel lsscore"><div class="ring" style="--p:'+Math.round(score/40*100)+'"><b>'+score+'/40</b></div><div><p style="margin:0 0 4px;font-weight:700">Perkiraan band Reading: '+rtBand(score).toFixed(1)+'</p><p class="small" style="margin:0">Memakai tabel konversi umum IELTS Academic, bukan nilai resmi. Bagian yang menjadi bukti jawaban disorot di teks. Jawaban yang salah tercatat di tab Kesalahan.</p><div class="row" style="margin-top:12px"><button class="btn" id="rtAgain">Kerjakan ulang</button><button class="btn ghost" data-rtv="list">Tes lain</button></div></div></div>':'';
   return '<div class="case lscase">'+head+res+start+tabs
-    +'<div class="rtgrid"><article class="rtpass"><h2>'+esc(p.t)+'</h2>'+paras+'</article><div class="rtqs">'+qs
+    +'<div class="rtgrid"><article class="rtpass"><h2>'+esc(p.t)+'</h2>'+rdBar(t.id+"-"+(state.rtp+1))+paras+'</article><div class="rtqs">'+qs
     +(chk?'':'<div class="nextbar">'+(state.rtp<2?'<button class="btn ghost" data-rtp="'+(state.rtp+1)+'">Bacaan '+(state.rtp+2)+'</button>':'')+'<button class="btn" id="rtCheckBtn">Periksa 40 jawaban</button></div>')+'</div></div></div>';
 }
 function rtBind(){
@@ -4393,6 +4423,7 @@ function go(t){var ch=state.tab!==t;if(ch){stopTimer();T.left=0;lsStop();rtStop(
 
 function bind(){
   var $=function(id){return document.getElementById(id)};
+  if(rdKey&&!document.querySelector('[data-rd="'+rdKey+'"]'))rdStop();
   if(state.tab==="soal")bindSoal();
   document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){go(b.dataset.tab)}});
   document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
