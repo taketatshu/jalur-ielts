@@ -565,6 +565,15 @@ input.lsin.ok{border-color:var(--good)}input.lsin.no{border-color:var(--bad);tex
 .pkres.ok{color:var(--good)}.pkres.no svg{color:var(--bad)}
 .pkright{margin:0 0 12px;line-height:1.6}
 .pken{font-size:17px;line-height:1.6;margin:12px 0 4px}
+.pkex,.pkwhy{border:2px solid var(--line);border-radius:8px;padding:10px 14px;margin:14px 0 4px;background:var(--surface)}
+.pkex h4,.pkwhy h4{margin:10px 0 4px;font-size:14px;color:var(--muted);font-family:var(--f-body);font-weight:700}
+.pkex h4:first-child,.pkwhy h4:first-child{margin-top:0}
+.pkex p{margin:0;line-height:1.6}
+.pkasal{text-decoration:line-through;text-decoration-color:var(--bad);color:var(--muted)}
+.pkwhy ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pkwhy li{display:grid;gap:2px;line-height:1.5}
+.pkwhy li b{font-family:var(--f-mono);font-size:14px}
+.pkwhy li em{font-style:normal;font-size:12.5px;color:var(--bad);margin-left:6px}
 .pwk{margin:4px 0 0;padding-left:20px;display:grid;gap:8px}
 .pwk li b{display:block;font-size:13px;color:var(--muted);font-weight:600}
 .pwk li span{line-height:1.55}
@@ -4854,6 +4863,8 @@ function pkEq(eq){var roles={},chips=eq.map(function(c,i){if(c[0]==="x")return '
 function pkInfo(p){return '<div class="eqbox"><div class="eqh"><span>Rumus kalimat</span><b>'+esc(p.nama)+'</b></div>'+pkEq(p.eq)+'</div>'
   +'<p class="pken">'+esc(p.en)+' '+spkBtn(p.en,"kalimat")+'</p><p class="small" style="margin:0 0 6px">'+esc(p.tr)+'</p>'
   +'<p class="small" style="margin:0"><b>Dipakai untuk:</b> '+esc(p.guna)+'</p>'}
+function pkEx(p,naik){return '<div class="pkex">'+(naik&&p.naik?'<h4>Cara mengubahnya</h4><p>'+esc(p.naik)+'</p>':'')+(p.ket?'<h4>Kenapa urutannya begini</h4><p>'+esc(p.ket)+'</p>':'')
+  +(p.asal?'<h4>Kalimat asli peserta</h4><p class="pkasal">'+esc(p.asal)+'</p><p class="small" style="margin:4px 0 0">Kalimat di atas dibetulkan sesuai komentar penguji Cambridge, atau ditulis ulang agar benar.</p>':'')+'</div>'}
 function pkTags(x){return '<div class="row" style="gap:6px;margin:0 0 10px"><span class="chip">'+pkSrc(x)+'</span>'+(x.lvl?'<span class="chip lvl">'+x.lvl+'</span>':'')+(x.dib?'<span class="chip">dibetulkan dari jawaban peserta</span>':'')+'</div>'}
 var PKJ={susun:["Susun ulang","Urutkan potongan menjadi kalimat band 7, lalu lihat rumusnya."],perbaiki:["Perbaiki kalimat","Kesalahan asli peserta ujian, dengan koreksi dari penguji Cambridge."],naik:["Naikkan level","Tulis ulang kalimat sederhana memakai pola band 7, lalu bandingkan dengan contoh."]};
 function pkCard(){
@@ -4885,7 +4896,7 @@ function pkView(){
      +'<div class="pkline" id="pkLine" aria-label="Kalimat Anda">'+(q.line.length?q.line.map(function(i){return '<button class="pkp on" type="button" data-pk-back="'+i+'"'+(q.res?" disabled":"")+'>'+esc(it.eq[i][1])+'</button>'}).join(""):'<span class="small">Ketuk potongan di bawah sesuai urutan.</span>')+'</div>'
      +'<div class="pkpool" id="pkPool">'+q.pool.filter(function(i){return !used[i]}).map(function(i){return '<button class="pkp" type="button" data-o="'+i+'">'+esc(it.eq[i][1])+'</button>'}).join("")+'</div>';
     if(!q.res)body+='<div class="nextbar"><button class="btn" id="pkCheck" type="button"'+(q.line.length<it.eq.length?" disabled":"")+'>Periksa</button><button class="btn ghost" id="pkReset" type="button">Ulang susun</button></div>';
-    else body+='<div class="pkres '+(q.res==="ok"?"ok":"no")+'">'+(q.res==="ok"?icoOk()+'<b>Benar.</b>':icoNo()+'<b>Belum tepat.</b>')+'</div>'+(q.res==="ok"?'':'<p class="pkright">Urutan yang benar: <b>'+esc(it.en)+'</b></p>')+pkInfo(it)
+    else body+='<div class="pkres '+(q.res==="ok"?"ok":"no")+'">'+(q.res==="ok"?icoOk()+'<b>Benar.</b>':icoNo()+'<b>Belum tepat.</b>')+'</div>'+(q.res==="ok"?'':'<p class="pkright">Urutan yang benar: <b>'+esc(it.en)+'</b></p>')+pkInfo(it)+pkEx(it,false)
       +'<div class="nextbar"><button class="btn" id="pkNext" type="button">Butir berikutnya</button></div>';
   }else if(j==="naik"){
     if(q.pid!==it.id){q.pid=it.id;q.cmp=false}
@@ -4894,7 +4905,7 @@ function pkView(){
      +'<p style="margin:0 0 10px"><b>Pola sasaran:</b> '+esc(it.nama)+'<br><span class="small">'+esc(it.guna)+'</span></p>'
      +'<label class="chlbl" for="pkTxt">Kalimat Anda</label><textarea id="pkTxt" rows="3" placeholder="Tulis kalimat Anda di sini" data-id="'+it.id+'">'+esc(mine)+'</textarea>';
     if(!q.cmp)body+='<div class="nextbar"><button class="btn" id="pkCmp" type="button">Bandingkan</button><span class="small">Tidak ada nilai otomatis; Anda menilai sendiri setelah melihat contoh.</span></div>';
-    else body+='<h3 class="sec-t" style="margin-top:16px">Contoh dari jawaban Cambridge</h3>'+pkInfo(it)
+    else body+='<h3 class="sec-t" style="margin-top:16px">Contoh dari jawaban Cambridge</h3>'+pkInfo(it)+pkEx(it,true)
       +'<p style="margin:14px 0 8px;font-weight:700">Apakah kalimat Anda sudah memakai pola ini dengan benar?</p><div class="row"><button class="btn good" data-pkself="1" type="button">Pola sudah saya pakai</button><button class="btn ghost" data-pkself="0" type="button">Belum</button><button class="btn ghost" id="pkCopy" type="button">Salin untuk dinilai Claude</button></div><p class="small" id="pkMsg" aria-live="polite"></p>';
   }else{
     if(!q.perm||q.pid!==it.id){q.pid=it.id;q.perm=chShuf(it.o.map(function(_,i){return i}));q.pick=null}
@@ -4902,7 +4913,9 @@ function pkView(){
     body='<p style="margin:0 0 8px">Pilih bentuk yang benar untuk bagian kosong.</p><div class="qh">'+blankify(it.kal,q.pick!==null?it.o[it.a]:"")+'</div><div class="ogrid">'
      +q.perm.map(function(o,i){var c=q.pick===null?"":o===it.a?" right":o===q.pick?" wrong":"";return '<button class="opt'+c+'" type="button" data-pkf="'+o+'"'+(q.pick!==null?" disabled":"")+'><b>'+"ABCD".charAt(i)+'</b> '+esc(it.o[o])+'</button>'}).join("")+'</div>';
     if(q.pick!==null)body+='<div class="pkres '+(q.pick===it.a?"ok":"no")+'">'+(q.pick===it.a?icoOk()+'<b>Benar.</b>':icoNo()+'<b>Belum tepat.</b> Jawaban: <b>'+esc(it.o[it.a])+'</b>')+' <span class="chip">'+esc(it.jenis)+'</span></div>'
-      +'<p class="why">'+esc(it.ket)+'</p><p class="pken">'+esc(full)+' '+spkBtn(full,"kalimat")+'</p><p class="small">Bentuk asli peserta ada di antara pilihan; koreksinya dari komentar penguji Cambridge.</p>'
+      +'<p class="why">'+esc(it.ket)+'</p><p class="pken">'+esc(full)+' '+spkBtn(full,"kalimat")+'</p>'
+      +(it.r?'<div class="pkwhy"><h4>Mengapa pilihan lain salah?</h4><ul>'+q.perm.map(function(o,i){if(o===it.a)return "";return '<li><b>'+"ABCD".charAt(i)+'. '+esc(it.o[o])+(o===q.pick?' <em>pilihan Anda</em>':'')+'</b><span>'+esc(it.r[o])+'</span></li>'}).join("")+'</ul></div>':'')
+      +'<p class="small">Bentuk asli peserta ada di antara pilihan; koreksinya dari komentar penguji Cambridge.</p>'
       +'<div class="nextbar"><button class="btn" id="pkNext" type="button">Butir berikutnya</button></div>';
   }
   return h+'<div class="panel" id="pkView" data-id="'+it.id+'">'+prog+pkTags(it)+body+'</div>';
