@@ -559,6 +559,9 @@ input.lsin.ok{border-color:var(--good)}input.lsin.no{border-color:var(--bad);tex
 .pkpool{margin:0 0 14px}
 .pkp{border:2px solid var(--edge);border-radius:8px;background:var(--surface);color:var(--ink);padding:8px 12px;font-size:15px;line-height:1.35;min-height:44px;text-align:left;max-width:100%;cursor:pointer}
 .pkp.on{border-color:var(--accent)}
+.pkp:not(:disabled){touch-action:none;user-select:none;-webkit-user-select:none}
+.pkghost{position:fixed;z-index:50;margin:0;opacity:.92;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.35);border-color:var(--accent)}
+.pkdrag{opacity:.35}
 .pkp:disabled{cursor:default;opacity:1}
 .pkres{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px;font-size:16px}
 .pkres svg{width:22px;height:22px;flex:none}
@@ -1030,11 +1033,16 @@ function say(w,btn){
     });
   }else ttsSay(w,id);
 }
+/* hentikan suara tombol speaker; spkSeq naik supaya MP3 kamus yang masih diunduh tidak ikut berbunyi */
+function sayStop(){spkSeq++;try{speechSynthesis.cancel()}catch(e){}if(curAudio){try{curAudio.pause()}catch(e){}}spkStop()}
 function slowBtn(){return '<button class="spk slw'+(VP.slow?' on':'')+'" type="button" data-slow aria-pressed="'+(VP.slow?'true':'false')+'" title="Putar lebih pelan">Pelan</button>'}
 function spk(w){var p=pr(w);return '<span class="pw"><span class="ipa">'+(p?'/'+esc(p)+'/':'')+'</span><button class="spk" type="button" data-say="'+esc(w)+'" aria-label="Dengarkan '+esc(w)+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></span>'}
 function spkBtn(t,label){return '<button class="spk" type="button" data-say="'+esc(t)+'" aria-label="Dengarkan '+esc(label||t)+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>'}
 function spkRow(a){return a.filter(function(w,i){return a.indexOf(w)===i}).map(function(w){return '<span class="pi"><b>'+esc(w)+'</b> '+spk(w)+'</span>'}).join('')+slowBtn()}
-document.addEventListener("click",function(e){var sb=e.target.closest&&e.target.closest("[data-slow]");if(sb){e.preventDefault();e.stopPropagation();VP.slow=!VP.slow;vpSave();document.querySelectorAll("[data-slow]").forEach(function(x){x.classList.toggle("on",VP.slow);x.setAttribute("aria-pressed",VP.slow?"true":"false")});var cb=document.getElementById("vpSlow");if(cb)cb.checked=VP.slow;return}var b=e.target.closest&&e.target.closest("[data-say]");if(b){e.preventDefault();e.stopPropagation();say(b.getAttribute("data-say"),b)}},true);
+document.addEventListener("click",function(e){var sb=e.target.closest&&e.target.closest("[data-slow]");if(sb){e.preventDefault();e.stopPropagation();VP.slow=!VP.slow;vpSave();document.querySelectorAll("[data-slow]").forEach(function(x){x.classList.toggle("on",VP.slow);x.setAttribute("aria-pressed",VP.slow?"true":"false")});var cb=document.getElementById("vpSlow");if(cb)cb.checked=VP.slow;return}var b=e.target.closest&&e.target.closest("[data-say]");if(b){e.preventDefault();e.stopPropagation();say(b.getAttribute("data-say"),b);return}
+  /* klik pada tombol atau kontrol lain menghentikan suara speaker */
+  /* hanya bila suara speaker memang aktif, supaya audio Listening (yang juga bisa memakai suara perangkat) tidak ikut terhenti */
+  if(spkCur&&e.target.closest&&e.target.closest("button,a,[role=tab],select,label,summary"))sayStop()},true);
 
 var S=load();
 function load(){var o=null;try{var r=localStorage.getItem(LS);if(r)o=Object.assign(def(),JSON.parse(r))}catch(e){}if(!o)return def();if(o.vv!==2){o.cards={};o.vv=2}try{return normQ(o)}catch(e){return o}}
@@ -4866,6 +4874,25 @@ function pkChunks(eq,max){
     for(var i=0;i<p.length-1;i++){var s=w(p[i].t)+w(p[i+1].t)+(isC(p[i])||isC(p[i+1])?100:0);if(s<bs){bs=s;bi=i}}
     p.splice(bi,2,{t:p[bi].t+" "+p[bi+1].t,roles:p[bi].roles.concat(p[bi+1].roles)})}
   return p}
+/* Geser potongan Susun ulang (mouse dan jari). Gerakan < 6 px tetap dianggap klik */
+var pkDrag=null,pkDragOn=false,pkSkip=false,pkSkipT=0;
+function pkMove(e){var d=pkDrag;if(!d)return;
+  if(!d.g){if(Math.abs(e.clientX-d.x0)+Math.abs(e.clientY-d.y0)<6)return;
+    var r=d.b.getBoundingClientRect();d.ox=d.x0-r.left;d.oy=d.y0-r.top;d.g=d.b.cloneNode(true);d.g.className="pkp pkghost";d.g.removeAttribute("data-o");d.g.removeAttribute("data-pk-back");
+    d.g.style.width=r.width+"px";document.body.appendChild(d.g);d.b.classList.add("pkdrag")}
+  if(e.cancelable)e.preventDefault();d.g.style.left=(e.clientX-d.ox)+"px";d.g.style.top=(e.clientY-d.oy)+"px"}
+function pkIn(el,x,y){if(!el)return false;var r=el.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom}
+function pkUp(e){var d=pkDrag;pkDrag=null;if(!d||!d.g)return;
+  if(d.g.parentNode)d.g.parentNode.removeChild(d.g);d.b.classList.remove("pkdrag");
+  pkSkip=true;clearTimeout(pkSkipT);pkSkipT=setTimeout(function(){pkSkip=false},400); /* browser mengirim satu klik setelah geser */
+  var x=e.clientX,y=e.clientY,line=document.getElementById("pkLine"),area=pkIn(line,x,y)?"line":pkIn(document.getElementById("pkPool"),x,y)?"pool":null,idx=0;
+  if(area==="line"){var kids=[].slice.call(line.querySelectorAll("[data-pk-back]")).filter(function(k){return k!==d.b});idx=kids.length;
+    for(var k=0;k<kids.length;k++){var r=kids[k].getBoundingClientRect();if(y<r.top||(y<=r.bottom&&x<r.left+r.width/2)){idx=k;break}}}
+  pkDrop(d.i,d.from,area,idx)}
+function pkCancel(){var d=pkDrag;pkDrag=null;if(d&&d.g){if(d.g.parentNode)d.g.parentNode.removeChild(d.g);d.b.classList.remove("pkdrag")}}
+/* area "line": sisipkan di posisi idx; "pool" atau dilepas di luar: potongan dari baris kembali ke kumpulan, dari kumpulan tetap di kumpulan */
+function pkDrop(i,from,area,idx){var q=state.pkq;if(!q||q.res)return;var L=q.line.filter(function(x){return x!==i});
+  if(area==="line")L.splice(Math.min(idx,L.length),0,i);q.line=L;render()}
 function pkMastered(){var st=pkSt();return PK.pola.filter(function(p){return st[p.id]&&st[p.id].box>=4}).length}
 function pkSrc(x){var m=/^(W1|W2|SP)-T(\d)$/.exec(x.src||""),n=m?{W1:"Writing Task 1",W2:"Writing Task 2",SP:"Speaking"}[m[1]]+", Test "+m[2]:x.src;return "Cambridge "+x.book+" &middot; "+esc(n)}
 function pkEq(eq){var roles={},chips=eq.map(function(c,i){if(c[0]==="x")return '<span class="eqx">'+esc(c[1])+'</span>';roles[c[0]]=1;
@@ -4904,7 +4931,7 @@ function pkView(){
     q.line=q.line||[];if(!q.pool||q.pid!==it.id){q.pid=it.id;q.line=[];q.parts=pkChunks(it.eq,pkMax(it.id));var o=q.parts.map(function(_,i){return i}),s=o;for(var k=0;k<8&&s.join()===o.join();k++)s=chShuf(o);q.pool=s;q.res=null}
     var used={},P=q.parts;q.line.forEach(function(i){used[i]=1});
     body='<p style="margin:0 0 4px">Susun potongan berikut menjadi satu kalimat yang benar.</p><p class="small" style="margin:0 0 8px">'+P.length+' potongan'+(P.length<it.eq.length?'. Potongan akan dipecah lebih halus setelah Anda menguasai kalimat ini.':'.')+'</p>'
-     +'<div class="pkline" id="pkLine" aria-label="Kalimat Anda">'+(q.line.length?q.line.map(function(i){return '<button class="pkp on" type="button" data-pk-back="'+i+'"'+(q.res?" disabled":"")+'>'+esc(P[i].t)+'</button>'}).join(""):'<span class="small">Ketuk potongan di bawah sesuai urutan.</span>')+'</div>'
+     +'<div class="pkline" id="pkLine" aria-label="Kalimat Anda">'+(q.line.length?q.line.map(function(i){return '<button class="pkp on" type="button" data-pk-back="'+i+'"'+(q.res?" disabled":"")+'>'+esc(P[i].t)+'</button>'}).join(""):'<span class="small">Ketuk atau geser potongan di bawah sesuai urutan.</span>')+'</div>'
      +'<div class="pkpool" id="pkPool">'+q.pool.filter(function(i){return !used[i]}).map(function(i){return '<button class="pkp" type="button" data-o="'+i+'">'+esc(P[i].t)+'</button>'}).join("")+'</div>';
     if(!q.res)body+='<div class="nextbar"><button class="btn" id="pkCheck" type="button"'+(q.line.length<P.length?" disabled":"")+'>Periksa</button><button class="btn ghost" id="pkReset" type="button">Ulang susun</button></div>';
     else body+='<div class="pkres '+(q.res==="ok"?"ok":"no")+'">'+(q.res==="ok"?icoOk()+'<b>Benar.</b>':icoNo()+'<b>Belum tepat.</b>')+'</div>'+(q.res==="ok"?'':'<p class="pkright">Urutan yang benar: <b>'+esc(it.en)+'</b></p>')+pkInfo(it)+pkEx(it,false)
@@ -4938,8 +4965,12 @@ function pkBind(){
   if(!state.pkv||!state.pkq)return;
   var q=state.pkq,it=pkCur();
   if($("pkMore"))$("pkMore").onclick=function(){var n=pkQueue(q.j,true);state.pkq={j:q.j,q:n,i:0,total:n.length};render()};
-  document.querySelectorAll("[data-o]").forEach(function(b){if(!b.closest("#pkPool"))return;b.onclick=function(){q.line.push(+b.dataset.o);render()}});
-  document.querySelectorAll("[data-pk-back]").forEach(function(b){b.onclick=function(){var i=+b.dataset.pkBack;q.line=q.line.filter(function(x){return x!==i});render()}});
+  document.querySelectorAll("[data-o]").forEach(function(b){if(!b.closest("#pkPool"))return;b.onclick=function(){if(pkSkip){pkSkip=false;return}q.line.push(+b.dataset.o);render()}});
+  document.querySelectorAll("[data-pk-back]").forEach(function(b){b.onclick=function(){if(pkSkip){pkSkip=false;return}var i=+b.dataset.pkBack;q.line=q.line.filter(function(x){return x!==i});render()}});
+  if(!q.res)document.querySelectorAll("#pkPool .pkp,#pkLine .pkp").forEach(function(b){b.onpointerdown=function(e){
+    if(e.button!==0||b.disabled)return;var from=b.closest("#pkLine")?"line":"pool";
+    pkDrag={b:b,from:from,i:+(from==="line"?b.dataset.pkBack:b.dataset.o),x0:e.clientX,y0:e.clientY,g:null};
+    if(!pkDragOn){pkDragOn=true;document.addEventListener("pointermove",pkMove,{passive:false});document.addEventListener("pointerup",pkUp);document.addEventListener("pointercancel",pkCancel)}}});
   if($("pkReset"))$("pkReset").onclick=function(){q.line=[];render()};
   if($("pkCheck"))$("pkCheck").onclick=function(){
     var got=q.line.map(function(i){return q.parts[i].t}).join(" "),want=q.parts.map(function(c){return c.t}).join(" "),ok=got===want;
