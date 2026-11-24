@@ -4847,7 +4847,10 @@ var PK=pkAll(),PKID={};PK.pola.concat(PK.fix).forEach(function(x){PKID[x.id]=x})
 function pkSt(){S.pk=S.pk||{};return S.pk}
 function pkPool(j){return (j==="perbaiki"?PK.fix:PK.pola).map(function(x){return x.id})}
 function pkQueue(j,extra){var st=pkSt(),t=today(),ids=pkPool(j),left=extra?PKNEW:Math.max(0,PKNEW-(day().pkNew||0));
-  var due=ids.filter(function(id){return st[id]&&st[id].due<=t}),fresh=ids.filter(function(id){return !st[id]}).slice(0,left);
+  var due=ids.filter(function(id){return st[id]&&st[id].due<=t}),fresh=ids.filter(function(id){return !st[id]});
+  /* Susun ulang dan Naikkan level: butir baru dari yang termudah (B2 dulu, lalu potongan paling sedikit) */
+  if(j!=="perbaiki")fresh.sort(function(a,b){var x=PKID[a],y=PKID[b];return (x.lvl===y.lvl?0:x.lvl==="B2"?-1:1)||x.eq.length-y.eq.length});
+  fresh=fresh.slice(0,left);
   /* latihan tambahan: kalau butir baru habis, ambil butir yang belum jatuh tempo, kotak terendah dulu */
   if(extra&&fresh.length<PKNEW)fresh=fresh.concat(ids.filter(function(id){return st[id]&&st[id].due>t}).sort(function(a,b){return st[a].box-st[b].box}).slice(0,PKNEW-fresh.length));
   return chShuf(due).concat(fresh)}
@@ -4855,6 +4858,14 @@ function pkRate(id,ok){var st=pkSt(),t=today(),dd=day(),c=st[id];
   if(!c){c={box:0,due:t,n:0,ok:0};dd.pkNew=(dd.pkNew||0)+1}
   c.n++;if(ok){c.ok++;c.box=Math.min(6,c.box+1);c.due=addDays(t,CHI[c.box])}else{c.box=0;c.due=t}
   st[id]=c;dd.pola=(dd.pola||0)+1;save()}
+/* Susun ulang bertahap: maks 5 potongan untuk butir baru atau setelah salah, 7 setelah 1–2 kali benar, utuh setelah 3 kali */
+function pkMax(id){var c=pkSt()[id],b=c?c.box:0;return b>=3?Infinity:b>=1?7:5}
+function pkChunks(eq,max){
+  var p=eq.map(function(c){return{t:c[1],roles:[c[0]]}}),w=function(s){return s.split(/\s+/).length},isC=function(x){return x.roles.length===1&&x.roles[0]==="c"};
+  while(p.length>max){var bi=0,bs=Infinity;
+    for(var i=0;i<p.length-1;i++){var s=w(p[i].t)+w(p[i+1].t)+(isC(p[i])||isC(p[i+1])?100:0);if(s<bs){bs=s;bi=i}}
+    p.splice(bi,2,{t:p[bi].t+" "+p[bi+1].t,roles:p[bi].roles.concat(p[bi+1].roles)})}
+  return p}
 function pkMastered(){var st=pkSt();return PK.pola.filter(function(p){return st[p.id]&&st[p.id].box>=4}).length}
 function pkSrc(x){var m=/^(W1|W2|SP)-T(\d)$/.exec(x.src||""),n=m?{W1:"Writing Task 1",W2:"Writing Task 2",SP:"Speaking"}[m[1]]+", Test "+m[2]:x.src;return "Cambridge "+x.book+" &middot; "+esc(n)}
 function pkEq(eq){var roles={},chips=eq.map(function(c,i){if(c[0]==="x")return '<span class="eqx">'+esc(c[1])+'</span>';roles[c[0]]=1;
@@ -4890,12 +4901,12 @@ function pkView(){
   if(!it)return h+'<div class="panel"><h2>'+(q&&q.total?'Latihan selesai':'Tidak ada butir yang menunggu')+'</h2><p>'+(q&&q.total?q.total+' butir sudah dilatih. ':'')+'Butir baru dibatasi '+PKNEW+' per hari. Butir yang benar muncul lagi dengan jarak makin panjang.</p><div class="row" style="margin-top:12px"><button class="btn" id="pkMore" type="button">Tambah '+PKNEW+' butir</button><button class="btn ghost" data-pkv="menu" type="button">Jenis latihan</button></div></div>';
   var prog='<p class="small mono" style="margin:0 0 8px">Butir '+(q.i+1)+' dari '+q.q.length+'</p>',body;
   if(j==="susun"){
-    q.line=q.line||[];if(!q.pool||q.pid!==it.id){q.pid=it.id;q.line=[];var o=it.eq.map(function(_,i){return i}),s=o;for(var k=0;k<8&&s.join()===o.join();k++)s=chShuf(o);q.pool=s;q.res=null}
-    var used={};q.line.forEach(function(i){used[i]=1});
-    body='<p style="margin:0 0 8px">Susun potongan berikut menjadi satu kalimat yang benar.</p>'
-     +'<div class="pkline" id="pkLine" aria-label="Kalimat Anda">'+(q.line.length?q.line.map(function(i){return '<button class="pkp on" type="button" data-pk-back="'+i+'"'+(q.res?" disabled":"")+'>'+esc(it.eq[i][1])+'</button>'}).join(""):'<span class="small">Ketuk potongan di bawah sesuai urutan.</span>')+'</div>'
-     +'<div class="pkpool" id="pkPool">'+q.pool.filter(function(i){return !used[i]}).map(function(i){return '<button class="pkp" type="button" data-o="'+i+'">'+esc(it.eq[i][1])+'</button>'}).join("")+'</div>';
-    if(!q.res)body+='<div class="nextbar"><button class="btn" id="pkCheck" type="button"'+(q.line.length<it.eq.length?" disabled":"")+'>Periksa</button><button class="btn ghost" id="pkReset" type="button">Ulang susun</button></div>';
+    q.line=q.line||[];if(!q.pool||q.pid!==it.id){q.pid=it.id;q.line=[];q.parts=pkChunks(it.eq,pkMax(it.id));var o=q.parts.map(function(_,i){return i}),s=o;for(var k=0;k<8&&s.join()===o.join();k++)s=chShuf(o);q.pool=s;q.res=null}
+    var used={},P=q.parts;q.line.forEach(function(i){used[i]=1});
+    body='<p style="margin:0 0 4px">Susun potongan berikut menjadi satu kalimat yang benar.</p><p class="small" style="margin:0 0 8px">'+P.length+' potongan'+(P.length<it.eq.length?'. Potongan akan dipecah lebih halus setelah Anda menguasai kalimat ini.':'.')+'</p>'
+     +'<div class="pkline" id="pkLine" aria-label="Kalimat Anda">'+(q.line.length?q.line.map(function(i){return '<button class="pkp on" type="button" data-pk-back="'+i+'"'+(q.res?" disabled":"")+'>'+esc(P[i].t)+'</button>'}).join(""):'<span class="small">Ketuk potongan di bawah sesuai urutan.</span>')+'</div>'
+     +'<div class="pkpool" id="pkPool">'+q.pool.filter(function(i){return !used[i]}).map(function(i){return '<button class="pkp" type="button" data-o="'+i+'">'+esc(P[i].t)+'</button>'}).join("")+'</div>';
+    if(!q.res)body+='<div class="nextbar"><button class="btn" id="pkCheck" type="button"'+(q.line.length<P.length?" disabled":"")+'>Periksa</button><button class="btn ghost" id="pkReset" type="button">Ulang susun</button></div>';
     else body+='<div class="pkres '+(q.res==="ok"?"ok":"no")+'">'+(q.res==="ok"?icoOk()+'<b>Benar.</b>':icoNo()+'<b>Belum tepat.</b>')+'</div>'+(q.res==="ok"?'':'<p class="pkright">Urutan yang benar: <b>'+esc(it.en)+'</b></p>')+pkInfo(it)+pkEx(it,false)
       +'<div class="nextbar"><button class="btn" id="pkNext" type="button">Butir berikutnya</button></div>';
   }else if(j==="naik"){
@@ -4931,7 +4942,7 @@ function pkBind(){
   document.querySelectorAll("[data-pk-back]").forEach(function(b){b.onclick=function(){var i=+b.dataset.pkBack;q.line=q.line.filter(function(x){return x!==i});render()}});
   if($("pkReset"))$("pkReset").onclick=function(){q.line=[];render()};
   if($("pkCheck"))$("pkCheck").onclick=function(){
-    var got=q.line.map(function(i){return it.eq[i][1]}).join(" "),want=it.eq.map(function(c){return c[1]}).join(" "),ok=got===want;
+    var got=q.line.map(function(i){return q.parts[i].t}).join(" "),want=q.parts.map(function(c){return c.t}).join(" "),ok=got===want;
     q.res=ok?"ok":"no";pkRate(it.id,ok);if(!ok)q.q.push(it.id);render()};
   document.querySelectorAll("[data-pkf]").forEach(function(b){b.onclick=function(){if(q.pick!==null)return;q.pick=+b.dataset.pkf;var ok=q.pick===it.a;pkRate(it.id,ok);if(!ok)q.q.push(it.id);render()}});
   if($("pkNext"))$("pkNext").onclick=function(){q.i++;q.pool=null;q.perm=null;q.res=null;q.pick=null;render();window.scrollTo(0,0)};
