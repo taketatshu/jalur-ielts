@@ -562,6 +562,7 @@ input.lsin.ok{border-color:var(--good)}input.lsin.no{border-color:var(--bad);tex
 .pkp:not(:disabled){touch-action:none;user-select:none;-webkit-user-select:none}
 .pkghost{position:fixed;z-index:50;margin:0;opacity:.92;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.35);border-color:var(--accent)}
 .pkdrag{opacity:.35}
+.pkp.pkph{border-style:dashed;border-color:var(--accent);background:transparent;color:transparent;box-shadow:none}
 .pkp:disabled{cursor:default;opacity:1}
 .pkres{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px;font-size:16px}
 .pkres svg{width:22px;height:22px;flex:none}
@@ -4880,16 +4881,34 @@ function pkMove(e){var d=pkDrag;if(!d)return;
   if(!d.g){if(Math.abs(e.clientX-d.x0)+Math.abs(e.clientY-d.y0)<6)return;
     var r=d.b.getBoundingClientRect();d.ox=d.x0-r.left;d.oy=d.y0-r.top;d.g=d.b.cloneNode(true);d.g.className="pkp pkghost";d.g.removeAttribute("data-o");d.g.removeAttribute("data-pk-back");
     d.g.style.width=r.width+"px";document.body.appendChild(d.g);d.b.classList.add("pkdrag")}
-  if(e.cancelable)e.preventDefault();d.g.style.left=(e.clientX-d.ox)+"px";d.g.style.top=(e.clientY-d.oy)+"px"}
+  if(e.cancelable)e.preventDefault();d.g.style.left=(e.clientX-d.ox)+"px";d.g.style.top=(e.clientY-d.oy)+"px";pkPreview(d,e.clientX,e.clientY)}
+/* animasi FLIP: catat posisi, ubah DOM, lalu geser halus dari posisi lama ke posisi baru */
+function pkFlip(box,fn){var els=[].slice.call(box.querySelectorAll(".pkp")),old=els.map(function(el){return el.getBoundingClientRect()});fn();
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  els.forEach(function(el,k){if(!el.isConnected||el.classList.contains("pkph"))return;var n=el.getBoundingClientRect(),dx=old[k].left-n.left,dy=old[k].top-n.top;if(!dx&&!dy)return;
+    el.style.transition="none";el.style.transform="translate("+dx+"px,"+dy+"px)";el.getBoundingClientRect();el.style.transition="transform .15s ease";el.style.transform=""})}
+/* tempat kosong di baris jawaban mengikuti posisi jari/mouse selama menyeret */
+function pkPreview(d,x,y){var line=document.getElementById("pkLine");if(!line)return;
+  if(!d.ph){if(d.from==="line"){d.ph=d.b;d.b.classList.remove("pkdrag")}else{d.ph=document.createElement("span");d.ph.className="pkp";d.ph.textContent=d.b.textContent}d.ph.classList.add("pkph");
+    line.style.minHeight=line.offsetHeight+"px"} /* tinggi baris dikunci selama menyeret supaya area lepas tidak menyusut */
+  var inside=pkIn(line,x,y),here=d.ph.parentNode===line&&d.ph.style.display!=="none";
+  if(!inside){if(here)pkFlip(line,function(){if(d.from==="line")d.ph.style.display="none";else line.removeChild(d.ph)});return}
+  var kids=[].slice.call(line.querySelectorAll("[data-pk-back]")).filter(function(k){return k!==d.ph}),idx=kids.length;
+  for(var k=0;k<kids.length;k++){var r=kids[k].getBoundingClientRect();if(y<r.top||(y<=r.bottom&&x<r.left+r.width/2)){idx=k;break}}
+  var ref=kids[idx]||null;if(here&&d.ph.nextElementSibling===ref&&(ref||!d.ph.nextElementSibling))return;
+  pkFlip(line,function(){var hint=line.querySelector(":scope > span.small");if(hint)hint.style.display="none";d.ph.style.display="";if(ref)line.insertBefore(d.ph,ref);else line.appendChild(d.ph)})}
 function pkIn(el,x,y){if(!el)return false;var r=el.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom}
 function pkUp(e){var d=pkDrag;pkDrag=null;if(!d||!d.g)return;
   if(d.g.parentNode)d.g.parentNode.removeChild(d.g);d.b.classList.remove("pkdrag");
   pkSkip=true;clearTimeout(pkSkipT);pkSkipT=setTimeout(function(){pkSkip=false},400); /* browser mengirim satu klik setelah geser */
   var x=e.clientX,y=e.clientY,line=document.getElementById("pkLine"),area=pkIn(line,x,y)?"line":pkIn(document.getElementById("pkPool"),x,y)?"pool":null,idx=0;
-  if(area==="line"){var kids=[].slice.call(line.querySelectorAll("[data-pk-back]")).filter(function(k){return k!==d.b});idx=kids.length;
-    for(var k=0;k<kids.length;k++){var r=kids[k].getBoundingClientRect();if(y<r.top||(y<=r.bottom&&x<r.left+r.width/2)){idx=k;break}}}
+  if(area==="line"){
+    if(d.ph&&d.ph.parentNode===line&&d.ph.style.display!=="none"){ /* posisi dari tempat kosong yang sudah tampil */
+      idx=[].slice.call(line.children).filter(function(el){return el===d.ph||(el!==d.b&&el.hasAttribute("data-pk-back"))}).indexOf(d.ph)}
+    else{var kids=[].slice.call(line.querySelectorAll("[data-pk-back]")).filter(function(k){return k!==d.b});idx=kids.length;
+      for(var k=0;k<kids.length;k++){var r=kids[k].getBoundingClientRect();if(y<r.top||(y<=r.bottom&&x<r.left+r.width/2)){idx=k;break}}}}
   pkDrop(d.i,d.from,area,idx)}
-function pkCancel(){var d=pkDrag;pkDrag=null;if(d&&d.g){if(d.g.parentNode)d.g.parentNode.removeChild(d.g);d.b.classList.remove("pkdrag")}}
+function pkCancel(){var d=pkDrag;pkDrag=null;if(d&&d.g){if(d.g.parentNode)d.g.parentNode.removeChild(d.g);render()}}
 /* area "line": sisipkan di posisi idx; "pool" atau dilepas di luar: potongan dari baris kembali ke kumpulan, dari kumpulan tetap di kumpulan */
 function pkDrop(i,from,area,idx){var q=state.pkq;if(!q||q.res)return;var L=q.line.filter(function(x){return x!==i});
   if(area==="line")L.splice(Math.min(idx,L.length),0,i);q.line=L;render()}
